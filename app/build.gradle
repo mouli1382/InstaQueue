@@ -1,0 +1,83 @@
+apply plugin: 'com.android.application'
+apply from: "../artifacts.gradle"
+
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+    defaultConfig {
+        applicationId "in.gm.instaqueue"
+        minSdkVersion 14
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+        debug {
+            keyAlias keystoreProperties['debugkeyAlias']
+            keyPassword keystoreProperties['debugkeyPassword']
+            storeFile file(keystoreProperties['debugstoreFile'])
+            storePassword keystoreProperties['debugstorePassword']
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
+    productFlavors {
+        store {
+            applicationId "in.gm.instaqueue.store"
+            minSdkVersion 14
+            targetSdkVersion 23
+            versionCode 1
+            versionName "1.0"
+        }
+
+        client {
+            applicationId "in.gm.instaqueue.client"
+            minSdkVersion 14
+            targetSdkVersion 23
+            versionCode 1
+            versionName "1.0"
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+    compile 'com.github.bumptech.glide:glide:3.6.1'
+    compile 'de.hdodenhof:circleimageview:1.3.0'
+    compile 'com.android.support:design:23.4.0'
+
+    //Firebase
+    compile 'com.google.firebase:firebase-database:9.4.0'
+
+    // Firebase UI
+    compile 'com.firebaseui:firebase-ui-database:0.4.0'
+
+    testCompile 'junit:junit:4.12'
+}
+
+apply plugin: 'com.google.gms.google-services'

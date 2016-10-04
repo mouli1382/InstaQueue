@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">IQStore</string>
+    <string name="invalid_phone_number">It is not a valid Phone Number. Kindly input a valid one.</string>
+</resources>
