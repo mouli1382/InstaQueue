@@ -52,7 +52,7 @@ public class LandingActivity extends BaseActivity {
         Query query = mFirebaseDatabaseReference
                 .child(FirebaseManager.TOKENS_CHILD)
                 .orderByChild("phoneNumber")
-                .equalTo("8886408089");
+                .equalTo("9177901022");
         mFirebaseAdapter = new FirebaseRecyclerAdapter<Token,
                 TokenRecyclerViewHolder>(
                 Token.class,
@@ -64,6 +64,7 @@ public class LandingActivity extends BaseActivity {
             protected void populateViewHolder(TokenRecyclerViewHolder viewHolder, Token token, int position) {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
                 viewHolder.tokenTextView.setText(token.getTokenNumber() + "");
+                viewHolder.tokenStoreNameView.setText(token.getStoreId());
 //                if (token.getPhotoUrl() == null) {
 //                    viewHolder.messengerImageView
 //                            .setImageDrawable(ContextCompat
