@@ -6,6 +6,8 @@ import android.view.View;
 
 public class BaseActivity extends AppCompatActivity {
 
+    protected String mPhoneNumber;
+
 //    private ProgressDialog mProgressDialog;
 //
 //    public void showProgressDialog() {

@@ -1,4 +1,4 @@
-package in.gm.instaqueue.activity.model;
+package in.gm.instaqueue.model;
 
 public class Store {
 

@@ -12,6 +12,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -36,11 +38,18 @@ public class LandingActivity extends BaseActivity {
             mFirebaseAdapter;
 
     private static long tokenNumber = 0;
+    private FirebaseUser mFirebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
+
+        mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if(mFirebaseUser == null) {
+            finish();
+            return;
+        }
 
         // Initialize ProgressBar and RecyclerView.
         mMainView = findViewById(R.id.mainView);
@@ -63,14 +72,14 @@ public class LandingActivity extends BaseActivity {
             protected void populateViewHolder(TokenRecyclerViewHolder viewHolder, Token token, int position) {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
                 viewHolder.tokenTextView.setText(token.getTokenNumber() + "");
-//                if (token.getPhotoUrl() == null) {
+//                if (token.getEmail() == null) {
 //                    viewHolder.messengerImageView
 //                            .setImageDrawable(ContextCompat
 //                                    .getDrawable(MainActivity.this,
 //                                            R.drawable.ic_account_circle_black_36dp));
 //                } else {
 //                    Glide.with(MainActivity.this)
-//                            .load(token.getPhotoUrl())
+//                            .load(token.getEmail())
 //                            .into(viewHolder.messengerImageView);
 //                }
             }
@@ -122,9 +131,10 @@ public class LandingActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 CharSequence phone = mPhoneNumberEditText.getText();
+                //ToDo Remove the country code hardcoding later.
                 if (Patterns.PHONE.matcher(phone).matches()) {
-                    Token token = new Token(1234 + "",
-                            phone.toString(),
+                    Token token = new Token(mFirebaseUser.getUid() ,
+                            "+91" + phone.toString(),
                             ++tokenNumber,
                             TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "");
                     mFirebaseDatabaseReference.child(FirebaseManager.TOKENS_CHILD)

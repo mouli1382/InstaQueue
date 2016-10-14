@@ -12,9 +12,14 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.concurrent.TimeUnit;
 
@@ -47,12 +52,18 @@ public class LandingActivity extends BaseActivity {
         mLinearLayoutManager.setStackFromEnd(true);
         mTokenRecyclerView.setLayoutManager(mLinearLayoutManager);
 
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if(firebaseUser == null) {
+            finish();
+            return;
+        }
+
         // New child entries
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         Query query = mFirebaseDatabaseReference
-                .child(FirebaseManager.TOKENS_CHILD)
-                .orderByChild("phoneNumber")
-                .equalTo("9177901022");
+                .child(FirebaseManager.TOKENS_CHILD);
+//                .orderByChild("phoneNumber")
+//                .equalTo(mPhoneNumber);
         mFirebaseAdapter = new FirebaseRecyclerAdapter<Token,
                 TokenRecyclerViewHolder>(
                 Token.class,
@@ -65,14 +76,14 @@ public class LandingActivity extends BaseActivity {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
                 viewHolder.tokenTextView.setText(token.getTokenNumber() + "");
                 viewHolder.tokenStoreNameView.setText(token.getStoreId());
-//                if (token.getPhotoUrl() == null) {
+//                if (token.getEmail() == null) {
 //                    viewHolder.messengerImageView
 //                            .setImageDrawable(ContextCompat
 //                                    .getDrawable(MainActivity.this,
 //                                            R.drawable.ic_account_circle_black_36dp));
 //                } else {
 //                    Glide.with(MainActivity.this)
-//                            .load(token.getPhotoUrl())
+//                            .load(token.getEmail())
 //                            .into(viewHolder.messengerImageView);
 //                }
             }
