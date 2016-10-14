@@ -1,71 +1,66 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/token"
-    tools:alpha="10"
-    card_view:layout_collapseParallaxMultiplier="0.0">
-    <!-- A CardView that contains a TextView -->
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="?android:attr/selectableItemBackground"
+    tools:alpha="10">
+
     <android.support.v7.widget.CardView
         android:id="@+id/card_view"
-    android:layout_gravity="center"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    card_view:cardCornerRadius="4dp"
-        card_view:cardElevation="2dp"
-        card_view:cardBackgroundColor="@android:color/transparent"
-        card_view:contentPadding="0dp"
-        android:background="@drawable/token">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        card_view:cardElevation="16dp">
 
-
-        <LinearLayout
-            android:orientation="vertical"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/token">
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="372dp"
-            android:layout_height="match_parent"
-            android:layout_margin="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp">
+            android:layout_margin="10dp">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/storeImageView"
                 android:layout_width="51dp"
                 android:layout_height="85dp"
-                android:src="@drawable/ic_account_circle_black_36dp"
-                android:adjustViewBounds="false" />
+                android:adjustViewBounds="false"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/ic_account_circle_black_36dp" />
 
-            <TextView
-                android:id="@+id/tokenTextView"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                tools:text="57"
-                android:typeface="monospace"
-                android:textColor="?android:attr/textColorPrimaryDisableOnly"
-                android:textStyle="normal|bold"
-                android:layout_width="match_parent" />
-        </LinearLayout>
-
-            <TextView
-                android:id="@+id/tokenStoreName"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_margin="5dp"
+                android:layout_toRightOf="@id/storeImageView"
                 android:gravity="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                tools:text="Store Name"
-                android:typeface="monospace"
-                android:textColor="?android:attr/textColorPrimaryDisableOnly"
-                android:textStyle="normal|bold"
-                android:textSize="12sp" />
-        </LinearLayout>
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tokenStoreName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                    android:textColor="?android:attr/textColorPrimaryDisableOnly"
+                    android:textSize="12sp"
+                    android:textStyle="normal|bold"
+                    android:typeface="monospace"
+                    tools:text="786976136416768000-786976136416768000"
+                    android:layout_marginBottom="5dp"/>
+
+                <TextView
+                    android:id="@+id/tokenTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                    android:textColor="?android:attr/textColorPrimaryDisableOnly"
+                    android:textStyle="normal|bold"
+                    android:typeface="monospace"
+                    tools:text="57" />
+            </LinearLayout>
+        </RelativeLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>

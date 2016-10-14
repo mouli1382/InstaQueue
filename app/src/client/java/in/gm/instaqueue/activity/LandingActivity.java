@@ -52,6 +52,10 @@ public class LandingActivity extends BaseActivity {
         mLinearLayoutManager.setStackFromEnd(true);
         mTokenRecyclerView.setLayoutManager(mLinearLayoutManager);
 
+        mTokenRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
+                getApplicationContext()
+        ));
+
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         if(firebaseUser == null) {
             finish();
