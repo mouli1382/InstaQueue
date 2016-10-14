@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">InstaQueue</string>
+    <string name="invalid_phone_number">Kindly enter a valid phone number.</string>
 </resources>
