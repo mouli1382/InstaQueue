@@ -34,6 +34,7 @@ import in.gm.instaqueue.BuildConfig;
 import in.gm.instaqueue.R;
 import in.gm.instaqueue.backend.myApi.MyApi;
 import in.gm.instaqueue.model.User;
+import in.gm.instaqueue.prefs.SharedPrefs;
 import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends BaseActivity {
@@ -76,7 +77,6 @@ public class MainActivity extends BaseActivity {
                 if (user != null) {
                     // User is signed in
                     Log.e(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-
                     startActivity(new Intent(MainActivity.this, LandingActivity.class));
                 } else {
                     // User is signed out
@@ -123,8 +123,10 @@ public class MainActivity extends BaseActivity {
                         Log.d(TAG, "signInWithCustomToken:onComplete:" + task.isSuccessful());
                         if(task.isSuccessful()) {
                             FirebaseUser user = mAuth.getCurrentUser();
-                            if(user != null)
+                            if(user != null) {
+                                SharedPrefs.getInstance(getApplicationContext()).putString(SharedPrefs.PHONE_NUMBER_KEY, mPhoneNumber);
                                 writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail(), mPhoneNumber);
+                            }
                         }
 
                         // If sign in fails, display a message to the user. If sign in succeeds
