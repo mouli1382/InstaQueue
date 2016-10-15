@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">InstaQueue</string>
     <string name="invalid_phone_number">Kindly enter a valid phone number.</string>
+    <string name="token_incremented">Your token is incremented.</string>
+    <string name="token_could_not_be_incremented">Your token could not incremented.</string>
+    <string name="first_token">You are first in the queue.</string>
+    <string name="fetch_token_text">Fetching token....</string>
+    <string name="no_connectivity">Network error...</string>
 </resources>

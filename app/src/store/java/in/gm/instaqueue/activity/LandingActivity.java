@@ -1,5 +1,9 @@
 package in.gm.instaqueue.activity;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,8 +18,14 @@ import android.widget.ProgressBar;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.concurrent.TimeUnit;
 
@@ -32,13 +42,14 @@ public class LandingActivity extends BaseActivity {
     private ProgressBar mProgressBar;
     private EditText mPhoneNumberEditText;
     private View mMainView;
+    private long mLastToken;
 
     private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseRecyclerAdapter<Token, TokenRecyclerViewHolder>
             mFirebaseAdapter;
 
-    private static long tokenNumber = 0;
     private FirebaseUser mFirebaseUser;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +69,28 @@ public class LandingActivity extends BaseActivity {
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setStackFromEnd(true);
         mTokenRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setMessage("Fetching token....");
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 
         // New child entries
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+
+        //This code is for query: for future use serves as a sample
+        /*Query qu = mFirebaseDatabaseReference.child(FirebaseManager.TOKENS_CHILD).orderByChild("tokenNumber").limitToLast(1);
+
+        qu.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists())
+                    mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });*/
         mFirebaseAdapter = new FirebaseRecyclerAdapter<Token,
                 TokenRecyclerViewHolder>(
                 Token.class,
@@ -130,19 +160,77 @@ public class LandingActivity extends BaseActivity {
         mGenerateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CharSequence phone = mPhoneNumberEditText.getText();
-                //ToDo Remove the country code hardcoding later.
-                if (Patterns.PHONE.matcher(phone).matches()) {
-                    Token token = new Token(mFirebaseUser.getUid() ,
-                            "+91" + phone.toString(),
-                            ++tokenNumber,
-                            TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "");
-                    mFirebaseDatabaseReference.child(FirebaseManager.TOKENS_CHILD)
-                            .push().setValue(token);
-                    mPhoneNumberEditText.setText("");
-                } else {
-                    showMessage(mMainView, R.string.invalid_phone_number);
+
+                ConnectivityManager cm =
+                        (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                boolean isConnected = activeNetwork != null &&
+                        activeNetwork.isConnectedOrConnecting();
+
+
+                if (!isConnected) {
+                    showMessage(mMainView, R.string.no_connectivity);
+                    return;
                 }
+                CharSequence phone = mPhoneNumberEditText.getText();
+
+                if (!Patterns.PHONE.matcher(phone).matches()) {
+                    showMessage(mMainView, R.string.invalid_phone_number);
+                    return;
+                }
+
+
+                mProgressDialog.setIndeterminate(true);
+                mProgressDialog.show();
+                DatabaseReference tokenCounterRef = mFirebaseDatabaseReference.child("tokenCounter");
+                tokenCounterRef.runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        Long currentValue = mutableData.getValue(Long.class);
+                        if (currentValue == null) {
+                            mutableData.setValue(1);
+                        } else {
+                            mutableData.setValue(currentValue + 1);
+                        }
+
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+                        System.out.println("Transaction completed");
+                        if (databaseError == null) {
+                            if (committed) {
+                                mProgressDialog.hide();
+                                showMessage(mMainView, R.string.token_incremented);
+                                //ToDo Remove the country code hardcoding later.
+                                Long currentToken = (Long) dataSnapshot.getValue();
+                                {
+                                    Token token = new Token(mFirebaseUser.getUid(),
+                                            "+91" + mPhoneNumberEditText.getText(),
+                                            currentToken,
+                                            TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "");
+                                    mFirebaseDatabaseReference.child(FirebaseManager.TOKENS_CHILD)
+                                            .push().setValue(token);
+                                    mPhoneNumberEditText.setText("");
+                                }
+                            }
+                            else{
+                                showMessage(mMainView, R.string.token_could_not_be_incremented);
+                                mProgressDialog.hide();
+                            }
+                        }
+                        else
+                        {
+                            mProgressDialog.hide();
+                            showMessage(mMainView, R.string.no_connectivity);
+                        }
+
+                    }
+                });
+
+
             }
         });
 
