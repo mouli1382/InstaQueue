@@ -11,12 +11,14 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +37,12 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
 
 import in.gm.instaqueue.R;
@@ -60,6 +68,7 @@ public class LandingFragment extends BaseFragment {
 
     private FirebaseUser mFirebaseUser;
     private ProgressDialog mProgressDialog;
+    private final static String mMsg91Url = "https://control.msg91.com/api/sendhttp.php?";
 
     public static LandingFragment createInstance() {
         LandingFragment fragment = new LandingFragment();
@@ -251,8 +260,67 @@ public class LandingFragment extends BaseFragment {
                                     mFirebaseDatabaseReference.child(FirebaseManager.TOKENS_CHILD)
                                             .push().setValue(token);
                                     mPhoneNumberEditText.setText("");
+                                    {
+                                        //Android SMS API integration code
+
+                                        //Your authentication key
+                                        String authkey = "128441AGQNt0b0eb2q580367e2";
+                                        //Multiple mobiles numbers separated by comma
+                                        String mobiles = token.getPhoneNumber();
+                                        //Sender ID,While using route4 sender id should be 6 characters long.
+                                        String senderId = "InstaQ";
+                                        //Your message to send, Add URL encoding here.
+                                        String message = "Your token number = " + currentToken;
+                                        //define route
+                                        String route = "4"; //4 For transaction, check with msg91
+
+                                        URLConnection myURLConnection = null;
+                                        URL myURL = null;
+                                        BufferedReader reader = null;
+
+                                        //encoding message
+                                        String encoded_message = URLEncoder.encode(message);
+
+                                        //Send SMS API
+                                        String mainUrl = mMsg91Url;
+
+                                        //Prepare parameter string
+                                        StringBuilder sbPostData = new StringBuilder(mainUrl);
+                                        sbPostData.append("authkey=" + authkey);
+                                        sbPostData.append("&mobiles=" + mobiles);
+                                        sbPostData.append("&message=" + encoded_message);
+                                        sbPostData.append("&route=" + route);
+                                        sbPostData.append("&sender=" + senderId);
+
+                                        //final string
+                                        mainUrl = sbPostData.toString();
+                                        class SendSMSTask extends AsyncTask<String, Integer, Long> {
+                                            protected Long doInBackground(String... urls) {
+                                                try {
+                                                    //prepare connection
+                                                    URL myURL = new URL(urls[0]);
+                                                    URLConnection myURLConnection = myURL.openConnection();
+                                                    myURLConnection.connect();
+                                                    BufferedReader reader = new BufferedReader(new InputStreamReader(myURLConnection.getInputStream()));
+
+                                                    //reading response
+                                                    String response;
+                                                    while ((response = reader.readLine()) != null)
+                                                        //print response
+                                                        Log.d("RESPONSE", "" + response);
+
+                                                    //finally close connection
+                                                    reader.close();
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                return 0L;
+                                            }
+                                        }
+                                        new SendSMSTask().execute(mainUrl);
+                                    }
                                 }
-                            } else {
+                            }else {
                                 showMessage(mMainView, R.string.token_could_not_be_incremented);
                                 mProgressDialog.hide();
                             }
