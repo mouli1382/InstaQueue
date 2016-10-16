@@ -1,5 +1,7 @@
 package in.gm.instaqueue.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +33,12 @@ public class LandingActivity extends BaseActivity {
 
     private static long tokenNumber = 0;
 
+    public static void start(Context caller) {
+        Intent intent = new Intent(caller, LandingActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        caller.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,16 +61,14 @@ public class LandingActivity extends BaseActivity {
             return;
         }
 
-        if(TextUtils.isEmpty(mPhoneNumber)) {
-            mPhoneNumber = SharedPrefs.getInstance(getApplicationContext()).getSting(SharedPrefs.PHONE_NUMBER_KEY);
-        }
+        String phoneNumber = getUserPhoneNumber();
 
         // New child entries
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         Query query = mFirebaseDatabaseReference
                 .child(FirebaseManager.TOKENS_CHILD)
                 .orderByChild("phoneNumber")
-                .equalTo(mPhoneNumber);
+                .equalTo(phoneNumber);
         mFirebaseAdapter = new FirebaseRecyclerAdapter<Token,
                 TokenRecyclerViewHolder>(
                 Token.class,
@@ -78,10 +84,10 @@ public class LandingActivity extends BaseActivity {
 //                if (token.getEmail() == null) {
 //                    viewHolder.messengerImageView
 //                            .setImageDrawable(ContextCompat
-//                                    .getDrawable(MainActivity.this,
+//                                    .getDrawable(OnBoardingActivity.this,
 //                                            R.drawable.ic_account_circle_black_36dp));
 //                } else {
-//                    Glide.with(MainActivity.this)
+//                    Glide.with(OnBoardingActivity.this)
 //                            .load(token.getEmail())
 //                            .into(viewHolder.messengerImageView);
 //                }

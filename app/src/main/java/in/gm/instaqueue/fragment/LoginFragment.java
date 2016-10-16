@@ -1,12 +1,16 @@
-package in.gm.instaqueue.activity;
+package in.gm.instaqueue.fragment;
+
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.digits.sdk.android.AuthCallback;
@@ -23,8 +27,6 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 
@@ -32,78 +34,55 @@ import java.io.IOException;
 
 import in.gm.instaqueue.BuildConfig;
 import in.gm.instaqueue.R;
+import in.gm.instaqueue.activity.LandingActivity;
+import in.gm.instaqueue.activity.OnBoardingActivity;
 import in.gm.instaqueue.backend.myApi.MyApi;
 import in.gm.instaqueue.model.User;
 import in.gm.instaqueue.prefs.SharedPrefs;
 import io.fabric.sdk.android.Fabric;
 
-public class MainActivity extends BaseActivity {
+public class LoginFragment extends Fragment {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "LoginFragment";
+    public static final String LOGIN_FRAGMENT_TAG = LoginFragment.class.getName();
+    private String mPhoneNumber;
 
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-    private DatabaseReference mDatabase;
+    public LoginFragment() {
+        // Required empty public constructor
+    }
 
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
+    public static LoginFragment createInstance() {
+        LoginFragment fragment = new LoginFragment();
+        return fragment;
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
         TwitterAuthConfig authConfig = new TwitterAuthConfig(BuildConfig.TWITTER_KEY, BuildConfig.TWITTER_SECRET);
-        Fabric.with(this, new TwitterCore(authConfig), new Digits.Builder().build());
+        Fabric.with(context, new TwitterCore(authConfig), new Digits.Builder().build());
+    }
 
-        setContentView(R.layout.activity_main);
-
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.e(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    startActivity(new Intent(MainActivity.this, LandingActivity.class));
-                } else {
-                    // User is signed out
-                    Log.e(TAG, "onAuthStateChanged:signed_out");
-                }
-            }
-        };
-
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-
-
-        DigitsAuthButton digitsButton = (DigitsAuthButton) findViewById(R.id.auth_button);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_login, container, false);
+        DigitsAuthButton digitsButton = (DigitsAuthButton) root.findViewById(R.id.auth_button);
         digitsButton.setCallback(new AuthCallback() {
             @Override
             public void success(DigitsSession session, String phoneNumber) {
-                // TODO: associate the session userID with your user model
-                Toast.makeText(getApplicationContext(), "Authentication successful for "
+                Toast.makeText(getActivity(), "Authentication successful for "
                         + phoneNumber, Toast.LENGTH_LONG).show();
 
                 mPhoneNumber = session.getPhoneNumber();
 
-                Log.e(TAG, "phone number = " + mPhoneNumber);
-                Log.e(TAG, "email = " + session.getEmail().toString());
-                Log.e(TAG, "token = " + session.getAuthToken().token + " secret = " + session.getAuthToken().secret);
+                //ToDo remove these.
+                Log.i(TAG, "phone number = " + mPhoneNumber);
+                Log.i(TAG, "email = " + session.getEmail().toString());
+                Log.i(TAG, "token = " + session.getAuthToken().token + " secret = " + session.getAuthToken().secret);
 
-
-                new EndpointsAsyncTask().execute(new Pair<Context, DigitsSession>(MainActivity.this, session));
+                new EndpointsAsyncTask().execute(new Pair<Context, DigitsSession>(getActivity(), session));
             }
 
             @Override
@@ -111,46 +90,53 @@ public class MainActivity extends BaseActivity {
                 Log.d("Digits", "Sign in with Digits failure", exception);
             }
         });
+
+        return root;
     }
 
     private void startSignIn(String customeToken) {
         // Initiate sign in with custom token
-        // [START sign_in_custom]
-        mAuth.signInWithCustomToken(customeToken)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithCustomToken:onComplete:" + task.isSuccessful());
-                        if(task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            if(user != null) {
-                                SharedPrefs.getInstance(getApplicationContext()).putString(SharedPrefs.PHONE_NUMBER_KEY, mPhoneNumber);
-                                writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail(), mPhoneNumber);
+        final OnBoardingActivity activity = (OnBoardingActivity) getActivity();
+        final FirebaseAuth firebaseAuth = activity.getAuthInstance();
+        final SharedPrefs sharedPrefs = activity.getSharedPrefs();
+        if (firebaseAuth != null) {
+            firebaseAuth.signInWithCustomToken(customeToken)
+                    .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            Log.d(TAG, "signInWithCustomToken:onComplete:" + task.isSuccessful());
+                            if (task.isSuccessful()) {
+                                FirebaseUser user = task.getResult().getUser();
+                                if (user != null) {
+                                    sharedPrefs.putString(SharedPrefs.PHONE_NUMBER_KEY, mPhoneNumber);
+                                    writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail(), mPhoneNumber);
+
+                                    //Launch the landing scree.
+                                    LandingActivity.start(getActivity());
+                                    getActivity().finish();
+                                }
+                            }
+
+                            // If sign in fails, display a message to the user. If sign in succeeds
+                            // the auth state listener will be notified and logic to handle the
+                            // signed in user can be handled in the listener.
+                            if (!task.isSuccessful()) {
+                                Log.w(TAG, "signInWithCustomToken", task.getException());
+                                Toast.makeText(getActivity(), "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();
                             }
                         }
-
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithCustomToken", task.getException());
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-        // [END sign_in_custom]
+                    });
+        }
     }
 
     private void writeNewUser(String userId, String name, String email, String phoneNumber) {
         User user = new User(name, email, phoneNumber);
-
-        mDatabase.child("users").child(userId).setValue(user);
+        ((OnBoardingActivity) getActivity()).getDatabaseReference().child("users").child(userId).setValue(user);
     }
 
     class EndpointsAsyncTask extends AsyncTask<Pair<Context, DigitsSession>, Void, String> {
         private MyApi myApiService = null;
-        private Context context;
 
         @Override
         protected String doInBackground(Pair<Context, DigitsSession>... params) {
@@ -172,8 +158,6 @@ public class MainActivity extends BaseActivity {
 
                 myApiService = builder.build();
             }
-
-            context = params[0].first;
             DigitsSession digitsSession = params[0].second;
 
             try {
@@ -185,11 +169,9 @@ public class MainActivity extends BaseActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            Log.e(EndpointsAsyncTask.class.getSimpleName(), "Firebase JWT = " + result);
+            Log.i(EndpointsAsyncTask.class.getSimpleName(), "Firebase JWT = " + result);
             startSignIn(result);
         }
     }
+
 }
-
-
-

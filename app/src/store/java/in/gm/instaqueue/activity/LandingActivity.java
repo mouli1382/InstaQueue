@@ -2,6 +2,7 @@ package in.gm.instaqueue.activity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -51,13 +52,20 @@ public class LandingActivity extends BaseActivity {
     private FirebaseUser mFirebaseUser;
     private ProgressDialog mProgressDialog;
 
+    public static void start(Context caller) {
+        Intent intent = new Intent(caller, LandingActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        caller.startActivity(intent);
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
 
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        if(mFirebaseUser == null) {
+        if (mFirebaseUser == null) {
             finish();
             return;
         }
@@ -105,10 +113,10 @@ public class LandingActivity extends BaseActivity {
 //                if (token.getEmail() == null) {
 //                    viewHolder.messengerImageView
 //                            .setImageDrawable(ContextCompat
-//                                    .getDrawable(MainActivity.this,
+//                                    .getDrawable(OnBoardingActivity.this,
 //                                            R.drawable.ic_account_circle_black_36dp));
 //                } else {
-//                    Glide.with(MainActivity.this)
+//                    Glide.with(OnBoardingActivity.this)
 //                            .load(token.getEmail())
 //                            .into(viewHolder.messengerImageView);
 //                }
@@ -162,7 +170,7 @@ public class LandingActivity extends BaseActivity {
             public void onClick(View view) {
 
                 ConnectivityManager cm =
-                        (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                        (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
                 NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
                 boolean isConnected = activeNetwork != null &&
@@ -215,14 +223,11 @@ public class LandingActivity extends BaseActivity {
                                             .push().setValue(token);
                                     mPhoneNumberEditText.setText("");
                                 }
-                            }
-                            else{
+                            } else {
                                 showMessage(mMainView, R.string.token_could_not_be_incremented);
                                 mProgressDialog.hide();
                             }
-                        }
-                        else
-                        {
+                        } else {
                             mProgressDialog.hide();
                             showMessage(mMainView, R.string.no_connectivity);
                         }
