@@ -34,6 +34,9 @@ import in.gm.instaqueue.R;
 import in.gm.instaqueue.adapter.TokenRecyclerViewHolder;
 import in.gm.instaqueue.firebase.FirebaseManager;
 import in.gm.instaqueue.model.Token;
+import in.gm.instaqueue.prefs.SharedPrefs;
+
+import static in.gm.instaqueue.prefs.SharedPrefs.PHONE_NUMBER_KEY;
 
 public class LandingActivity extends BaseActivity {
 
@@ -99,12 +102,16 @@ public class LandingActivity extends BaseActivity {
 
             }
         });*/
+        Query query = mFirebaseDatabaseReference
+                .child(FirebaseManager.TOKENS_CHILD)
+                .orderByChild("storeId")
+                .equalTo(mFirebaseUser.getUid());
         mFirebaseAdapter = new FirebaseRecyclerAdapter<Token,
                 TokenRecyclerViewHolder>(
                 Token.class,
                 R.layout.item_token,
                 TokenRecyclerViewHolder.class,
-                mFirebaseDatabaseReference.child(FirebaseManager.TOKENS_CHILD)) {
+                query) {
 
             @Override
             protected void populateViewHolder(TokenRecyclerViewHolder viewHolder, Token token, int position) {
@@ -191,7 +198,14 @@ public class LandingActivity extends BaseActivity {
 
                 mProgressDialog.setIndeterminate(true);
                 mProgressDialog.show();
-                DatabaseReference tokenCounterRef = mFirebaseDatabaseReference.child("tokenCounter");
+                SharedPrefs sharedPref = SharedPrefs.getInstance(getApplicationContext());
+                String phoneNum = sharedPref.getSting(PHONE_NUMBER_KEY);
+                if (phoneNum.isEmpty())
+                {
+                    showMessage(mMainView, "Please authenticate again");
+                    return;
+                }
+                DatabaseReference tokenCounterRef = mFirebaseDatabaseReference.child("tokenCounter" + "/" + phoneNum);
                 tokenCounterRef.runTransaction(new Transaction.Handler() {
                     @Override
                     public Transaction.Result doTransaction(MutableData mutableData) {
