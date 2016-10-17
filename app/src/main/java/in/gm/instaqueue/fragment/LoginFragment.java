@@ -5,7 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,7 +41,7 @@ import in.gm.instaqueue.model.User;
 import in.gm.instaqueue.prefs.SharedPrefs;
 import io.fabric.sdk.android.Fabric;
 
-public class LoginFragment extends Fragment {
+public class LoginFragment extends BaseFragment {
 
     private static final String TAG = "LoginFragment";
     public static final String LOGIN_FRAGMENT_TAG = LoginFragment.class.getName();
@@ -97,8 +97,7 @@ public class LoginFragment extends Fragment {
     private void startSignIn(String customeToken) {
         // Initiate sign in with custom token
         final OnBoardingActivity activity = (OnBoardingActivity) getActivity();
-        final FirebaseAuth firebaseAuth = activity.getAuthInstance();
-        final SharedPrefs sharedPrefs = activity.getSharedPrefs();
+        final FirebaseAuth firebaseAuth = mFirebaseManager.getAuthInstance();
         if (firebaseAuth != null) {
             firebaseAuth.signInWithCustomToken(customeToken)
                     .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
@@ -108,7 +107,7 @@ public class LoginFragment extends Fragment {
                             if (task.isSuccessful()) {
                                 FirebaseUser user = task.getResult().getUser();
                                 if (user != null) {
-                                    sharedPrefs.putString(SharedPrefs.PHONE_NUMBER_KEY, mPhoneNumber);
+                                    mSharedPrefs.putString(SharedPrefs.PHONE_NUMBER_KEY, mPhoneNumber);
                                     writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail(), mPhoneNumber);
 
                                     //Launch the landing scree.

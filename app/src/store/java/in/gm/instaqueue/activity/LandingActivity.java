@@ -17,16 +17,13 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.concurrent.TimeUnit;
 
@@ -46,7 +43,6 @@ public class LandingActivity extends BaseActivity {
     private ProgressBar mProgressBar;
     private EditText mPhoneNumberEditText;
     private View mMainView;
-    private long mLastToken;
 
     private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseRecyclerAdapter<Token, TokenRecyclerViewHolder>
@@ -67,7 +63,7 @@ public class LandingActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
 
-        mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        mFirebaseUser = getCurrentUser();
         if (mFirebaseUser == null) {
             finish();
             return;
@@ -85,7 +81,7 @@ public class LandingActivity extends BaseActivity {
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 
         // New child entries
-        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mFirebaseDatabaseReference = getDatabaseReference();
 
         //This code is for query: for future use serves as a sample
         /*Query qu = mFirebaseDatabaseReference.child(FirebaseManager.TOKENS_CHILD).orderByChild("tokenNumber").limitToLast(1);
@@ -198,8 +194,7 @@ public class LandingActivity extends BaseActivity {
 
                 mProgressDialog.setIndeterminate(true);
                 mProgressDialog.show();
-                SharedPrefs sharedPref = SharedPrefs.getInstance(getApplicationContext());
-                String phoneNum = sharedPref.getSting(PHONE_NUMBER_KEY);
+                String phoneNum = mSharedPrefs.getSting(PHONE_NUMBER_KEY);
                 if (phoneNum.isEmpty())
                 {
                     showMessage(mMainView, "Please authenticate again");

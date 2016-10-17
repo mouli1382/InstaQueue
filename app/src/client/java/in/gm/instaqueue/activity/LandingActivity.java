@@ -31,8 +31,6 @@ public class LandingActivity extends BaseActivity {
     private FirebaseRecyclerAdapter<Token, TokenRecyclerViewHolder>
             mFirebaseAdapter;
 
-    private static long tokenNumber = 0;
-
     public static void start(Context caller) {
         Intent intent = new Intent(caller, LandingActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -55,7 +53,7 @@ public class LandingActivity extends BaseActivity {
 //                getApplicationContext()
 //        ));
 
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser firebaseUser = getCurrentUser();
         if(firebaseUser == null) {
             finish();
             return;
@@ -64,7 +62,7 @@ public class LandingActivity extends BaseActivity {
         String phoneNumber = getUserPhoneNumber();
 
         // New child entries
-        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mFirebaseDatabaseReference = getDatabaseReference();
         Query query = mFirebaseDatabaseReference
                 .child(FirebaseManager.TOKENS_CHILD)
                 .orderByChild("phoneNumber")
