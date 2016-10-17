@@ -251,7 +251,7 @@ public class LandingActivity extends BaseActivity {
                                         //Your message to send, Add URL encoding here.
                                         String message = "Your token number = " + currentToken;
                                         //define route
-                                        String route = "default";
+                                        String route = "4";
 
                                         URLConnection myURLConnection = null;
                                         URL myURL = null;
