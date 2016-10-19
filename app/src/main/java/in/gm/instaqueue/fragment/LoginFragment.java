@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +15,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.digits.sdk.android.AuthCallback;
+import com.digits.sdk.android.AuthConfig;
 import com.digits.sdk.android.Digits;
-import com.digits.sdk.android.DigitsAuthButton;
 import com.digits.sdk.android.DigitsException;
 import com.digits.sdk.android.DigitsSession;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -33,12 +34,12 @@ import com.twitter.sdk.android.core.TwitterCore;
 import java.io.IOException;
 
 import in.gm.instaqueue.BuildConfig;
-import in.gm.instaqueue.R;
 import in.gm.instaqueue.activity.LandingActivity;
 import in.gm.instaqueue.activity.OnBoardingActivity;
 import in.gm.instaqueue.backend.myApi.MyApi;
 import in.gm.instaqueue.model.User;
 import in.gm.instaqueue.prefs.SharedPrefs;
+import in.gm.instaqueue.util.AppConstants;
 import io.fabric.sdk.android.Fabric;
 
 public class LoginFragment extends BaseFragment {
@@ -46,9 +47,23 @@ public class LoginFragment extends BaseFragment {
     private static final String TAG = "LoginFragment";
     public static final String LOGIN_FRAGMENT_TAG = LoginFragment.class.getName();
     private String mPhoneNumber;
+    private String mLineNumber;
 
     public LoginFragment() {
-        // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (((OnBoardingActivity) getActivity()).checkPermission((OnBoardingActivity) getActivity(), AppConstants.PERMISSION_READ_PHONE_STATE)) {
+            TelephonyManager tMgr = (TelephonyManager) _application.getSystemService(Context.TELEPHONY_SERVICE);
+            mLineNumber = tMgr.getLine1Number();
+        }
+
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(BuildConfig.TWITTER_KEY, BuildConfig.TWITTER_SECRET);
+        Fabric.with(_application, new TwitterCore(authConfig), new Digits.Builder().build());
+
     }
 
     public static LoginFragment createInstance() {
@@ -57,19 +72,9 @@ public class LoginFragment extends BaseFragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(BuildConfig.TWITTER_KEY, BuildConfig.TWITTER_SECRET);
-        Fabric.with(context, new TwitterCore(authConfig), new Digits.Builder().build());
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_login, container, false);
-        DigitsAuthButton digitsButton = (DigitsAuthButton) root.findViewById(R.id.auth_button);
-        digitsButton.setCallback(new AuthCallback() {
+        AuthCallback authCallback = new AuthCallback() {
             @Override
             public void success(DigitsSession session, String phoneNumber) {
                 Toast.makeText(getActivity(), "Authentication successful for "
@@ -89,14 +94,18 @@ public class LoginFragment extends BaseFragment {
             public void failure(DigitsException exception) {
                 Log.d("Digits", "Sign in with Digits failure", exception);
             }
-        });
+        };
 
-        return root;
+        AuthConfig.Builder authConfigBuilder = new AuthConfig.Builder()
+                .withAuthCallBack(authCallback)
+                .withPhoneNumber("+91" + mLineNumber);
+        Digits.authenticate(authConfigBuilder.build());
+
+        return null;
     }
 
     private void startSignIn(String customeToken) {
         // Initiate sign in with custom token
-        final OnBoardingActivity activity = (OnBoardingActivity) getActivity();
         final FirebaseAuth firebaseAuth = mFirebaseManager.getAuthInstance();
         if (firebaseAuth != null) {
             firebaseAuth.signInWithCustomToken(customeToken)
@@ -110,9 +119,9 @@ public class LoginFragment extends BaseFragment {
                                     mSharedPrefs.putString(SharedPrefs.PHONE_NUMBER_KEY, mPhoneNumber);
                                     writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail(), mPhoneNumber);
 
-                                    //Launch the landing scree.
-                                    LandingActivity.start(getActivity());
                                     getActivity().finish();
+                                    //Launch the landing screen.
+                                    LandingActivity.start(getActivity());
                                 }
                             }
 

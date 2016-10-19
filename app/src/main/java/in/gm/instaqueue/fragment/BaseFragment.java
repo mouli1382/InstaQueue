@@ -1,6 +1,7 @@
 package in.gm.instaqueue.fragment;
 
 
+import android.app.Application;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -19,6 +20,9 @@ public class BaseFragment extends Fragment {
 
     @Inject
     protected FirebaseManager mFirebaseManager;
+
+    @Inject
+    protected Application _application;
 
     public BaseFragment() {
         // Required empty public constructor

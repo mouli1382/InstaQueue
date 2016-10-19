@@ -15,4 +15,8 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="granted_permission_read_sms">READ_SMS permission granted.</string>
+    <string name="rejected_permission_read_sms">READ_SMS permission rejected.</string>
+    <string name="granted_permission_read_phonestate">READ_PHONE_STATE permission granted.</string>
+    <string name="rejected_permission_read_phonestate">READ_PHONE_STATE permission rejected.</string>
 </resources>

@@ -65,7 +65,7 @@ public class WelcomeActivity extends BaseActivity {
             startActivity(intent);
             finish();
         } else {
-            Intent intent = new Intent(this, OnBoardingActivity.class);
+            Intent intent = new Intent(this, RequestPermissionsActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);
             finish();
