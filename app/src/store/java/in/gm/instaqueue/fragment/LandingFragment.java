@@ -221,11 +221,11 @@ public class LandingFragment extends BaseFragment {
 
                 mProgressDialog.setIndeterminate(true);
                 mProgressDialog.show();
-                String phoneNum = mSharedPrefs.getSting(PHONE_NUMBER_KEY);
+                /*String phoneNum = mSharedPrefs.getSting(PHONE_NUMBER_KEY);
                 if (phoneNum.isEmpty()) {
                     showMessage(mMainView, "Please authenticate again");
                     return;
-                }
+                }*/
                 DatabaseReference tokenCounterRef = mFirebaseDatabaseReference
                         .child("store")
                         .child(getCurrentUser().getUid())
@@ -317,7 +317,8 @@ public class LandingFragment extends BaseFragment {
                                                 return 0L;
                                             }
                                         }
-                                        new SendSMSTask().execute(mainUrl);
+                                        //Uncomment this  to execute the send sms
+                                        //new SendSMSTask().execute(mainUrl);
                                     }
                                 }
                             }else {
