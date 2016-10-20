@@ -54,6 +54,7 @@ public class LandingActivity extends BaseActivity {
     private LinearLayoutManager mLinearLayoutManager;
     private ProgressBar mProgressBar;
     private EditText mPhoneNumberEditText;
+    private EditText mCounterNumberEditText;
     private View mMainView;
     private long mLastToken;
 
@@ -107,8 +108,10 @@ public class LandingActivity extends BaseActivity {
         });*/
         Query query = mFirebaseDatabaseReference
                 .child(FirebaseManager.TOKENS_CHILD)
-                .orderByChild("storeId")
-                .equalTo(mFirebaseUser.getUid());
+                //.orderByChild("storeId")
+               // .equalTo(mFirebaseUser.getUid())
+                .orderByChild("counterName")
+                .equalTo("1");
         mFirebaseAdapter = new FirebaseRecyclerAdapter<Token,
                 TokenRecyclerViewHolder>(
                 Token.class,
@@ -155,6 +158,7 @@ public class LandingActivity extends BaseActivity {
         mTokenRecyclerView.setAdapter(mFirebaseAdapter);
 
         mPhoneNumberEditText = (EditText) findViewById(R.id.phoneEditText);
+        mCounterNumberEditText = (EditText) findViewById(R.id.counterEditText);
         mPhoneNumberEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -208,7 +212,7 @@ public class LandingActivity extends BaseActivity {
                     showMessage(mMainView, "Please authenticate again");
                     return;
                 }
-                DatabaseReference tokenCounterRef = mFirebaseDatabaseReference.child("tokenCounter" + "/" + phoneNum);
+                DatabaseReference tokenCounterRef = mFirebaseDatabaseReference.child("tokenCounter" + "/" + mFirebaseUser.getUid());
                 tokenCounterRef.runTransaction(new Transaction.Handler() {
                     @Override
                     public Transaction.Result doTransaction(MutableData mutableData) {
@@ -235,8 +239,12 @@ public class LandingActivity extends BaseActivity {
                                     Token token = new Token(mFirebaseUser.getUid(),
                                             "+91" + mPhoneNumberEditText.getText(),
                                             currentToken,
-                                            TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "");
+                                            TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "",
+                                            mCounterNumberEditText.getText().toString());
                                     mFirebaseDatabaseReference.child(FirebaseManager.TOKENS_CHILD)
+                                            .push().setValue(token);
+
+                                    mFirebaseDatabaseReference.child(FirebaseManager.COUNTERS_CHILD).child(mFirebaseUser.getUid()).child(mCounterNumberEditText.getText().toString())
                                             .push().setValue(token);
                                     mPhoneNumberEditText.setText("");
                                     {
