@@ -6,6 +6,11 @@ public class Token {
     private String phoneNumber;
     private long tokenNumber;
     private String timestamp;
+    private int status;
+
+    public enum Status {
+        ISSUED, PENDING, COMPLETED
+    };
 
     public Token() {
     }
@@ -15,6 +20,22 @@ public class Token {
         this.phoneNumber = phoneNumber;
         this.tokenNumber = tokenNumber;
         this.timestamp = timestamp;
+        this.status = Status.ISSUED.ordinal();
+    }
+
+    public boolean needsBuzz() {
+        if (status == Status.PENDING.ordinal()) {
+            return true;
+        }
+        return false;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public String getStoreId() {

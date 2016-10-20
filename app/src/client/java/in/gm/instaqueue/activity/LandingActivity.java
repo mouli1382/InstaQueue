@@ -2,24 +2,24 @@ package in.gm.instaqueue.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.widget.ProgressBar;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
 import in.gm.instaqueue.R;
 import in.gm.instaqueue.adapter.TokenRecyclerViewHolder;
 import in.gm.instaqueue.firebase.FirebaseManager;
 import in.gm.instaqueue.model.Token;
-import in.gm.instaqueue.prefs.SharedPrefs;
 
 public class LandingActivity extends BaseActivity {
 
@@ -54,7 +54,7 @@ public class LandingActivity extends BaseActivity {
 //        ));
 
         FirebaseUser firebaseUser = getCurrentUser();
-        if(firebaseUser == null) {
+        if (firebaseUser == null) {
             finish();
             return;
         }
@@ -89,6 +89,10 @@ public class LandingActivity extends BaseActivity {
 //                            .load(token.getEmail())
 //                            .into(viewHolder.messengerImageView);
 //                }
+
+                if (token.needsBuzz()) {
+                    playSound();
+                }
             }
         };
 
@@ -112,5 +116,15 @@ public class LandingActivity extends BaseActivity {
 
         mTokenRecyclerView.setLayoutManager(mLinearLayoutManager);
         mTokenRecyclerView.setAdapter(mFirebaseAdapter);
+    }
+
+    private void playSound() {
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Ringtone ringtone = RingtoneManager.getRingtone(LandingActivity.this, defaultSoundUri);
+        ringtone.play();
+
+        //Requires vibrate permission.
+//        Vibrator vibrator = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+//        vibrator.vibrate(200);
     }
 }

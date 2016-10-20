@@ -85,46 +85,35 @@ public class BaseActivity extends AppCompatActivity {
         return ((IQApplication) getApplicationContext()).getAppComponent();
     }
 
-    public void requestPermission(final AppCompatActivity appCompatActivity, View view, final int requestCode, final String... permissions) {
-        for (final String permission : permissions) {
-            if (!checkPermission(appCompatActivity, permission)) {
-                // Should we show an explanation?
-                if (ActivityCompat.shouldShowRequestPermissionRationale(appCompatActivity,
-                        permission)) {
+    public void requestPermission(final AppCompatActivity appCompatActivity, View view, final int requestCode, final String permission) {
+        if (!checkPermission(appCompatActivity, permission)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(appCompatActivity,
+                    permission)) {
 
-                    Snackbar.make(view, "Accept the damn permissions!",
-                            Snackbar.LENGTH_INDEFINITE)
-                            .setAction(android.R.string.ok, new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    ActivityCompat.requestPermissions(appCompatActivity,
-                                            new String[]{permission},
-                                            requestCode);
-                                }
-                            })
-                            .show();
-                } else {
-
-                    // No explanation needed, we can request the permission.
-
-                    ActivityCompat.requestPermissions(appCompatActivity,
-                            new String[]{permission},
-                            requestCode);
-
-                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                    // app-defined int constant. The callback method gets the
-                    // result of the request.
-                }
+                Snackbar.make(view, "Accept the damn permissions!",
+                        Snackbar.LENGTH_INDEFINITE)
+                        .setAction(android.R.string.ok, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                ActivityCompat.requestPermissions(appCompatActivity,
+                                        new String[]{permission},
+                                        requestCode);
+                            }
+                        })
+                        .show();
+            } else {
+                ActivityCompat.requestPermissions(appCompatActivity,
+                        new String[]{permission},
+                        requestCode);
             }
         }
     }
 
-    public boolean checkPermission(AppCompatActivity appCompatActivity, String... permissions) {
-        for (String permission : permissions) {
-            if (ContextCompat
-                    .checkSelfPermission(appCompatActivity, permission) != PackageManager.PERMISSION_GRANTED)
-                return false;
-        }
+    public boolean checkPermission(AppCompatActivity appCompatActivity, String permission) {
+        if (ContextCompat
+                .checkSelfPermission(appCompatActivity, permission) != PackageManager.PERMISSION_GRANTED)
+            return false;
+
         return true;
     }
 }
