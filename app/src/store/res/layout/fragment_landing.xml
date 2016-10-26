@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark"
     android:id="@+id/mainView"
     tools:context="in.gm.instaqueue.activity.LandingActivity">
 
@@ -11,8 +10,7 @@
         android:id="@+id/tokenRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/linearLayout"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+        android:layout_above="@+id/linearLayout"/>
 
     <LinearLayout
         android:id="@+id/linearLayout"

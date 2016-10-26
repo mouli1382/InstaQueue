@@ -141,7 +141,7 @@ public class LoginFragment extends BaseFragment {
 
     private void writeNewUser(String userId, String name, String email, String phoneNumber) {
         User user = new User(name, email, phoneNumber);
-        ((OnBoardingActivity) getActivity()).getDatabaseReference().child("users").child(userId).setValue(user);
+        getDatabaseReference().child("users").child(userId).setValue(user);
     }
 
     class EndpointsAsyncTask extends AsyncTask<Pair<Context, DigitsSession>, Void, String> {

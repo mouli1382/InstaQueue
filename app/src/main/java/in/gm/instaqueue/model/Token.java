@@ -7,10 +7,13 @@ public class Token {
     private long tokenNumber;
     private String timestamp;
     private int status;
+    private int buzzCount;
 
     public enum Status {
-        ISSUED, PENDING, COMPLETED
-    };
+        ISSUED, READY, CANCELLED, COMPLETED
+    }
+
+    ;
 
     public Token() {
     }
@@ -21,10 +24,11 @@ public class Token {
         this.tokenNumber = tokenNumber;
         this.timestamp = timestamp;
         this.status = Status.ISSUED.ordinal();
+        this.buzzCount = 0;
     }
 
     public boolean needsBuzz() {
-        if (status == Status.PENDING.ordinal()) {
+        if (status == Status.READY.ordinal()) {
             return true;
         }
         return false;
@@ -68,5 +72,13 @@ public class Token {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public int getBuzzCount() {
+        return buzzCount;
+    }
+
+    public void setBuzzCount(int buzzCount) {
+        this.buzzCount = buzzCount;
     }
 }

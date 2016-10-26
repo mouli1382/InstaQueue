@@ -8,6 +8,7 @@ import com.google.firebase.database.FirebaseDatabase;
 public class FirebaseManager {
 
     public static final String TOKENS_CHILD = "tokens";
+    public static final String TOKENS_HISTORY_CHILD = "token-history";
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
