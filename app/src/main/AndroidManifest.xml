@@ -16,16 +16,16 @@
         <activity android:name=".activity.BaseActivity" />
         <activity
             android:name=".activity.BaseDrawerActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.Background" />
         <activity
             android:name=".activity.RequestPermissionsActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.Background" />
         <activity android:name=".activity.OnBoardingActivity" />
         <activity android:name=".activity.GoogleSignInActivity" />
         <activity android:name=".activity.DigitsSignInActivity" />
         <activity
             android:name=".activity.WelcomeActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

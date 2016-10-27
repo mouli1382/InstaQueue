@@ -14,8 +14,11 @@ import android.widget.ProgressBar;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import in.gm.instaqueue.R;
 import in.gm.instaqueue.adapter.TokenRecyclerViewHolder;
@@ -95,6 +98,18 @@ public class LandingFragment extends BaseFragment {
                 }
             }
         };
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+            }
+        });
 
         mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override

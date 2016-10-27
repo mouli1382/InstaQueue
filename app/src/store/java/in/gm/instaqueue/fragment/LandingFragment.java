@@ -33,6 +33,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.concurrent.TimeUnit;
 
@@ -93,21 +94,6 @@ public class LandingFragment extends BaseFragment {
         // New child entries
         mFirebaseDatabaseReference = getDatabaseReference();
 
-        //This code is for query: for future use serves as a sample
-        /*Query qu = mFirebaseDatabaseReference.child(FirebaseManager.TOKENS_CHILD).orderByChild("tokenNumber").limitToLast(1);
-
-        qu.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.exists())
-                    mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });*/
         Query query = mFirebaseDatabaseReference
                 .child(FirebaseManager.TOKENS_CHILD)
                 .orderByChild("storeId")
@@ -136,7 +122,6 @@ public class LandingFragment extends BaseFragment {
 
 
                 final DatabaseReference tokenRef = getRef(position);
-//                final String tokenKey = tokenRef.getKey();
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -146,6 +131,18 @@ public class LandingFragment extends BaseFragment {
                 });
             }
         };
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+            }
+        });
 
         mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
