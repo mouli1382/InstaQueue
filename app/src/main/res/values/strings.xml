@@ -19,4 +19,5 @@
     <string name="rejected_permission_read_sms">READ_SMS permission rejected.</string>
     <string name="granted_permission_read_phonestate">READ_PHONE_STATE permission granted.</string>
     <string name="rejected_permission_read_phonestate">READ_PHONE_STATE permission rejected.</string>
+    <string name="use_my_phone_number">Use My Phone Number</string>
 </resources>
