@@ -39,10 +39,9 @@ import java.util.concurrent.TimeUnit;
 
 import in.gm.instaqueue.R;
 import in.gm.instaqueue.adapter.TokenRecyclerViewHolder;
-import in.gm.instaqueue.firebase.FirebaseManager;
 import in.gm.instaqueue.model.Token;
 
-import static in.gm.instaqueue.prefs.SharedPrefs.PHONE_NUMBER_KEY;
+import static in.gm.instaqueue.preferences.IQSharedPreferences.PHONE_NUMBER_KEY;
 
 public class LandingFragment extends BaseFragment {
     public static final String LANDING_FRAGMENT_TAG = "landing_fragment_tag";

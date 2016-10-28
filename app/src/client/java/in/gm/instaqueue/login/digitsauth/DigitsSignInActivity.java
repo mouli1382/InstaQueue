@@ -1,4 +1,4 @@
-package in.gm.instaqueue.login.digitsauth;
+package in.gm.instaqueue.authentication.digits;
 
 
 import android.content.Context;
@@ -37,7 +37,7 @@ import in.gm.instaqueue.activity.BaseActivity;
 import in.gm.instaqueue.activity.LandingActivity;
 import in.gm.instaqueue.backend.myApi.MyApi;
 import in.gm.instaqueue.model.User;
-import in.gm.instaqueue.prefs.SharedPrefs;
+import in.gm.instaqueue.preferences.SharedPrefs;
 import in.gm.instaqueue.util.AppConstants;
 import io.fabric.sdk.android.Fabric;
 

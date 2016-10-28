@@ -1,4 +1,4 @@
-package in.gm.instaqueue.prefs;
+package in.gm.instaqueue.preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -6,13 +6,12 @@ import android.text.TextUtils;
 
 import in.gm.instaqueue.R;
 
-public class SharedPrefs {
+public class IQSharedPreferences {
 
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
-    public static final String PHONE_NUMBER_KEY = "phone_number_key";
 
-    public SharedPrefs(Context context) {
+    public IQSharedPreferences(Context context) {
         mSharedPreferences = context.getSharedPreferences(
                 context.getString(R.string.application_preferences_file), Context.MODE_PRIVATE);
 

@@ -1,9 +1,9 @@
-package in.gm.instaqueue.login;
+package in.gm.instaqueue.authentication;
 
 import android.os.Bundle;
 
 import in.gm.instaqueue.activity.BaseActivity;
-import in.gm.instaqueue.login.digitsauth.DigitsSignInActivity;
+import in.gm.instaqueue.authentication.digits.DigitsSignInActivity;
 
 public class OnBoardingActivity extends BaseActivity {
 

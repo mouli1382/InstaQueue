@@ -1,10 +1,9 @@
-package in.gm.instaqueue.dagger.module;
+package in.gm.instaqueue.application;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import in.gm.instaqueue.app.IQApplication;
 
 @Module
 public class ApplicationModule {

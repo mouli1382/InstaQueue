@@ -1,4 +1,4 @@
-package in.gm.instaqueue.login.digitsauth;
+package in.gm.instaqueue.authentication.digits;
 
 
 import android.content.Context;
@@ -37,8 +37,8 @@ import in.gm.instaqueue.activity.BaseActivity;
 import in.gm.instaqueue.activity.LandingActivity;
 import in.gm.instaqueue.backend.myApi.MyApi;
 import in.gm.instaqueue.model.User;
-import in.gm.instaqueue.prefs.SharedPrefs;
-import in.gm.instaqueue.util.AppConstants;
+import in.gm.instaqueue.preferences.IQSharedPreferences;
+import in.gm.instaqueue.util.ApplicationConstants;
 import io.fabric.sdk.android.Fabric;
 
 
@@ -52,7 +52,7 @@ public class DigitsSignInActivity extends BaseActivity {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (checkPermission(this, AppConstants.PERMISSION_READ_PHONE_STATE)) {
+        if (checkPermission(this, ApplicationConstants.PERMISSION_READ_PHONE_STATE)) {
             TelephonyManager tMgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
             mLineNumber = tMgr.getLine1Number();
         }
@@ -105,7 +105,7 @@ public class DigitsSignInActivity extends BaseActivity {
                             if (task.isSuccessful()) {
                                 FirebaseUser user = task.getResult().getUser();
                                 if (user != null) {
-                                    mSharedPrefs.putString(SharedPrefs.PHONE_NUMBER_KEY, mPhoneNumber);
+                                    mSharedPrefs.putString(IQSharedPreferences.PHONE_NUMBER_KEY, mPhoneNumber);
                                     writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail(), mPhoneNumber);
 
                                     finish();

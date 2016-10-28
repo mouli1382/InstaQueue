@@ -1,4 +1,4 @@
-package in.gm.instaqueue.firebase;
+package in.gm.instaqueue.database;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

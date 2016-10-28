@@ -1,4 +1,4 @@
-package in.gm.instaqueue;
+package in.gm.instaqueue.mvp;
 
 public interface BaseView<T> {
 

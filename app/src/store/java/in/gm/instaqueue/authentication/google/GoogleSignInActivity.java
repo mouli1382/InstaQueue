@@ -1,4 +1,4 @@
-package in.gm.instaqueue.login.gauth;
+package in.gm.instaqueue.authentication.google;
 
 
 import android.content.Context;

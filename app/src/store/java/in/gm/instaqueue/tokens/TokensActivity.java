@@ -6,7 +6,7 @@ import javax.inject.Inject;
 
 import in.gm.instaqueue.R;
 import in.gm.instaqueue.activity.BaseDrawerActivity;
-import in.gm.instaqueue.util.ActivityUtils;
+import in.gm.instaqueue.util.ActivityUtilities;
 
 public class TokensActivity extends BaseDrawerActivity {
 
@@ -23,7 +23,7 @@ public class TokensActivity extends BaseDrawerActivity {
                 (TokensFragment) getSupportFragmentManager().findFragmentById(R.id.content_base_drawer);
         if (tokensFragment == null) {
             tokensFragment = TokensFragment.newInstance();
-            ActivityUtils.addFragmentToActivity(
+            ActivityUtilities.addFragmentToActivity(
                     getSupportFragmentManager(), tokensFragment, R.id.content_base_drawer);
         }
 

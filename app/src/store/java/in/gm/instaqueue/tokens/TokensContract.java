@@ -4,8 +4,8 @@ import android.support.annotation.NonNull;
 
 import java.util.List;
 
-import in.gm.instaqueue.BasePresenter;
-import in.gm.instaqueue.BaseView;
+import in.gm.instaqueue.mvp.BasePresenter;
+import in.gm.instaqueue.mvp.BaseView;
 import in.gm.instaqueue.model.Token;
 
 public interface TokensContract {

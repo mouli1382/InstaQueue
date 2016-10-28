@@ -22,7 +22,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import in.gm.instaqueue.R;
 import in.gm.instaqueue.adapter.TokenRecyclerViewHolder;
-import in.gm.instaqueue.firebase.FirebaseManager;
 import in.gm.instaqueue.model.Token;
 
 public class LandingFragment extends BaseFragment {
