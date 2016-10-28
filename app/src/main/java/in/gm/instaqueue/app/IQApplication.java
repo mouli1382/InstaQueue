@@ -2,14 +2,14 @@ package in.gm.instaqueue.app;
 
 import android.app.Application;
 
-import in.gm.instaqueue.dagger.component.AppComponent;
+import in.gm.instaqueue.dagger.component.ApplicationComponent;
 import in.gm.instaqueue.dagger.component.DaggerAppComponent;
-import in.gm.instaqueue.dagger.module.AppModule;
+import in.gm.instaqueue.dagger.module.ApplicationModule;
 import in.gm.instaqueue.dagger.module.DbModule;
 import in.gm.instaqueue.dagger.module.PreferenceModule;
 
 public class IQApplication extends Application {
-    private AppComponent appComponent;
+    private ApplicationComponent appComponent;
 
     @Override
     public void onCreate() {
@@ -21,14 +21,14 @@ public class IQApplication extends Application {
         if (appComponent == null) {
             appComponent = DaggerAppComponent
                     .builder()
-                    .appModule(new AppModule(this))
+                    .appModule(new ApplicationModule(this))
                     .dbModule(new DbModule())
                     .preferenceModule(new PreferenceModule())
                     .build();
         }
     }
 
-    public AppComponent getAppComponent() {
+    public ApplicationComponent getAppComponent() {
         return appComponent;
     }
 }

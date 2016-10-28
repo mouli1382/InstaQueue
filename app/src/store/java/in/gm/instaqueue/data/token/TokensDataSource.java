@@ -1,70 +1,50 @@
-/*
- * Copyright 2016, The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package in.gm.instaqueue.data.token;
 
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-
 import java.util.List;
 
-/**
- * Main entry point for accessing tasks data.
- * <p>
- * For simplicity, only getTasks() and getTask() have callbacks. Consider adding callbacks to other
- * methods to inform the user of network/database errors or successful operations.
- * For example, when a new task is created, it's synchronously stored in cache but usually every
- * operation on database or network should be executed in a different thread.
- */
+import in.gm.instaqueue.model.Token;
+
 public interface TokensDataSource {
 
-    interface LoadTasksCallback {
+    interface LoadTokensCallback {
 
-        void onTasksLoaded(List<Task> tasks);
-
-        void onDataNotAvailable();
-    }
-
-    interface GetTaskCallback {
-
-        void onTaskLoaded(Task task);
+        void onTokensLoaded(List<Token> Tokens);
 
         void onDataNotAvailable();
     }
 
-    void getTasks(@NonNull LoadTasksCallback callback);
+    interface GetTokenCallback {
 
-    void getTask(@NonNull String taskId, @NonNull GetTaskCallback callback);
+        void onTokenLoaded(Token Token);
 
-    void saveTask(@NonNull Task task);
+        void onDataNotAvailable();
+    }
 
-    void completeTask(@NonNull Task task);
+    void getTokens(@NonNull LoadTokensCallback callback);
 
-    void completeTask(@NonNull String taskId);
+    void getToken(@NonNull String TokenId, @NonNull GetTokenCallback callback);
 
-    void activateTask(@NonNull Task task);
+    void saveToken(@NonNull Token Token);
 
-    void activateTask(@NonNull String taskId);
+    void activateToken(@NonNull Token Token);
 
-    void clearCompletedTasks();
+    void activateToken(@NonNull String TokenId);
 
-    void refreshTasks();
+    void completeToken(@NonNull Token Token);
 
-    void deleteAllTasks();
+    void completeToken(@NonNull String TokenId);
 
-    void deleteTask(@NonNull String taskId);
+    void cancelToken(@NonNull Token Token);
+
+    void cancelToken(@NonNull String TokenId);
+
+    void clearCompletedTokens();
+
+    void refreshTokens();
+
+    void deleteAllTokens();
+
+    void deleteToken(@NonNull String TokenId);
 }

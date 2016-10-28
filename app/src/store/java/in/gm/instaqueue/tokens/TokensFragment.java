@@ -1,22 +1,12 @@
-/*
- * Copyright 2016, The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package in.gm.instaqueue.tokens;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,48 +15,41 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
-
-import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import in.gm.instaqueue.R;
+import in.gm.instaqueue.model.Token;
 
-/**
- * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
- */
-public class TokensFragment extends Fragment implements TasksContract.View {
+public class TokensFragment extends Fragment implements TokensContract.View {
 
-    private TasksContract.Presenter mPresenter;
+    private TokensContract.Presenter mPresenter;
 
-    private TasksAdapter mListAdapter;
+    private TokensAdapter mTokensAdapter;
 
-    private View mNoTasksView;
+    private View mNoTokensView;
 
-    private ImageView mNoTaskIcon;
+    private ImageView mNoTokenIcon;
 
-    private TextView mNoTaskMainView;
+    private TextView mNoTokenMainView;
 
-    private TextView mNoTaskAddView;
+    private TextView mNoTokenAddView;
 
-    private LinearLayout mTasksView;
+    private LinearLayout mTokensView;
 
     private TextView mFilteringLabelView;
 
@@ -81,7 +64,7 @@ public class TokensFragment extends Fragment implements TasksContract.View {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mListAdapter = new TasksAdapter(new ArrayList<Task>(0), mItemListener);
+        mTokensAdapter = new TokensAdapter(new ArrayList<Token>(0), mItemListener);
     }
 
     @Override
@@ -91,8 +74,8 @@ public class TokensFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
-    public void setPresenter(@NonNull TasksContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
+    public void setPresenter(@NonNull TokensContract.Presenter presenter) {
+        mPresenter = presenter;
     }
 
     @Override
@@ -104,35 +87,41 @@ public class TokensFragment extends Fragment implements TasksContract.View {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.tasks_frag, container, false);
+        View root = inflater.inflate(R.layout.fragment_tokens, container, false);
 
-        // Set up tasks view
-        ListView listView = (ListView) root.findViewById(R.id.tasks_list);
-        listView.setAdapter(mListAdapter);
+        // Set up Tokens view
+        RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.tokens_list);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+//        linearLayoutManager.setStackFromEnd(true);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(mTokensAdapter);
+
+        initSwipe(recyclerView);
+
         mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
-        mTasksView = (LinearLayout) root.findViewById(R.id.tasksLL);
+        mTokensView = (LinearLayout) root.findViewById(R.id.tokensLL);
 
-        // Set up  no tasks view
-        mNoTasksView = root.findViewById(R.id.noTasks);
-        mNoTaskIcon = (ImageView) root.findViewById(R.id.noTasksIcon);
-        mNoTaskMainView = (TextView) root.findViewById(R.id.noTasksMain);
-        mNoTaskAddView = (TextView) root.findViewById(R.id.noTasksAdd);
-        mNoTaskAddView.setOnClickListener(new View.OnClickListener() {
+        // Set up  no Tokens view
+        mNoTokensView = root.findViewById(R.id.notokens);
+        mNoTokenIcon = (ImageView) root.findViewById(R.id.notokensIcon);
+        mNoTokenMainView = (TextView) root.findViewById(R.id.notokensMain);
+        mNoTokenAddView = (TextView) root.findViewById(R.id.notokensAdd);
+        mNoTokenAddView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showAddTask();
+                showAddToken();
             }
         });
 
         // Set up floating action button
         FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_add_task);
+                (FloatingActionButton) getActivity().findViewById(R.id.fab);
 
         fab.setImageResource(R.drawable.ic_add);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.addNewTask();
+                mPresenter.addNewToken();
             }
         });
 
@@ -145,12 +134,12 @@ public class TokensFragment extends Fragment implements TasksContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
         // Set the scrolling view in the custom SwipeRefreshLayout.
-        swipeRefreshLayout.setScrollUpChild(listView);
+        swipeRefreshLayout.setScrollUpChild(recyclerView);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mPresenter.loadTasks(false);
+                mPresenter.loadTokens(false);
             }
         });
 
@@ -163,13 +152,13 @@ public class TokensFragment extends Fragment implements TasksContract.View {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear:
-                mPresenter.clearCompletedTasks();
+                mPresenter.clearCompletedTokens();
                 break;
             case R.id.menu_filter:
                 showFilteringPopUpMenu();
                 break;
             case R.id.menu_refresh:
-                mPresenter.loadTasks(true);
+                mPresenter.loadTokens(true);
                 break;
         }
         return true;
@@ -177,28 +166,31 @@ public class TokensFragment extends Fragment implements TasksContract.View {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.tasks_fragment_menu, menu);
+        inflater.inflate(R.menu.tokens_fragment_menu, menu);
     }
 
     @Override
     public void showFilteringPopUpMenu() {
         PopupMenu popup = new PopupMenu(getContext(), getActivity().findViewById(R.id.menu_filter));
-        popup.getMenuInflater().inflate(R.menu.filter_tasks, popup.getMenu());
+        popup.getMenuInflater().inflate(R.menu.filter_tokens, popup.getMenu());
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.active:
-                        mPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);
+                        mPresenter.setFiltering(TokensFilterType.ACTIVE_TOKENS);
                         break;
                     case R.id.completed:
-                        mPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);
+                        mPresenter.setFiltering(TokensFilterType.COMPLETED_TOKENS);
+                        break;
+                    case R.id.cancelled:
+                        mPresenter.setFiltering(TokensFilterType.CANCELLED_TOKENS);
                         break;
                     default:
-                        mPresenter.setFiltering(TasksFilterType.ALL_TASKS);
+                        mPresenter.setFiltering(TokensFilterType.ALL_TOKENS);
                         break;
                 }
-                mPresenter.loadTasks(false);
+                mPresenter.loadTokens(false);
                 return true;
             }
         });
@@ -207,22 +199,27 @@ public class TokensFragment extends Fragment implements TasksContract.View {
     }
 
     /**
-     * Listener for clicks on tasks in the ListView.
+     * Listener for clicks on Tokens in the ListView.
      */
-    TaskItemListener mItemListener = new TaskItemListener() {
+    TokenItemListener mItemListener = new TokenItemListener() {
         @Override
-        public void onTaskClick(Task clickedTask) {
-            mPresenter.openTaskDetails(clickedTask);
+        public void onTokenClick(Token clickedToken) {
+            mPresenter.openTokenDetails(clickedToken);
         }
 
         @Override
-        public void onCompleteTaskClick(Task completedTask) {
-            mPresenter.completeTask(completedTask);
+        public void onCompleteTokenClick(Token completedToken) {
+            mPresenter.completeToken(completedToken);
         }
 
         @Override
-        public void onActivateTaskClick(Task activatedTask) {
-            mPresenter.activateTask(activatedTask);
+        public void onActivateTokenClick(Token activatedToken) {
+            mPresenter.activateToken(activatedToken);
+        }
+
+        @Override
+        public void onCancelTokenClick(Token cancelledToken) {
+            mPresenter.cancelToken(cancelledToken);
         }
     };
 
@@ -245,35 +242,44 @@ public class TokensFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
-    public void showTasks(List<Task> tasks) {
-        mListAdapter.replaceData(tasks);
+    public void showTokens(List<Token> Tokens) {
+//        mTokensAdapter.replaceData(Tokens);
 
-        mTasksView.setVisibility(View.VISIBLE);
-        mNoTasksView.setVisibility(View.GONE);
+        mTokensView.setVisibility(View.VISIBLE);
+        mNoTokensView.setVisibility(View.GONE);
     }
 
     @Override
-    public void showNoActiveTasks() {
-        showNoTasksViews(
-                getResources().getString(R.string.no_tasks_active),
+    public void showNoActiveTokens() {
+        showNoTokensViews(
+                getResources().getString(R.string.no_tokens_active),
                 R.drawable.ic_check_circle_24dp,
                 false
         );
     }
 
     @Override
-    public void showNoTasks() {
-        showNoTasksViews(
-                getResources().getString(R.string.no_tasks_all),
+    public void showNoTokens() {
+        showNoTokensViews(
+                getResources().getString(R.string.no_tokens_all),
                 R.drawable.ic_assignment_turned_in_24dp,
                 false
         );
     }
 
     @Override
-    public void showNoCompletedTasks() {
-        showNoTasksViews(
-                getResources().getString(R.string.no_tasks_completed),
+    public void showNoCompletedTokens() {
+        showNoTokensViews(
+                getResources().getString(R.string.no_tokens_completed),
+                R.drawable.ic_verified_user_24dp,
+                false
+        );
+    }
+
+    @Override
+    public void showNoCancelledTokens() {
+        showNoTokensViews(
+                getResources().getString(R.string.no_tokens_completed),
                 R.drawable.ic_verified_user_24dp,
                 false
         );
@@ -281,16 +287,16 @@ public class TokensFragment extends Fragment implements TasksContract.View {
 
     @Override
     public void showSuccessfullySavedMessage() {
-        showMessage(getString(R.string.successfully_saved_task_message));
+        showMessage(getString(R.string.successfully_saved_token_message));
     }
 
-    private void showNoTasksViews(String mainText, int iconRes, boolean showAddView) {
-        mTasksView.setVisibility(View.GONE);
-        mNoTasksView.setVisibility(View.VISIBLE);
+    private void showNoTokensViews(String mainText, int iconRes, boolean showAddView) {
+        mTokensView.setVisibility(View.GONE);
+        mNoTokensView.setVisibility(View.VISIBLE);
 
-        mNoTaskMainView.setText(mainText);
-        mNoTaskIcon.setImageDrawable(getResources().getDrawable(iconRes));
-        mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
+        mNoTokenMainView.setText(mainText);
+        mNoTokenIcon.setImageDrawable(getResources().getDrawable(iconRes));
+        mNoTokenAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -309,38 +315,48 @@ public class TokensFragment extends Fragment implements TasksContract.View {
     }
 
     @Override
-    public void showAddTask() {
-        Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-        startActivityForResult(intent, AddEditTaskActivity.REQUEST_ADD_TASK);
+    public void showCancelledFilterLabel() {
+        mFilteringLabelView.setText(getResources().getString(R.string.label_completed));
     }
 
     @Override
-    public void showTaskDetailsUi(String taskId) {
+    public void showAddToken() {
+//        Intent intent = new Intent(getContext(), AddEditTokenActivity.class);
+//        startActivityForResult(intent, AddEditTokenActivity.REQUEST_ADD_Token);
+    }
+
+    @Override
+    public void showTokenDetailsUi(String TokenId) {
         // in it's own Activity, since it makes more sense that way and it gives us the flexibility
         // to show some Intent stubbing.
-        Intent intent = new Intent(getContext(), TaskDetailActivity.class);
-        intent.putExtra(TaskDetailActivity.EXTRA_TASK_ID, taskId);
-        startActivity(intent);
+//        Intent intent = new Intent(getContext(), TokenDetailActivity.class);
+//        intent.putExtra(TokenDetailActivity.EXTRA_Token_ID, TokenId);
+//        startActivity(intent);
     }
 
     @Override
-    public void showTaskMarkedComplete() {
-        showMessage(getString(R.string.task_marked_complete));
+    public void showTokenMarkedComplete() {
+        showMessage(getString(R.string.token_marked_complete));
     }
 
     @Override
-    public void showTaskMarkedActive() {
-        showMessage(getString(R.string.task_marked_active));
+    public void showTokenMarkedActive() {
+        showMessage(getString(R.string.token_marked_active));
     }
 
     @Override
-    public void showCompletedTasksCleared() {
-        showMessage(getString(R.string.completed_tasks_cleared));
+    public void showTokenMarkedCancel() {
+        showMessage(getString(R.string.token_marked_cancel));
     }
 
     @Override
-    public void showLoadingTasksError() {
-        showMessage(getString(R.string.loading_tasks_error));
+    public void showCompletedTokensCleared() {
+        showMessage(getString(R.string.completed_tokens_cleared));
+    }
+
+    @Override
+    public void showLoadingTokensError() {
+        showMessage(getString(R.string.loading_tokens_error));
     }
 
     private void showMessage(String message) {
@@ -352,94 +368,83 @@ public class TokensFragment extends Fragment implements TasksContract.View {
         return isAdded();
     }
 
-    private static class TasksAdapter extends BaseAdapter {
 
-        private List<Task> mTasks;
-        private TaskItemListener mItemListener;
+    public interface TokenItemListener {
 
-        public TasksAdapter(List<Task> tasks, TaskItemListener itemListener) {
-            setList(tasks);
-            mItemListener = itemListener;
-        }
+        void onTokenClick(Token clickedToken);
 
-        public void replaceData(List<Task> tasks) {
-            setList(tasks);
-            notifyDataSetChanged();
-        }
+        void onCompleteTokenClick(Token completedToken);
 
-        private void setList(List<Task> tasks) {
-            mTasks = checkNotNull(tasks);
-        }
+        void onActivateTokenClick(Token activatedToken);
 
-        @Override
-        public int getCount() {
-            return mTasks.size();
-        }
-
-        @Override
-        public Task getItem(int i) {
-            return mTasks.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            View rowView = view;
-            if (rowView == null) {
-                LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-                rowView = inflater.inflate(R.layout.task_item, viewGroup, false);
-            }
-
-            final Task task = getItem(i);
-
-            TextView titleTV = (TextView) rowView.findViewById(R.id.title);
-            titleTV.setText(task.getTitleForList());
-
-            CheckBox completeCB = (CheckBox) rowView.findViewById(R.id.complete);
-
-            // Active/completed task UI
-            completeCB.setChecked(task.isCompleted());
-            if (task.isCompleted()) {
-                rowView.setBackgroundDrawable(viewGroup.getContext()
-                        .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
-            } else {
-                rowView.setBackgroundDrawable(viewGroup.getContext()
-                        .getResources().getDrawable(R.drawable.touch_feedback));
-            }
-
-            completeCB.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (!task.isCompleted()) {
-                        mItemListener.onCompleteTaskClick(task);
-                    } else {
-                        mItemListener.onActivateTaskClick(task);
-                    }
-                }
-            });
-
-            rowView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mItemListener.onTaskClick(task);
-                }
-            });
-
-            return rowView;
-        }
+        void onCancelTokenClick(Token activatedToken);
     }
 
-    public interface TaskItemListener {
+    private Paint p = new Paint();
 
-        void onTaskClick(Task clickedTask);
+    private void initSwipe(RecyclerView recyclerView) {
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
-        void onCompleteTaskClick(Task completedTask);
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
 
-        void onActivateTaskClick(Task activatedTask);
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+//                int position = viewHolder.getAdapterPosition();
+//                final DatabaseReference tokenRef = mFirebaseAdapter.getRef(position);
+//                Token token = mFirebaseAdapter.getItem(position);
+//                if (direction == ItemTouchHelper.LEFT) {
+//                    //Mark it Cancelled
+//                    token.setStatus(Token.Status.CANCELLED.ordinal());
+//                    tokenRef.child("status").setValue(Token.Status.CANCELLED.ordinal());
+//                } else {
+//                    //Mark it Completed
+//                    token.setStatus(Token.Status.COMPLETED.ordinal());
+//                    tokenRef.child("status").setValue(Token.Status.COMPLETED.ordinal());
+//                }
+//
+//                //Move it to token-history table.
+//                mFirebaseDatabaseReference
+//                        .child(FirebaseManager.TOKENS_HISTORY_CHILD)
+//                        .push()
+//                        .setValue(token);
+//                tokenRef.removeValue();
+//                mFirebaseAdapter.notifyItemRemoved(position);
+            }
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+
+                Bitmap icon;
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+
+                    View itemView = viewHolder.itemView;
+                    float height = (float) itemView.getBottom() - (float) itemView.getTop();
+                    float width = height / 3;
+
+                    if (dX > 0) {
+                        p.setColor(Color.parseColor("#388E3C"));
+                        RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX, (float) itemView.getBottom());
+                        c.drawRect(background, p);
+                        icon = BitmapFactory.decodeResource(getResources(), android.R.drawable.ic_menu_compass);
+                        RectF icon_dest = new RectF((float) itemView.getLeft() + width, (float) itemView.getTop() + width, (float) itemView.getLeft() + 2 * width, (float) itemView.getBottom() - width);
+                        c.drawBitmap(icon, null, icon_dest, p);
+                    } else {
+                        p.setColor(Color.parseColor("#D32F2F"));
+                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
+                        c.drawRect(background, p);
+                        icon = BitmapFactory.decodeResource(getResources(), android.R.drawable.ic_menu_close_clear_cancel);
+                        RectF icon_dest = new RectF((float) itemView.getRight() - 2 * width, (float) itemView.getTop() + width, (float) itemView.getRight() - width, (float) itemView.getBottom() - width);
+                        c.drawBitmap(icon, null, icon_dest, p);
+                    }
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
 }

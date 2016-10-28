@@ -3,10 +3,11 @@ package in.gm.instaqueue.data.token;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import in.gm.instaqueue.dagger.module.ApplicationModule;
 
 @Singleton
-@Component(modules = {TasksRepositoryModule.class, ApplicationModule.class})
+@Component(modules = {TokensRepositoryModule.class, ApplicationModule.class})
 public interface TokensRepositoryComponent {
 
-    TasksRepository getTasksRepository();
+    TokensRepository getTokensRepository();
 }

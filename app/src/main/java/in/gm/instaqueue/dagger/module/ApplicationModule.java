@@ -1,7 +1,5 @@
 package in.gm.instaqueue.dagger.module;
 
-import android.app.Application;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -19,7 +17,7 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    public Application provideApplication() {
+    public IQApplication provideApplication() {
         return application;
     }
 }

@@ -16,7 +16,7 @@ import com.google.firebase.database.DatabaseReference;
 import javax.inject.Inject;
 
 import in.gm.instaqueue.app.IQApplication;
-import in.gm.instaqueue.dagger.component.AppComponent;
+import in.gm.instaqueue.dagger.component.ApplicationComponent;
 import in.gm.instaqueue.firebase.FirebaseManager;
 import in.gm.instaqueue.prefs.SharedPrefs;
 
@@ -81,7 +81,7 @@ public class BaseActivity extends AppCompatActivity {
         snackbar.show();
     }
 
-    public AppComponent getAppComponent() {
+    public ApplicationComponent getAppComponent() {
         return ((IQApplication) getApplicationContext()).getAppComponent();
     }
 

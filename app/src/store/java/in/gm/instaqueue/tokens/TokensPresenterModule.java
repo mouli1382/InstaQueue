@@ -3,21 +3,17 @@ package in.gm.instaqueue.tokens;
 import dagger.Module;
 import dagger.Provides;
 
-/**
- * This is a Dagger module. We use this to pass in the View dependency to the
- * {@link TasksPresenter}.
- */
 @Module
 public class TokensPresenterModule {
 
-    private final TasksContract.View mView;
+    private final TokensContract.View mView;
 
-    public TokensPresenterModule(TasksContract.View view) {
+    public TokensPresenterModule(TokensContract.View view) {
         mView = view;
     }
 
     @Provides
-    TasksContract.View provideTasksContractView() {
+    TokensContract.View provideTokensContractView() {
         return mView;
     }
 
