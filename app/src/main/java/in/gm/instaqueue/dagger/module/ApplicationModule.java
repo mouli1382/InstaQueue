@@ -9,11 +9,11 @@ import dagger.Provides;
 import in.gm.instaqueue.app.IQApplication;
 
 @Module
-public class AppModule {
+public class ApplicationModule {
 
     private IQApplication application;
 
-    public AppModule(IQApplication app) {
+    public ApplicationModule(IQApplication app) {
         this.application = app;
     }
 
