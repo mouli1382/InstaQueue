@@ -1,4 +1,4 @@
-package in.gm.instaqueue.activity;
+package in.gm.instaqueue.login.digitsauth;
 
 
 import android.content.Context;
@@ -33,6 +33,8 @@ import com.twitter.sdk.android.core.TwitterCore;
 import java.io.IOException;
 
 import in.gm.instaqueue.BuildConfig;
+import in.gm.instaqueue.activity.BaseActivity;
+import in.gm.instaqueue.activity.LandingActivity;
 import in.gm.instaqueue.backend.myApi.MyApi;
 import in.gm.instaqueue.model.User;
 import in.gm.instaqueue.prefs.SharedPrefs;

@@ -20,9 +20,9 @@
         <activity
             android:name=".activity.RequestPermissionsActivity"
             android:theme="@style/AppTheme.Background" />
-        <activity android:name=".activity.OnBoardingActivity" />
-        <activity android:name=".activity.GoogleSignInActivity" />
-        <activity android:name=".activity.DigitsSignInActivity" />
+        <activity android:name=".login.OnBoardingActivity" />
+        <activity android:name=".login.gauth.GoogleSignInActivity" />
+        <activity android:name=".login.digitsauth.DigitsSignInActivity" />
         <activity
             android:name=".activity.WelcomeActivity"
             android:theme="@style/AppTheme.NoTitleBar.Fullscreen">

@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 
 import in.gm.instaqueue.R;
+import in.gm.instaqueue.login.OnBoardingActivity;
 
 import static in.gm.instaqueue.util.AppConstants.PERMISSION_READ_PHONE_STATE;
 import static in.gm.instaqueue.util.AppConstants.PERMISSION_RECEIVE_SMS;

@@ -1,4 +1,4 @@
-package in.gm.instaqueue.activity;
+package in.gm.instaqueue.login.gauth;
 
 
 import android.content.Context;
@@ -23,6 +23,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import in.gm.instaqueue.R;
+import in.gm.instaqueue.activity.BaseActivity;
+import in.gm.instaqueue.activity.LandingActivity;
 
 
 public class GoogleSignInActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
