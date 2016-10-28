@@ -2,12 +2,10 @@ package in.gm.instaqueue.application;
 
 import android.app.Application;
 
-import in.gm.instaqueue.data.token.DaggerTokensRepositoryComponent;
-import in.gm.instaqueue.data.token.TokensRepositoryComponent;
 import in.gm.instaqueue.data.token.TokensRepositoryModule;
 
 public class IQApplication extends Application {
-    private TokensRepositoryComponent tokensRepositoryComponent;
+    private ApplicationComponent applicationComponent;
 
     @Override
     public void onCreate() {
@@ -16,13 +14,14 @@ public class IQApplication extends Application {
     }
 
     private void setupObjectGraph() {
-        tokensRepositoryComponent = DaggerTokensRepositoryComponent
+        applicationComponent = DaggerApplicationComponent
                 .builder()
+                .applicationModule(new ApplicationModule(this))
                 .tokensRepositoryModule(new TokensRepositoryModule())
                 .build();
     }
 
-    public TokensRepositoryComponent getTokensRepositoryComponent() {
-        return tokensRepositoryComponent;
+    public ApplicationComponent getApplicationComponent() {
+        return applicationComponent;
     }
 }

@@ -22,6 +22,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import javax.inject.Inject;
+
 import in.gm.instaqueue.R;
 import in.gm.instaqueue.activity.BaseActivity;
 import in.gm.instaqueue.activity.LandingActivity;
@@ -32,10 +34,13 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
     private static final String TAG = "GoogleSignInActivity";
     private static final int RC_SIGN_IN = 9001;
 
+    @Inject
+    @GAuth
+    FirebaseAuthenticationManager mAuthenticationManager;
+
+    private FirebaseAuth mFirebaseAuth;
     private GoogleApiClient mGoogleApiClient;
 
-    // Firebase instance variables
-    private FirebaseAuth mFirebaseAuth;
 
     public static void start(Context caller) {
         Intent intent = new Intent(caller, GoogleSignInActivity.class);
@@ -46,7 +51,7 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Configure Google Sign In
+        // Configure GAuth Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -57,7 +62,7 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
                 .build();
 
         // Initialize FirebaseAuth
-        mFirebaseAuth = mFirebaseManager.getAuthInstance();
+        mFirebaseAuth = mAuthenticationManager.getAuthInstance();
 
         signIn();
     }
@@ -75,12 +80,12 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
-                // Google Sign In was successful, authenticate with Firebase
+                // GAuth Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
             } else {
-                // Google Sign In failed
-                Log.e(TAG, "Google Sign In failed.");
+                // GAuth Sign In failed
+                Log.e(TAG, "GAuth Sign In failed.");
             }
         }
     }
@@ -113,9 +118,9 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // An unresolvable error has occurred and GAuth APIs (including Sign-In) will not
         // be available.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
-        Toast.makeText(GoogleSignInActivity.this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(GoogleSignInActivity.this, "GAuth Play Services error.", Toast.LENGTH_SHORT).show();
     }
 }

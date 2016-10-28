@@ -7,6 +7,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import com.google.firebase.auth.FirebaseAuth;
+
+import javax.inject.Inject;
+
 import in.gm.instaqueue.R;
 
 /**
@@ -17,6 +21,9 @@ import in.gm.instaqueue.R;
 public class WelcomeActivity extends BaseActivity {
 
     private static final String TAG = "WelcomeActivity";
+
+    @Inject
+    protected FirebaseAuth mFirebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

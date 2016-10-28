@@ -4,6 +4,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import in.gm.instaqueue.preferences.IQSharedPreferences;
 
 @Module
 public class ApplicationModule {
@@ -16,7 +17,13 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    public IQApplication provideApplication() {
+    public IQApplication provideIQApplication() {
         return application;
+    }
+
+    @Provides
+    @Singleton
+    public IQSharedPreferences provideIQSharedPreferences() {
+        return new IQSharedPreferences(application);
     }
 }

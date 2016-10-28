@@ -1,7 +1,5 @@
 package in.gm.instaqueue.database;
 
-import javax.inject.Singleton;
-
 import dagger.Module;
 import dagger.Provides;
 
@@ -9,8 +7,7 @@ import dagger.Provides;
 public class DatabaseModule {
 
     @Provides
-    @Singleton
-    public DatabaseManager provideDatabaseManager() {
-        return null;
+    public FirebaseDatabaseManager provideDatabaseManager() {
+        return new FirebaseDatabaseManager();
     }
 }

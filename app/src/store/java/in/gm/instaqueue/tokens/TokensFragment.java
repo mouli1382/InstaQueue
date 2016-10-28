@@ -407,7 +407,7 @@ public class TokensFragment extends Fragment implements TokensContract.View {
 //
 //                //Move it to token-history table.
 //                mFirebaseDatabaseReference
-//                        .child(FirebaseManager.TOKENS_HISTORY_CHILD)
+//                        .child(FirebaseAuthenticationManager.TOKENS_HISTORY_CHILD)
 //                        .push()
 //                        .setValue(token);
 //                tokenRef.removeValue();

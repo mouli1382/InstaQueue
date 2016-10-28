@@ -20,12 +20,12 @@ public class LandingActivity extends BaseDrawerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState == null) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.content_base_drawer, LandingFragment.createInstance(), LandingFragment.LANDING_FRAGMENT_TAG)
-                    .commit();
-        }
+//        if (savedInstanceState == null) {
+//            FragmentManager fragmentManager = getSupportFragmentManager();
+//            fragmentManager.beginTransaction()
+//                    .replace(R.id.content_base_drawer, LandingFragment.createInstance(), LandingFragment.LANDING_FRAGMENT_TAG)
+//                    .commit();
+//        }
     }
 
 

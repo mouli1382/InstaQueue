@@ -6,6 +6,7 @@ import javax.inject.Inject;
 
 import in.gm.instaqueue.R;
 import in.gm.instaqueue.activity.BaseDrawerActivity;
+import in.gm.instaqueue.application.IQApplication;
 import in.gm.instaqueue.util.ActivityUtilities;
 
 public class TokensActivity extends BaseDrawerActivity {
@@ -29,7 +30,7 @@ public class TokensActivity extends BaseDrawerActivity {
 
         // Create the presenter
         DaggerTokensComponent.builder()
-                .appComponent(getApplication().get())
+                .applicationComponent(((IQApplication)getApplication()).getApplicationComponent())
                 .tokensPresenterModule(new TokensPresenterModule(tokensFragment)).build()
                 .inject(this);
 

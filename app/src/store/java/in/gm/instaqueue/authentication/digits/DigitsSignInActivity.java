@@ -32,15 +32,18 @@ import com.twitter.sdk.android.core.TwitterCore;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+
 import in.gm.instaqueue.BuildConfig;
 import in.gm.instaqueue.activity.BaseActivity;
 import in.gm.instaqueue.activity.LandingActivity;
+import in.gm.instaqueue.application.IQApplication;
 import in.gm.instaqueue.backend.myApi.MyApi;
+import in.gm.instaqueue.database.FirebaseDatabaseManager;
 import in.gm.instaqueue.model.User;
 import in.gm.instaqueue.preferences.IQSharedPreferences;
 import in.gm.instaqueue.util.ApplicationConstants;
 import io.fabric.sdk.android.Fabric;
-
 
 public class DigitsSignInActivity extends BaseActivity {
 
@@ -48,17 +51,28 @@ public class DigitsSignInActivity extends BaseActivity {
     private String mPhoneNumber;
     private String mLineNumber;
 
+    @Inject
+    DigitsAuthenticationManager mAuthenticationManager;
+
+    @Inject
+    FirebaseDatabaseManager mFirebaseDatabaseManager;
+
+    private IQSharedPreferences mSharedPrefs;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        IQApplication iqApplication = (IQApplication) getApplicationContext();
+        mSharedPrefs = iqApplication.getApplicationComponent().getIQSharedPreferences();
+
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(BuildConfig.TWITTER_KEY, BuildConfig.TWITTER_SECRET);
+        Fabric.with(iqApplication, new TwitterCore(authConfig), new Digits.Builder().build());
 
         if (checkPermission(this, ApplicationConstants.PERMISSION_READ_PHONE_STATE)) {
             TelephonyManager tMgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
             mLineNumber = tMgr.getLine1Number();
         }
-
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(BuildConfig.TWITTER_KEY, BuildConfig.TWITTER_SECRET);
-        Fabric.with(getApplicationContext(), new TwitterCore(authConfig), new Digits.Builder().build());
 
         AuthCallback authCallback = new AuthCallback() {
             @Override
@@ -78,7 +92,7 @@ public class DigitsSignInActivity extends BaseActivity {
 
             @Override
             public void failure(DigitsException exception) {
-                Log.d("Digits", "Sign in with Digits failure", exception);
+                Log.d("DigitsAuth", "Sign in with DigitsAuth failure", exception);
             }
         };
 
@@ -95,7 +109,7 @@ public class DigitsSignInActivity extends BaseActivity {
 
     private void startSignIn(String customeToken) {
         // Initiate sign in with custom token
-        final FirebaseAuth firebaseAuth = mFirebaseManager.getAuthInstance();
+        final FirebaseAuth firebaseAuth = mAuthenticationManager.getAuthInstance();
         if (firebaseAuth != null) {
             firebaseAuth.signInWithCustomToken(customeToken)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -105,7 +119,7 @@ public class DigitsSignInActivity extends BaseActivity {
                             if (task.isSuccessful()) {
                                 FirebaseUser user = task.getResult().getUser();
                                 if (user != null) {
-                                    mSharedPrefs.putString(IQSharedPreferences.PHONE_NUMBER_KEY, mPhoneNumber);
+                                    mSharedPrefs.putString(ApplicationConstants.PHONE_NUMBER_KEY, mPhoneNumber);
                                     writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail(), mPhoneNumber);
 
                                     finish();
@@ -129,7 +143,7 @@ public class DigitsSignInActivity extends BaseActivity {
 
     private void writeNewUser(String userId, String name, String email, String phoneNumber) {
         User user = new User(name, email, phoneNumber);
-        getDatabaseReference().child("users").child(userId).setValue(user);
+        mFirebaseDatabaseManager.getDatabaseReference().child("users").child(userId).setValue(user);
     }
 
     class EndpointsAsyncTask extends AsyncTask<Pair<Context, DigitsSession>, Void, String> {

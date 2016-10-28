@@ -78,7 +78,7 @@ public class DigitsSignInActivity extends BaseActivity {
 
             @Override
             public void failure(DigitsException exception) {
-                Log.d("Digits", "Sign in with Digits failure", exception);
+                Log.d("DigitsAuth", "Sign in with DigitsAuth failure", exception);
             }
         };
 

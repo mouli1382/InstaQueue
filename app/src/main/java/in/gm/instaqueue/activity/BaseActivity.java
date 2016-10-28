@@ -9,6 +9,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import javax.inject.Inject;
+
+import in.gm.instaqueue.application.IQApplication;
+import in.gm.instaqueue.preferences.IQSharedPreferences;
+
 public class BaseActivity extends AppCompatActivity {
     private static final String TAG = "BaseActivity";
 
