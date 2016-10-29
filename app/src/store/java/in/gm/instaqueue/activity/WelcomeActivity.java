@@ -13,6 +13,7 @@ import javax.inject.Named;
 import in.gm.instaqueue.R;
 import in.gm.instaqueue.application.IQStoreApplication;
 import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
+import in.gm.instaqueue.tokens.TokensActivity;
 
 /**
  * ToDo Show Welcome screen explaining the app functionality in a paginated view.
@@ -72,7 +73,7 @@ public class WelcomeActivity extends BaseActivity {
 
     private void bootUp() {
         if (mFirebaseAuth.getAuthInstance().getCurrentUser() != null) {
-            Intent intent = new Intent(this, LandingActivity.class);
+            Intent intent = new Intent(this, TokensActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);
             finish();

@@ -1,12 +1,13 @@
 package in.gm.instaqueue.tokens;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import javax.inject.Inject;
 
 import in.gm.instaqueue.R;
 import in.gm.instaqueue.activity.BaseDrawerActivity;
-import in.gm.instaqueue.application.IQApplication;
 import in.gm.instaqueue.application.IQStoreApplication;
 import in.gm.instaqueue.util.ActivityUtilities;
 
@@ -16,6 +17,12 @@ public class TokensActivity extends BaseDrawerActivity {
 
     @Inject
     TokensPresenter mTokensPresenter;
+
+    public static void start(Context caller) {
+        Intent intent = new Intent(caller, TokensActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        caller.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

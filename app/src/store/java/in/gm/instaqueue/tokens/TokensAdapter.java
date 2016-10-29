@@ -13,12 +13,21 @@ import in.gm.instaqueue.model.Token;
 
 public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder> {
 
-    private final List<Token> mTokens;
+    private List<Token> mTokens;
     private TokensFragment.TokenItemListener mTokenItemListener;
 
     public TokensAdapter(List<Token> items, TokensFragment.TokenItemListener tokenItemListener) {
-        mTokens = items;
+        setList(items);
         mTokenItemListener = tokenItemListener;
+    }
+
+    public void replaceData(List<Token> tokens) {
+        setList(tokens);
+        notifyDataSetChanged();
+    }
+
+    private void setList(List<Token> tokens) {
+        mTokens = tokens;
     }
 
     @Override

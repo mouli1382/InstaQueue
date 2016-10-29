@@ -2,10 +2,13 @@ package in.gm.instaqueue.data.token;
 
 import android.support.annotation.NonNull;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import in.gm.instaqueue.model.Token;
+import rx.Observable;
 
 @Singleton
 public class TokensRepository implements TokensDataSource {
@@ -18,47 +21,47 @@ public class TokensRepository implements TokensDataSource {
     }
 
     @Override
-    public void getTokens(@NonNull LoadTokensCallback callback) {
+    public Observable<List<Token>> getTokens() {
+        return mTokensDataSource.getTokens();
+    }
+
+    @Override
+    public Observable<Token> getToken(@NonNull String tokenId) {
+        return mTokensDataSource.getToken(tokenId);
+    }
+
+    @Override
+    public void addNewToken(@NonNull Token token) {
+        mTokensDataSource.addNewToken(token);
+    }
+
+    @Override
+    public void activateToken(@NonNull Token token) {
+        mTokensDataSource.activateToken(token);
+    }
+
+    @Override
+    public void activateToken(@NonNull String tokenId) {
 
     }
 
     @Override
-    public void getToken(@NonNull String TokenId, @NonNull GetTokenCallback callback) {
+    public void completeToken(@NonNull Token token) {
+        mTokensDataSource.completeToken(token);
+    }
+
+    @Override
+    public void completeToken(@NonNull String tokenId) {
 
     }
 
     @Override
-    public void saveToken(@NonNull Token Token) {
-
+    public void cancelToken(@NonNull Token token) {
+        mTokensDataSource.cancelToken(token);
     }
 
     @Override
-    public void activateToken(@NonNull Token Token) {
-
-    }
-
-    @Override
-    public void activateToken(@NonNull String TokenId) {
-
-    }
-
-    @Override
-    public void completeToken(@NonNull Token Token) {
-
-    }
-
-    @Override
-    public void completeToken(@NonNull String TokenId) {
-
-    }
-
-    @Override
-    public void cancelToken(@NonNull Token Token) {
-
-    }
-
-    @Override
-    public void cancelToken(@NonNull String TokenId) {
+    public void cancelToken(@NonNull String tokenId) {
 
     }
 
@@ -69,16 +72,6 @@ public class TokensRepository implements TokensDataSource {
 
     @Override
     public void refreshTokens() {
-
-    }
-
-    @Override
-    public void deleteAllTokens() {
-
-    }
-
-    @Override
-    public void deleteToken(@NonNull String TokenId) {
 
     }
 }

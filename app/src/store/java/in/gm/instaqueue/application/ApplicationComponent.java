@@ -5,6 +5,7 @@ import javax.inject.Singleton;
 import dagger.Component;
 import in.gm.instaqueue.activity.WelcomeActivity;
 import in.gm.instaqueue.authentication.AuthenticationModule;
+import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
 import in.gm.instaqueue.authentication.digits.DigitsSignInActivity;
 import in.gm.instaqueue.authentication.google.GoogleSignInActivity;
 import in.gm.instaqueue.data.token.TokensRepository;

@@ -8,9 +8,12 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true">
-        <activity android:name=".activity.LandingActivity"
-            android:theme="@style/AppTheme.Background">
-        </activity>
+        <activity
+            android:name=".activity.LandingActivity"
+            android:theme="@style/AppTheme.Background" />
+        <activity
+            android:name=".tokens.TokensActivity"
+            android:theme="@style/AppTheme.Background" />
     </application>
 
 </manifest>

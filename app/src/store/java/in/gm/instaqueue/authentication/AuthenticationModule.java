@@ -17,19 +17,25 @@ import io.fabric.sdk.android.Fabric;
 public class AuthenticationModule {
     private FirebaseAuthenticationManager firebaseAuthenticationManager;
 
-    @Provides @Named("digits")
+    @Provides
+    @Named("digits")
     @Singleton
     public FirebaseAuthenticationManager provideDigitsAuthenticationManager(IQStoreApplication application) {
         TwitterAuthConfig authConfig = new TwitterAuthConfig(BuildConfig.TWITTER_KEY, BuildConfig.TWITTER_SECRET);
         Fabric.with(application, new TwitterCore(authConfig), new Digits.Builder().build());
-        firebaseAuthenticationManager = new FirebaseAuthenticationManager();
+        if (null == firebaseAuthenticationManager) {
+            firebaseAuthenticationManager = new FirebaseAuthenticationManager();
+        }
         return firebaseAuthenticationManager;
     }
 
-    @Provides @Named("gauth")
+    @Provides
+    @Named("gauth")
     @Singleton
     public FirebaseAuthenticationManager provideGoogleAuthenticationManager() {
-        firebaseAuthenticationManager = new FirebaseAuthenticationManager();
+        if (null == firebaseAuthenticationManager) {
+            firebaseAuthenticationManager = new FirebaseAuthenticationManager();
+        }
         return firebaseAuthenticationManager;
     }
 }

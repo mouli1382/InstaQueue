@@ -44,6 +44,7 @@ import in.gm.instaqueue.backend.myApi.MyApi;
 import in.gm.instaqueue.database.FirebaseDatabaseManager;
 import in.gm.instaqueue.model.User;
 import in.gm.instaqueue.preferences.IQSharedPreferences;
+import in.gm.instaqueue.tokens.TokensActivity;
 import in.gm.instaqueue.util.ApplicationConstants;
 import io.fabric.sdk.android.Fabric;
 
@@ -127,7 +128,7 @@ public class DigitsSignInActivity extends BaseActivity {
 
                                     finish();
                                     //Launch the landing screen.
-                                    LandingActivity.start(DigitsSignInActivity.this);
+                                    TokensActivity.start(DigitsSignInActivity.this);
                                 }
                             }
 

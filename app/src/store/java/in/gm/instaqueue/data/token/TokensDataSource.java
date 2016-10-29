@@ -5,46 +5,29 @@ import android.support.annotation.NonNull;
 import java.util.List;
 
 import in.gm.instaqueue.model.Token;
+import rx.Observable;
 
 public interface TokensDataSource {
 
-    interface LoadTokensCallback {
+    Observable<List<Token>> getTokens();
 
-        void onTokensLoaded(List<Token> Tokens);
+    Observable<Token> getToken(@NonNull String tokenId);
 
-        void onDataNotAvailable();
-    }
+    void addNewToken(@NonNull Token token);
 
-    interface GetTokenCallback {
+    void activateToken(@NonNull Token token);
 
-        void onTokenLoaded(Token Token);
+    void activateToken(@NonNull String tokenId);
 
-        void onDataNotAvailable();
-    }
+    void completeToken(@NonNull Token token);
 
-    void getTokens(@NonNull LoadTokensCallback callback);
+    void completeToken(@NonNull String tokenId);
 
-    void getToken(@NonNull String TokenId, @NonNull GetTokenCallback callback);
+    void cancelToken(@NonNull Token token);
 
-    void saveToken(@NonNull Token Token);
-
-    void activateToken(@NonNull Token Token);
-
-    void activateToken(@NonNull String TokenId);
-
-    void completeToken(@NonNull Token Token);
-
-    void completeToken(@NonNull String TokenId);
-
-    void cancelToken(@NonNull Token Token);
-
-    void cancelToken(@NonNull String TokenId);
+    void cancelToken(@NonNull String tokenId);
 
     void clearCompletedTokens();
 
     void refreshTokens();
-
-    void deleteAllTokens();
-
-    void deleteToken(@NonNull String TokenId);
 }

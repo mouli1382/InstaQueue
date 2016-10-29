@@ -70,7 +70,13 @@ public class TokensFragment extends Fragment implements TokensContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        mPresenter.subscribe();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.unsubscribe();
     }
 
     @Override
@@ -243,7 +249,7 @@ public class TokensFragment extends Fragment implements TokensContract.View {
 
     @Override
     public void showTokens(List<Token> Tokens) {
-//        mTokensAdapter.replaceData(Tokens);
+        mTokensAdapter.replaceData(Tokens);
 
         mTokensView.setVisibility(View.VISIBLE);
         mNoTokensView.setVisibility(View.GONE);
