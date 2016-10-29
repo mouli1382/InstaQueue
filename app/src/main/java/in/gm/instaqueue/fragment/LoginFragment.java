@@ -11,6 +11,7 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -29,12 +30,14 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 
 import java.io.IOException;
 
 import in.gm.instaqueue.BuildConfig;
+import in.gm.instaqueue.R;
 import in.gm.instaqueue.activity.LandingActivity;
 import in.gm.instaqueue.activity.OnBoardingActivity;
 import in.gm.instaqueue.backend.myApi.MyApi;
@@ -118,8 +121,13 @@ public class LoginFragment extends BaseFragment {
                                 FirebaseUser user = task.getResult().getUser();
                                 if (user != null) {
                                     mSharedPrefs.putString(SharedPrefs.PHONE_NUMBER_KEY, mPhoneNumber);
-                                    writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail(), mPhoneNumber);
 
+                                    writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail(), mPhoneNumber);
+                                    mFirebaseManager.getDatabaseReference()
+                                            .child("store")
+                                            .child(user.getUid()).child("credits").setValue(500);
+                                    MenuItem menuItem = (MenuItem) getActivity().findViewById(R.id.nav_camera);
+                                    menuItem.setTitle("credits        500");
                                     getActivity().finish();
                                     //Launch the landing screen.
                                     LandingActivity.start(getActivity());

@@ -6,4 +6,5 @@
 
 
     <color name="grey_50">#FAFAFA</color>
+    <color name="colorPrimaryDark">#303f9f</color>
 </resources>
