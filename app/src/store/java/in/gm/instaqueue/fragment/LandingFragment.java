@@ -61,6 +61,7 @@ public class LandingFragment extends BaseFragment {
     private ProgressBar mProgressBar;
     private EditText mPhoneNumberEditText;
     private View mMainView;
+    private EditText mCounterEditText;
 
     private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseRecyclerAdapter<Token, TokenRecyclerViewHolder>
@@ -93,6 +94,7 @@ public class LandingFragment extends BaseFragment {
         mLinearLayoutManager = new LinearLayoutManager(getActivity());
         mLinearLayoutManager.setStackFromEnd(true);
         mTokenRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mCounterEditText = (EditText)root.findViewById(R.id.counterEditText);
 
         initSwipe();
 
@@ -256,7 +258,9 @@ public class LandingFragment extends BaseFragment {
                                     Token token = new Token(mFirebaseUser.getUid(),
                                             "+91" + mPhoneNumberEditText.getText(),
                                             currentToken,
-                                            TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "");
+                                            TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "",
+                                            mCounterEditText.getText().toString()
+                                            );
                                     mFirebaseDatabaseReference.child(FirebaseManager.TOKENS_CHILD)
                                             .push().setValue(token);
                                     mPhoneNumberEditText.setText("");
