@@ -27,20 +27,21 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterCore;
 
 import java.io.IOException;
 
-import in.gm.instaqueue.BuildConfig;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import in.gm.instaqueue.activity.BaseActivity;
 import in.gm.instaqueue.activity.LandingActivity;
+import in.gm.instaqueue.application.IQClientApplication;
+import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
 import in.gm.instaqueue.backend.myApi.MyApi;
+import in.gm.instaqueue.database.FirebaseDatabaseManager;
 import in.gm.instaqueue.model.User;
-import in.gm.instaqueue.preferences.SharedPrefs;
-import in.gm.instaqueue.util.AppConstants;
-import io.fabric.sdk.android.Fabric;
-
+import in.gm.instaqueue.preferences.IQSharedPreferences;
+import in.gm.instaqueue.util.ApplicationConstants;
 
 public class DigitsSignInActivity extends BaseActivity {
 
@@ -48,17 +49,28 @@ public class DigitsSignInActivity extends BaseActivity {
     private String mPhoneNumber;
     private String mLineNumber;
 
+    @Inject
+    FirebaseAuthenticationManager mAuthenticationManager;
+
+    @Inject
+    FirebaseDatabaseManager mFirebaseDatabaseManager;
+
+    @Inject
+    IQSharedPreferences mSharedPrefs;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (checkPermission(this, AppConstants.PERMISSION_READ_PHONE_STATE)) {
+        ((IQClientApplication)getApplication())
+                .getApplicationComponent()
+                .inject(this);
+
+
+        if (checkPermission(this, ApplicationConstants.PERMISSION_READ_PHONE_STATE)) {
             TelephonyManager tMgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
             mLineNumber = tMgr.getLine1Number();
         }
-
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(BuildConfig.TWITTER_KEY, BuildConfig.TWITTER_SECRET);
-        Fabric.with(getApplicationContext(), new TwitterCore(authConfig), new Digits.Builder().build());
 
         AuthCallback authCallback = new AuthCallback() {
             @Override
@@ -95,7 +107,7 @@ public class DigitsSignInActivity extends BaseActivity {
 
     private void startSignIn(String customeToken) {
         // Initiate sign in with custom token
-        final FirebaseAuth firebaseAuth = mFirebaseManager.getAuthInstance();
+        final FirebaseAuth firebaseAuth = mAuthenticationManager.getAuthInstance();
         if (firebaseAuth != null) {
             firebaseAuth.signInWithCustomToken(customeToken)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -105,7 +117,7 @@ public class DigitsSignInActivity extends BaseActivity {
                             if (task.isSuccessful()) {
                                 FirebaseUser user = task.getResult().getUser();
                                 if (user != null) {
-                                    mSharedPrefs.putString(SharedPrefs.PHONE_NUMBER_KEY, mPhoneNumber);
+                                    mSharedPrefs.putString(ApplicationConstants.PHONE_NUMBER_KEY, mPhoneNumber);
                                     writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail(), mPhoneNumber);
 
                                     finish();
@@ -129,7 +141,7 @@ public class DigitsSignInActivity extends BaseActivity {
 
     private void writeNewUser(String userId, String name, String email, String phoneNumber) {
         User user = new User(name, email, phoneNumber);
-        getDatabaseReference().child("users").child(userId).setValue(user);
+        mFirebaseDatabaseManager.getDatabaseReference().child("users").child(userId).setValue(user);
     }
 
     class EndpointsAsyncTask extends AsyncTask<Pair<Context, DigitsSession>, Void, String> {

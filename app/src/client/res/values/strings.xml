@@ -1,3 +1,57 @@
 <resources>
     <string name="app_name">IQClient</string>
+    <string name="buzz">BUZZ</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+
+    <!-- Remove unused -->
+    <string name="add_token">New Token</string>
+    <string name="edit_token">Edit Token</string>
+    <string name="token_marked_complete">token marked complete</string>
+    <string name="token_marked_active">token marked active</string>
+    <string name="token_marked_cancel">token marked cancel</string>
+    <string name="loading_tokens_error">Error while loading tokens</string>
+    <string name="completed_tokens_cleared">Completed tokens cleared</string>
+    <string name="menu_filter">Filter</string>
+    <string name="menu_clear">Clear completed</string>
+    <string name="menu_delete_token">Delete token</string>
+    <string name="navigation_view_header_title">Tokens</string>
+    <string name="title_hint">Title</string>
+    <string name="description_hint">Enter your Token here.</string>
+    <string name="empty_token_message">TO DOs cannot be empty</string>
+    <string name="successfully_saved_token_message">Token saved</string>
+    <string name="list_title">Token List</string>
+    <string name="statistics_title">Statistics</string>
+    <string name="statistics_no_tokens">You have no tokens.</string>
+    <string name="statistics_active_tokens">Active tokens:</string>
+    <string name="statistics_completed_tokens">Completed tokens:</string>
+    <string name="statistics_error">Error loading statistics.</string>
+    <string name="no_data">No data</string>
+    <string name="loading">LOADING</string>
+
+    <string-array name="list_tokens_array">
+        <item>@string/nav_all</item>
+        <item>@string/nav_active</item>
+        <item>@string/nav_completed</item>
+        <item>@string/nav_cancelled</item>
+    </string-array>
+    <string name="nav_all">All</string>
+    <string name="nav_active">Active</string>
+    <string name="nav_completed">Completed</string>
+    <string name="nav_cancelled">Cancelled</string>
+    <string name="label_all">All Tokens</string>
+    <string name="label_active">Active Tokens</string>
+    <string name="label_completed">Completed Tokens</string>
+    <string name="label_cancelled">Cancelled Tokens</string>
+    <string name="no_tokens_all">You have no Tokens!</string>
+    <string name="no_tokens_active">You have no active Tokens!</string>
+    <string name="no_tokens_completed">You have no completed Tokens!</string>
+    <string name="no_tokens_cancelled">You have no cancelled Tokens!</string>
+    <string name="no_tokens_add">Add a Token item +</string>
+    <string name="refresh">Refresh</string>
+
+
 </resources>
