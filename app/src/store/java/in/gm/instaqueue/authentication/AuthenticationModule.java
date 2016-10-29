@@ -1,27 +1,35 @@
 package in.gm.instaqueue.authentication;
 
+import com.digits.sdk.android.Digits;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterCore;
+
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import in.gm.instaqueue.application.IQApplication;
-import in.gm.instaqueue.authentication.digits.DigitsAuth;
-import in.gm.instaqueue.authentication.digits.DigitsAuthenticationManager;
-import in.gm.instaqueue.authentication.google.FirebaseAuthenticationManager;
-import in.gm.instaqueue.authentication.google.GAuth;
+import in.gm.instaqueue.BuildConfig;
+import in.gm.instaqueue.application.IQStoreApplication;
+import io.fabric.sdk.android.Fabric;
 
 @Module
 public class AuthenticationModule {
+    private FirebaseAuthenticationManager firebaseAuthenticationManager;
 
-    @Provides
-    @DigitsAuth
-    public DigitsAuthenticationManager provideDigitsAuthenticationManager() {
-        return new DigitsAuthenticationManager();
+    @Provides @Named("digits")
+    @Singleton
+    public FirebaseAuthenticationManager provideDigitsAuthenticationManager(IQStoreApplication application) {
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(BuildConfig.TWITTER_KEY, BuildConfig.TWITTER_SECRET);
+        Fabric.with(application, new TwitterCore(authConfig), new Digits.Builder().build());
+        firebaseAuthenticationManager = new FirebaseAuthenticationManager();
+        return firebaseAuthenticationManager;
     }
 
-    @Provides
-    @GAuth
-    public FirebaseAuthenticationManager provideFirebaseAuthenticationManager() {
-        return new FirebaseAuthenticationManager();
+    @Provides @Named("gauth")
+    @Singleton
+    public FirebaseAuthenticationManager provideGoogleAuthenticationManager() {
+        firebaseAuthenticationManager = new FirebaseAuthenticationManager();
+        return firebaseAuthenticationManager;
     }
 }

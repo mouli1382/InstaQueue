@@ -33,11 +33,13 @@ import com.twitter.sdk.android.core.TwitterCore;
 import java.io.IOException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import in.gm.instaqueue.BuildConfig;
 import in.gm.instaqueue.activity.BaseActivity;
 import in.gm.instaqueue.activity.LandingActivity;
-import in.gm.instaqueue.application.IQApplication;
+import in.gm.instaqueue.application.IQStoreApplication;
+import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
 import in.gm.instaqueue.backend.myApi.MyApi;
 import in.gm.instaqueue.database.FirebaseDatabaseManager;
 import in.gm.instaqueue.model.User;
@@ -52,22 +54,23 @@ public class DigitsSignInActivity extends BaseActivity {
     private String mLineNumber;
 
     @Inject
-    DigitsAuthenticationManager mAuthenticationManager;
+    @Named("digits")
+    FirebaseAuthenticationManager mAuthenticationManager;
 
     @Inject
     FirebaseDatabaseManager mFirebaseDatabaseManager;
 
-    private IQSharedPreferences mSharedPrefs;
+    @Inject
+    IQSharedPreferences mSharedPrefs;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        IQApplication iqApplication = (IQApplication) getApplicationContext();
-        mSharedPrefs = iqApplication.getApplicationComponent().getIQSharedPreferences();
+        ((IQStoreApplication)getApplication())
+                .getApplicationComponent()
+                .inject(this);
 
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(BuildConfig.TWITTER_KEY, BuildConfig.TWITTER_SECRET);
-        Fabric.with(iqApplication, new TwitterCore(authConfig), new Digits.Builder().build());
 
         if (checkPermission(this, ApplicationConstants.PERMISSION_READ_PHONE_STATE)) {
             TelephonyManager tMgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);

@@ -7,11 +7,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import com.google.firebase.auth.FirebaseAuth;
-
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import in.gm.instaqueue.R;
+import in.gm.instaqueue.application.IQStoreApplication;
+import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
 
 /**
  * ToDo Show Welcome screen explaining the app functionality in a paginated view.
@@ -23,11 +24,15 @@ public class WelcomeActivity extends BaseActivity {
     private static final String TAG = "WelcomeActivity";
 
     @Inject
-    protected FirebaseAuth mFirebaseAuth;
+    @Named("digits")
+    protected FirebaseAuthenticationManager mFirebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ((IQStoreApplication)getApplication())
+                .getApplicationComponent()
+                .inject(this);
         setContentView(R.layout.activity_welcome);
     }
 
@@ -66,7 +71,7 @@ public class WelcomeActivity extends BaseActivity {
     }
 
     private void bootUp() {
-        if (getCurrentUser() != null) {
+        if (mFirebaseAuth.getAuthInstance().getCurrentUser() != null) {
             Intent intent = new Intent(this, LandingActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);

@@ -9,15 +9,15 @@ import in.gm.instaqueue.preferences.IQSharedPreferences;
 @Module
 public class ApplicationModule {
 
-    private IQApplication application;
+    private IQStoreApplication application;
 
-    public ApplicationModule(IQApplication app) {
+    public ApplicationModule(IQStoreApplication app) {
         this.application = app;
     }
 
     @Provides
     @Singleton
-    public IQApplication provideIQApplication() {
+    public IQStoreApplication provideIQApplication() {
         return application;
     }
 

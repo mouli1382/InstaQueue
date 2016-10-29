@@ -1,10 +1,6 @@
-package in.gm.instaqueue.authentication.google;
+package in.gm.instaqueue.authentication;
 
 import com.google.firebase.auth.FirebaseAuth;
-
-import javax.inject.Singleton;
-
-import in.gm.instaqueue.authentication.AuthenticationManager;
 
 public class FirebaseAuthenticationManager implements AuthenticationManager {
 

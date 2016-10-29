@@ -23,10 +23,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import in.gm.instaqueue.R;
 import in.gm.instaqueue.activity.BaseActivity;
 import in.gm.instaqueue.activity.LandingActivity;
+import in.gm.instaqueue.application.IQStoreApplication;
+import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
 
 
 public class GoogleSignInActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
@@ -35,7 +38,7 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
     private static final int RC_SIGN_IN = 9001;
 
     @Inject
-    @GAuth
+    @Named("gauth")
     FirebaseAuthenticationManager mAuthenticationManager;
 
     private FirebaseAuth mFirebaseAuth;
@@ -50,6 +53,10 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ((IQStoreApplication)getApplication())
+                .getApplicationComponent()
+                .inject(this);
 
         // Configure GAuth Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
