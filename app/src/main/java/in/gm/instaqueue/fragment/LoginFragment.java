@@ -121,6 +121,7 @@ public class LoginFragment extends BaseFragment {
                                 FirebaseUser user = task.getResult().getUser();
                                 if (user != null) {
                                     mSharedPrefs.putString(SharedPrefs.PHONE_NUMBER_KEY, mPhoneNumber);
+                                    mSharedPrefs.putString(SharedPrefs.UUID_KEY, user.getUid());
 
                                     writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail(), mPhoneNumber);
                                     mFirebaseManager.getDatabaseReference()

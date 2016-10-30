@@ -65,7 +65,7 @@
         android:inputType="numberDecimal"
         android:ems="10"
         android:layout_alignBottom="@+id/textView6"
-        android:id="@+id/editText2"
+        android:id="@+id/creditEdit"
         android:text="500"
         android:textSize="30sp"
         android:layout_alignLeft="@+id/textView3"
