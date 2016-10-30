@@ -1,5 +1,7 @@
 package in.gm.instaqueue.model;
 
+import android.text.TextUtils;
+
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.ServerValue;
 
@@ -12,13 +14,15 @@ public class Token {
     private String storeId;
     private String phoneNumber;
     private long tokenNumber;
-    private String timestamp;
+    private long timestamp;
     private int status;
     private int buzzCount;
 
     public enum Status {
         ISSUED, READY, CANCELLED, COMPLETED
-    };
+    }
+
+    ;
 
     public Token() {
         // Default constructor required for calls to DataSnapshot.getValue(Token.class)
@@ -80,11 +84,11 @@ public class Token {
         this.tokenNumber = tokenNumber;
     }
 
-    public String getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -106,6 +110,10 @@ public class Token {
 
     public boolean isCancelled() {
         return status == Status.CANCELLED.ordinal();
+    }
+
+    public boolean isEmpty() {
+        return TextUtils.isEmpty(phoneNumber);
     }
 
     @Exclude
@@ -135,7 +143,7 @@ public class Token {
         if (!getuId().equals(token.getuId())) return false;
         if (!getStoreId().equals(token.getStoreId())) return false;
         if (!getPhoneNumber().equals(token.getPhoneNumber())) return false;
-        return getTimestamp().equals(token.getTimestamp());
+        return getTimestamp() != (token.getTimestamp());
 
     }
 
@@ -145,7 +153,7 @@ public class Token {
         result = 31 * result + getStoreId().hashCode();
         result = 31 * result + getPhoneNumber().hashCode();
         result = 31 * result + (int) (getTokenNumber() ^ (getTokenNumber() >>> 32));
-        result = 31 * result + getTimestamp().hashCode();
+        result = 31 * result + (int) (getTimestamp() ^ (getTimestamp() >>> 32));
         result = 31 * result + getStatus();
         result = 31 * result + getBuzzCount();
         return result;

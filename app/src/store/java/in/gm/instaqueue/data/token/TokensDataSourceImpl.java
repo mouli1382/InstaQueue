@@ -10,6 +10,7 @@ import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
 import in.gm.instaqueue.database.FirebaseDatabaseManager;
 import in.gm.instaqueue.model.Token;
 import rx.Observable;
+import rx.Subscriber;
 
 public class TokensDataSourceImpl implements TokensDataSource {
 
@@ -32,8 +33,9 @@ public class TokensDataSourceImpl implements TokensDataSource {
     }
 
     @Override
-    public void addNewToken(@NonNull Token token) {
-        mFirebaseDatabaseManager.addNewToken(token);
+    public void addNewToken(@NonNull Token token, Subscriber<? super String> subscriber) {
+        token.setStoreId(mFirebaseAuth.getCurrentUser().getUid());
+        mFirebaseDatabaseManager.addNewToken(token, subscriber);
     }
 
     @Override

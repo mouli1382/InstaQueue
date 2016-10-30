@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 
 import in.gm.instaqueue.model.Token;
 import rx.Observable;
+import rx.Subscriber;
 
 @Singleton
 public class TokensRepository implements TokensDataSource {
@@ -31,8 +32,8 @@ public class TokensRepository implements TokensDataSource {
     }
 
     @Override
-    public void addNewToken(@NonNull Token token) {
-        mTokensDataSource.addNewToken(token);
+    public void addNewToken(@NonNull Token token, Subscriber<? super String> subscriber) {
+        mTokensDataSource.addNewToken(token, subscriber);
     }
 
     @Override

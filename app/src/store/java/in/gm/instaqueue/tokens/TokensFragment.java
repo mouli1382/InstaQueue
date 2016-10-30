@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import in.gm.instaqueue.R;
+import in.gm.instaqueue.addedittoken.AddEditTokenActivity;
 import in.gm.instaqueue.model.Token;
 
 public class TokensFragment extends Fragment implements TokensContract.View {
@@ -327,8 +328,8 @@ public class TokensFragment extends Fragment implements TokensContract.View {
 
     @Override
     public void showAddToken() {
-//        Intent intent = new Intent(getContext(), AddEditTokenActivity.class);
-//        startActivityForResult(intent, AddEditTokenActivity.REQUEST_ADD_Token);
+        Intent intent = new Intent(getContext(), AddEditTokenActivity.class);
+        startActivityForResult(intent, AddEditTokenActivity.REQUEST_ADD_TOKEN);
     }
 
     @Override

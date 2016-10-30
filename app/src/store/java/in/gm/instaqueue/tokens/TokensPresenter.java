@@ -1,11 +1,13 @@
 package in.gm.instaqueue.tokens;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
+import in.gm.instaqueue.addedittoken.AddEditTokenActivity;
 import in.gm.instaqueue.data.token.TokensRepository;
 import in.gm.instaqueue.model.Token;
 import rx.Observable;
@@ -54,10 +56,10 @@ final class TokensPresenter implements TokensContract.Presenter {
     @Override
     public void result(int requestCode, int resultCode) {
         // If a Token was successfully added, show snackbar
-//        if (AddEditTokenActivity.REQUEST_ADD_Token == requestCode
-//                && Activity.RESULT_OK == resultCode) {
-//            mTokensView.showSuccessfullySavedMessage();
-//        }
+        if (AddEditTokenActivity.REQUEST_ADD_TOKEN == requestCode
+                && Activity.RESULT_OK == resultCode) {
+            mTokensView.showSuccessfullySavedMessage();
+        }
     }
 
     @Override

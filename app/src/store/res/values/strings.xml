@@ -20,9 +20,9 @@
     <string name="menu_delete_token">Delete token</string>
     <string name="navigation_view_header_title">Tokens</string>
     <string name="title_hint">Title</string>
-    <string name="description_hint">Enter your Token here.</string>
+    <string name="description_hint">Enter customer Phone Number here.</string>
     <string name="empty_token_message">TO DOs cannot be empty</string>
-    <string name="successfully_saved_token_message">Token saved</string>
+    <string name="successfully_saved_token_message">Token created</string>
     <string name="list_title">Token List</string>
     <string name="statistics_title">Statistics</string>
     <string name="statistics_no_tokens">You have no tokens.</string>

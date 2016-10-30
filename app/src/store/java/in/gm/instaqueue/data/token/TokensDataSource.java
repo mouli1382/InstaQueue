@@ -6,6 +6,7 @@ import java.util.List;
 
 import in.gm.instaqueue.model.Token;
 import rx.Observable;
+import rx.Subscriber;
 
 public interface TokensDataSource {
 
@@ -13,7 +14,7 @@ public interface TokensDataSource {
 
     Observable<Token> getToken(@NonNull String tokenId);
 
-    void addNewToken(@NonNull Token token);
+    void addNewToken(@NonNull Token token, Subscriber<? super String> subscriber);
 
     void activateToken(@NonNull Token token);
 

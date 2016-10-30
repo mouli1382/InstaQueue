@@ -14,6 +14,9 @@
         <activity
             android:name=".tokens.TokensActivity"
             android:theme="@style/AppTheme.Background" />
+        <activity
+            android:name=".addedittoken.AddEditTokenActivity"
+            android:theme="@style/AppTheme.Background" />
     </application>
 
 </manifest>

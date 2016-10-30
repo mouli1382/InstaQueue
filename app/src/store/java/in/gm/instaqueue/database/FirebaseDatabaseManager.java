@@ -51,15 +51,26 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 query.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
-                        });
-                        subscriber.onNext(new ArrayList<>(tokens.values()));
-                        subscriber.onCompleted();
+                        if(dataSnapshot != null) {
+                            HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
+                            });
+                            if(tokens != null) {
+                                subscriber.onNext(new ArrayList<>(tokens.values()));
+                                subscriber.onCompleted();
+                            } else {
+                                subscriber.onError(new Exception("Empty Tokens."));
+                                subscriber.onCompleted();
+                            }
+                        } else {
+                            subscriber.onError(new Exception("Empty Tokens."));
+                            subscriber.onCompleted();
+                        }
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         Log.e(TAG, "[fetch All Tokens] onCancelled:" + databaseError);
+                        subscriber.onError(new Exception("Empty Tokens."));
                         subscriber.onCompleted();
                     }
                 });
@@ -96,10 +107,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         });
     }
 
-    public Observable<Token> addNewToken(final Token token) {
-        return Observable.create(new Observable.OnSubscribe<Token>() {
-            @Override
-            public void call(final Subscriber<? super Token> subscriber) {
+    public void addNewToken(final Token token, final Subscriber<? super String> subscriber) {
                 incrementTokenCounter(token, new Transaction.Handler() {
                     @Override
                     public Transaction.Result doTransaction(MutableData mutableData) {
@@ -123,7 +131,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                             .push().getKey();
                                     Token newToken = new Token(key, token.getStoreId(), token.getPhoneNumber(), currentToken);
                                     mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
-                                    subscriber.onNext(newToken);
+                                    subscriber.onNext(null);
                                     subscriber.onCompleted();
                                 }
                             } else {
@@ -135,8 +143,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
                     }
                 });
-            }
-        });
     }
 
     public void updateToken(Token token) {
