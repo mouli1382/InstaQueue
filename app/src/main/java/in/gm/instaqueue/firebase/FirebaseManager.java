@@ -9,7 +9,9 @@ public class FirebaseManager {
 
     public static final String TOKENS_CHILD = "tokens";
     public static final String TOKENS_HISTORY_CHILD = "token-history";
+
     public static final String COUNTERS_CHILD = "CounterNumbers";
+    public static final String CREDITS_CHILD = "credits";
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;

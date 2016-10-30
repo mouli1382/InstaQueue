@@ -11,6 +11,7 @@ public class SharedPrefs {
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
     public static final String PHONE_NUMBER_KEY = "phone_number_key";
+    public static final String UUID_KEY = "UUID_key";
 
     public SharedPrefs(Context context) {
         mSharedPreferences = context.getSharedPreferences(

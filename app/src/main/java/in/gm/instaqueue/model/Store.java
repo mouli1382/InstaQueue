@@ -5,6 +5,7 @@ public class Store {
     private String storeId;
     private String name;
     private String logoUrl;
+    private long credits;
 
     public String getLogoUrl() {
         return logoUrl;
@@ -28,6 +29,14 @@ public class Store {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public long getCredits() {
+        return credits;
+    }
+
+    public void setName(long credits) {
+        this.credits = credits;
     }
 
 }
