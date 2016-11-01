@@ -27,6 +27,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String TAG = "FirebaseDatabaseManager";
 
     private static final String TOKENS_CHILD = "tokens/";
+    private static final String TOPICS_CHILD = "topics/";
 
     private DatabaseReference mDatabaseReference;
 
@@ -51,10 +52,10 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 query.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot != null) {
+                        if (dataSnapshot != null) {
                             HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
                             });
-                            if(tokens != null) {
+                            if (tokens != null) {
                                 subscriber.onNext(new ArrayList<>(tokens.values()));
                                 subscriber.onCompleted();
                             } else {
@@ -108,41 +109,51 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     public void addNewToken(final Token token, final Subscriber<? super String> subscriber) {
-                incrementTokenCounter(token, new Transaction.Handler() {
-                    @Override
-                    public Transaction.Result doTransaction(MutableData mutableData) {
-                        Long currentValue = mutableData.getValue(Long.class);
-                        if (currentValue == null) {
-                            mutableData.setValue(1);
-                        } else {
-                            mutableData.setValue(currentValue + 1);
+        incrementTokenCounter(token, new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Long currentValue = mutableData.getValue(Long.class);
+                if (currentValue == null) {
+                    mutableData.setValue(1);
+                } else {
+                    mutableData.setValue(currentValue + 1);
+                }
+
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+                if (databaseError == null) {
+                    if (committed) {
+                        Long currentToken = (Long) dataSnapshot.getValue();
+                        {
+                            String key = mDatabaseReference.child(TOKENS_CHILD)
+                                    .push().getKey();
+                            Token newToken = new Token(key, token.getStoreId(), token.getPhoneNumber(), currentToken);
+                            mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
+                            updateTopicsForPushNotification(newToken);
+
+                            subscriber.onNext(null);
+                            subscriber.onCompleted();
                         }
-
-                        return Transaction.success(mutableData);
+                    } else {
+                        subscriber.onError(databaseError.toException());
                     }
+                } else {
+                    subscriber.onError(databaseError.toException());
+                }
 
-                    @Override
-                    public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
-                        if (databaseError == null) {
-                            if (committed) {
-                                Long currentToken = (Long) dataSnapshot.getValue();
-                                {
-                                    String key = mDatabaseReference.child(TOKENS_CHILD)
-                                            .push().getKey();
-                                    Token newToken = new Token(key, token.getStoreId(), token.getPhoneNumber(), currentToken);
-                                    mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
-                                    subscriber.onNext(null);
-                                    subscriber.onCompleted();
-                                }
-                            } else {
-                                subscriber.onError(databaseError.toException());
-                            }
-                        } else {
-                            subscriber.onError(databaseError.toException());
-                        }
+            }
+        });
+    }
 
-                    }
-                });
+    private void updateTopicsForPushNotification(Token token) {
+        HashMap<String, String> result = new HashMap<>();
+        result.put("tokenId", token.getuId());
+        result.put("phoneNumber", token.getPhoneNumber());
+//        result.put("tokenNumber", token.getTokenNumber());
+        mDatabaseReference.child(TOPICS_CHILD).child(token.getuId()).setValue(result);
     }
 
     public void updateToken(Token token) {
