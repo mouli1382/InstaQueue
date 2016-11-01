@@ -16,8 +16,6 @@ public interface TokensContract {
 
         void showTokens(List<Token> tokens);
 
-        void showAddToken();
-
         void showTokenDetailsUi(String tokenId);
 
         void showTokenMarkedComplete();
@@ -46,8 +44,6 @@ public interface TokensContract {
 
         void showNoCancelledTokens();
 
-        void showSuccessfullySavedMessage();
-
         boolean isActive();
 
         void showFilteringPopUpMenu();
@@ -59,17 +55,7 @@ public interface TokensContract {
 
         void loadTokens(boolean forceUpdate);
 
-        void addNewToken();
-
         void openTokenDetails(@NonNull Token requestedToken);
-
-        void activateToken(@NonNull Token activeToken);
-
-        void completeToken(@NonNull Token completedToken);
-
-        void cancelToken(@NonNull Token activeToken);
-
-        void clearCompletedTokens();
 
         void setFiltering(TokensFilterType requestType);
 

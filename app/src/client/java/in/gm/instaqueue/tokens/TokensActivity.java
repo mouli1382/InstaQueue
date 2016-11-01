@@ -1,5 +1,7 @@
 package in.gm.instaqueue.tokens;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import javax.inject.Inject;
@@ -16,6 +18,12 @@ public class TokensActivity extends BaseDrawerActivity {
     @Inject
     TokensPresenter mTokensPresenter;
 
+    public static void start(Context caller) {
+        Intent intent = new Intent(caller, TokensActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        caller.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +38,7 @@ public class TokensActivity extends BaseDrawerActivity {
 
         // Create the presenter
         DaggerTokensComponent.builder()
-                .applicationComponent(((IQClientApplication)getApplication()).getApplicationComponent())
+                .applicationComponent(((IQClientApplication) getApplication()).getApplicationComponent())
                 .tokensPresenterModule(new TokensPresenterModule(tokensFragment)).build()
                 .inject(this);
 

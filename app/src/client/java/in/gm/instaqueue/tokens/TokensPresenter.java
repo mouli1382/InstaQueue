@@ -1,13 +1,21 @@
 package in.gm.instaqueue.tokens;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
+import in.gm.instaqueue.data.token.TokensRepository;
 import in.gm.instaqueue.model.Token;
-import in.gm.instaqueue.token.TokensRepository;
+import rx.Observable;
+import rx.Observer;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 
 final class TokensPresenter implements TokensContract.Presenter {
@@ -20,10 +28,13 @@ final class TokensPresenter implements TokensContract.Presenter {
 
     private boolean mFirstLoad = true;
 
+    private CompositeSubscription mSubscriptions;
+
     @Inject
     TokensPresenter(TokensRepository tokensRepository, TokensContract.View tokensView) {
         mTokensRepository = tokensRepository;
         mTokensView = tokensView;
+        mSubscriptions = new CompositeSubscription();
     }
 
     @Inject
@@ -32,17 +43,18 @@ final class TokensPresenter implements TokensContract.Presenter {
     }
 
     @Override
-    public void start() {
+    public void subscribe() {
         loadTokens(false);
+    }
+
+    @Override
+    public void unsubscribe() {
+        mSubscriptions.clear();
     }
 
     @Override
     public void result(int requestCode, int resultCode) {
         // If a Token was successfully added, show snackbar
-//        if (AddEditTokenActivity.REQUEST_ADD_Token == requestCode
-//                && Activity.RESULT_OK == resultCode) {
-//            mTokensView.showSuccessfullySavedMessage();
-//        }
     }
 
     @Override
@@ -64,59 +76,50 @@ final class TokensPresenter implements TokensContract.Presenter {
             mTokensRepository.refreshTokens();
         }
 
-//        mTokensRepository.getTokens(new TokensDataSource.LoadTokensCallback() {
-//            @Override
-//            public void onTokensLoaded(List<Token> Tokens) {
-//                List<Token> TokensToShow = new ArrayList<Token>();
-//
-//                // This callback may be called twice, once for the cache and once for loading
-//                // the data from the server API, so we check before decrementing, otherwise
-//                // it throws "Counter has been corrupted!" exception.
-//                if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
-//                    EspressoIdlingResource.decrement(); // Set app as idle.
-//                }
-//
-//                // We filter the Tokens based on the requestType
-//                for (Token Token : Tokens) {
-//                    switch (mCurrentFiltering) {
-//                        case ALL_TokenS:
-//                            TokensToShow.add(Token);
-//                            break;
-//                        case ACTIVE_TokenS:
-//                            if (Token.isActive()) {
-//                                TokensToShow.add(Token);
-//                            }
-//                            break;
-//                        case COMPLETED_TokenS:
-//                            if (Token.isCompleted()) {
-//                                TokensToShow.add(Token);
-//                            }
-//                            break;
-//                        default:
-//                            TokensToShow.add(Token);
-//                            break;
-//                    }
-//                }
-//                // The view may not be able to handle UI updates anymore
-//                if (!mTokensView.isActive()) {
-//                    return;
-//                }
-//                if (showLoadingUI) {
-//                    mTokensView.setLoadingIndicator(false);
-//                }
-//
-//                processTokens(TokensToShow);
-//            }
-//
-//            @Override
-//            public void onDataNotAvailable() {
-//                // The view may not be able to handle UI updates anymore
-//                if (!mTokensView.isActive()) {
-//                    return;
-//                }
-//                mTokensView.showLoadingTokensError();
-//            }
-//        });
+        mSubscriptions.clear();
+        Subscription subscription = mTokensRepository
+                .getTokens()
+                .flatMap(new Func1<List<Token>, Observable<Token>>() {
+                    @Override
+                    public Observable<Token> call(List<Token> tokens) {
+                        return Observable.from(tokens);
+                    }
+                })
+                .filter(new Func1<Token, Boolean>() {
+                    @Override
+                    public Boolean call(Token token) {
+                        switch (mCurrentFiltering) {
+                            case ACTIVE_TOKENS:
+                                return token.isActive();
+                            case COMPLETED_TOKENS:
+                                return token.isCompleted();
+                            case CANCELLED_TOKENS:
+                                return token.isCancelled();
+                            default:
+                                return true;
+                        }
+                    }
+                })
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Token>>() {
+                    @Override
+                    public void onCompleted() {
+                        mTokensView.setLoadingIndicator(false);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        mTokensView.showLoadingTokensError();
+                    }
+
+                    @Override
+                    public void onNext(List<Token> tokens) {
+                        processTokens(tokens);
+                    }
+                });
+        mSubscriptions.add(subscription);
     }
 
     private void processTokens(List<Token> Tokens) {
@@ -166,41 +169,8 @@ final class TokensPresenter implements TokensContract.Presenter {
     }
 
     @Override
-    public void addNewToken() {
-        mTokensView.showAddToken();
-    }
-
-    @Override
     public void openTokenDetails(@NonNull Token requestedToken) {
 //        mTokensView.showTokenDetailsUi(requestedToken.getId());
-    }
-
-    @Override
-    public void completeToken(@NonNull Token completedToken) {
-        mTokensRepository.completeToken(completedToken);
-        mTokensView.showTokenMarkedComplete();
-        loadTokens(false, false);
-    }
-
-    @Override
-    public void activateToken(@NonNull Token activeToken) {
-        mTokensRepository.activateToken(activeToken);
-        mTokensView.showTokenMarkedActive();
-        loadTokens(false, false);
-    }
-
-    @Override
-    public void cancelToken(@NonNull Token activeToken) {
-        mTokensRepository.activateToken(activeToken);
-        mTokensView.showTokenMarkedCancel();
-        loadTokens(false, false);
-    }
-
-    @Override
-    public void clearCompletedTokens() {
-        mTokensRepository.clearCompletedTokens();
-        mTokensView.showCompletedTokensCleared();
-        loadTokens(false, false);
     }
 
     @Override

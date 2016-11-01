@@ -1,29 +1,5 @@
 package in.gm.instaqueue.fragment;
 
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ProgressBar;
-
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-
-import in.gm.instaqueue.R;
-import in.gm.instaqueue.adapter.TokenRecyclerViewHolder;
-import in.gm.instaqueue.model.Token;
-
 public class LandingFragment extends BaseFragment {
 
 //    public static final String LANDING_FRAGMENT_TAG = "landing_fragment_tag";

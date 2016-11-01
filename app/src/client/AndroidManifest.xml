@@ -11,6 +11,9 @@
         <activity
             android:name=".activity.LandingActivity"
             android:theme="@style/AppTheme.Background"></activity>
+        <activity
+            android:name=".tokens.TokensActivity"
+            android:theme="@style/AppTheme.Background"></activity>
     </application>
 
 </manifest>

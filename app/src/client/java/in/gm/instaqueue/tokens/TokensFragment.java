@@ -1,16 +1,9 @@
 package in.gm.instaqueue.tokens;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -18,7 +11,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -70,7 +62,13 @@ public class TokensFragment extends Fragment implements TokensContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        mPresenter.subscribe();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.unsubscribe();
     }
 
     @Override
@@ -96,8 +94,6 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(mTokensAdapter);
 
-        initSwipe(recyclerView);
-
         mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
         mTokensView = (LinearLayout) root.findViewById(R.id.tokensLL);
 
@@ -106,24 +102,18 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         mNoTokenIcon = (ImageView) root.findViewById(R.id.notokensIcon);
         mNoTokenMainView = (TextView) root.findViewById(R.id.notokensMain);
         mNoTokenAddView = (TextView) root.findViewById(R.id.notokensAdd);
-        mNoTokenAddView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAddToken();
-            }
-        });
 
         // Set up floating action button
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab);
-
-        fab.setImageResource(R.drawable.ic_add);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPresenter.addNewToken();
-            }
-        });
+//        FloatingActionButton fab =
+//                (FloatingActionButton) getActivity().findViewById(R.id.fab);
+//
+//        fab.setImageResource(R.drawable.ic_add);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mPresenter.addNewToken();
+//            }
+//        });
 
         // Set up progress indicator
         final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
@@ -152,7 +142,7 @@ public class TokensFragment extends Fragment implements TokensContract.View {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear:
-                mPresenter.clearCompletedTokens();
+//                mPresenter.clearCompletedTokens();
                 break;
             case R.id.menu_filter:
                 showFilteringPopUpMenu();
@@ -209,17 +199,17 @@ public class TokensFragment extends Fragment implements TokensContract.View {
 
         @Override
         public void onCompleteTokenClick(Token completedToken) {
-            mPresenter.completeToken(completedToken);
+//            mPresenter.completeToken(completedToken);
         }
 
         @Override
         public void onActivateTokenClick(Token activatedToken) {
-            mPresenter.activateToken(activatedToken);
+//            mPresenter.activateToken(activatedToken);
         }
 
         @Override
         public void onCancelTokenClick(Token cancelledToken) {
-            mPresenter.cancelToken(cancelledToken);
+//            mPresenter.cancelToken(cancelledToken);
         }
     };
 
@@ -243,7 +233,7 @@ public class TokensFragment extends Fragment implements TokensContract.View {
 
     @Override
     public void showTokens(List<Token> Tokens) {
-//        mTokensAdapter.replaceData(Tokens);
+        mTokensAdapter.replaceData(Tokens);
 
         mTokensView.setVisibility(View.VISIBLE);
         mNoTokensView.setVisibility(View.GONE);
@@ -285,11 +275,6 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         );
     }
 
-    @Override
-    public void showSuccessfullySavedMessage() {
-        showMessage(getString(R.string.successfully_saved_token_message));
-    }
-
     private void showNoTokensViews(String mainText, int iconRes, boolean showAddView) {
         mTokensView.setVisibility(View.GONE);
         mNoTokensView.setVisibility(View.VISIBLE);
@@ -317,12 +302,6 @@ public class TokensFragment extends Fragment implements TokensContract.View {
     @Override
     public void showCancelledFilterLabel() {
         mFilteringLabelView.setText(getResources().getString(R.string.label_completed));
-    }
-
-    @Override
-    public void showAddToken() {
-//        Intent intent = new Intent(getContext(), AddEditTokenActivity.class);
-//        startActivityForResult(intent, AddEditTokenActivity.REQUEST_ADD_Token);
     }
 
     @Override
@@ -379,72 +358,4 @@ public class TokensFragment extends Fragment implements TokensContract.View {
 
         void onCancelTokenClick(Token activatedToken);
     }
-
-    private Paint p = new Paint();
-
-    private void initSwipe(RecyclerView recyclerView) {
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-//                int position = viewHolder.getAdapterPosition();
-//                final DatabaseReference tokenRef = mFirebaseAdapter.getRef(position);
-//                Token token = mFirebaseAdapter.getItem(position);
-//                if (direction == ItemTouchHelper.LEFT) {
-//                    //Mark it Cancelled
-//                    token.setStatus(Token.Status.CANCELLED.ordinal());
-//                    tokenRef.child("status").setValue(Token.Status.CANCELLED.ordinal());
-//                } else {
-//                    //Mark it Completed
-//                    token.setStatus(Token.Status.COMPLETED.ordinal());
-//                    tokenRef.child("status").setValue(Token.Status.COMPLETED.ordinal());
-//                }
-//
-//                //Move it to token-history table.
-//                mFirebaseDatabaseReference
-//                        .child(FirebaseAuthenticationManager.TOKENS_HISTORY_CHILD)
-//                        .push()
-//                        .setValue(token);
-//                tokenRef.removeValue();
-//                mFirebaseAdapter.notifyItemRemoved(position);
-            }
-
-            @Override
-            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-
-                Bitmap icon;
-                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-
-                    View itemView = viewHolder.itemView;
-                    float height = (float) itemView.getBottom() - (float) itemView.getTop();
-                    float width = height / 3;
-
-                    if (dX > 0) {
-                        p.setColor(Color.parseColor("#388E3C"));
-                        RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX, (float) itemView.getBottom());
-                        c.drawRect(background, p);
-                        icon = BitmapFactory.decodeResource(getResources(), android.R.drawable.ic_menu_compass);
-                        RectF icon_dest = new RectF((float) itemView.getLeft() + width, (float) itemView.getTop() + width, (float) itemView.getLeft() + 2 * width, (float) itemView.getBottom() - width);
-                        c.drawBitmap(icon, null, icon_dest, p);
-                    } else {
-                        p.setColor(Color.parseColor("#D32F2F"));
-                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
-                        c.drawRect(background, p);
-                        icon = BitmapFactory.decodeResource(getResources(), android.R.drawable.ic_menu_close_clear_cancel);
-                        RectF icon_dest = new RectF((float) itemView.getRight() - 2 * width, (float) itemView.getTop() + width, (float) itemView.getRight() - width, (float) itemView.getBottom() - width);
-                        c.drawBitmap(icon, null, icon_dest, p);
-                    }
-                }
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-            }
-        };
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
-    }
-
 }

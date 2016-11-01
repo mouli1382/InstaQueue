@@ -1,8 +1,8 @@
 package in.gm.instaqueue.application;
 
 import in.gm.instaqueue.authentication.AuthenticationModule;
+import in.gm.instaqueue.data.token.TokensRepositoryModule;
 import in.gm.instaqueue.database.DatabaseModule;
-import in.gm.instaqueue.token.TokensRepositoryModule;
 
 public class IQClientApplication extends IQApplication {
     private ApplicationComponent applicationComponent;
