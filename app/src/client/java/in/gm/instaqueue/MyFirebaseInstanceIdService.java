@@ -33,21 +33,25 @@ public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
         // Once a token is generated, we subscribe to topic.
         String myPhoneNumber = ((IQClientApplication) getApplicationContext())
                 .getApplicationComponent()
+//                .getFirebaseAuthenticationManager()
+//                .getAuthInstance()
+//                .getCurrentUser()
+//                .getUid()
                 .getIQSharedPreferences()
                 .getSting(ApplicationConstants.PHONE_NUMBER_KEY);
 
-        FirebaseMessaging.getInstance()
-                .subscribeToTopic(IQ_TOKENS_TOPIC + "_" + myPhoneNumber);
+//        FirebaseMessaging.getInstance()
+//                .subscribeToTopic(token);
 
         //Send the token to the app server for GCM push
-        try {
-            sendRegistrationToServer(token);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            sendRegistrationToServer(token, myPhoneNumber);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
-    private void sendRegistrationToServer(String token) throws IOException {
+    private void sendRegistrationToServer(String token, String myPhoneNumber) throws IOException {
         Registration.Builder builder = new Registration.Builder(AndroidHttp.newCompatibleTransport(),
                 new AndroidJsonFactory(), null)
                 // Need setRootUrl and setGoogleClientRequestInitializer only for local testing,
@@ -62,7 +66,7 @@ public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
                     }
                 });
         Registration regService = builder.build();
-        regService.register(token).execute();
+        regService.register(token, myPhoneNumber).execute();
     }
 
 }

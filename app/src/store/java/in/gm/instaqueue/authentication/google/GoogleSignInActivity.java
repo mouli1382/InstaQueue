@@ -27,9 +27,9 @@ import javax.inject.Named;
 
 import in.gm.instaqueue.R;
 import in.gm.instaqueue.activity.BaseActivity;
-import in.gm.instaqueue.activity.LandingActivity;
 import in.gm.instaqueue.application.IQStoreApplication;
 import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
+import in.gm.instaqueue.tokens.TokensActivity;
 
 
 public class GoogleSignInActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
@@ -117,7 +117,7 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
                             finish();
 
                             //Launch the landing screen.
-                            LandingActivity.start(GoogleSignInActivity.this);
+                            TokensActivity.start(GoogleSignInActivity.this);
                         }
                     }
                 });

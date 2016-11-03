@@ -19,4 +19,8 @@
 
         <property name="gcm.api.key" value="AIzaSyC6RhuXhw9HjrE_v-9KNBAMVEq3pQ6IkD0" />
     </system-properties>
+
+    <manual-scaling>
+        <instances>1</instances>
+    </manual-scaling>
 </appengine-web-app>
