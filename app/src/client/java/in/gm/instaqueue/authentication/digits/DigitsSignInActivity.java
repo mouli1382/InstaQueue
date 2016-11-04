@@ -27,20 +27,20 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.IOException;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import in.gm.instaqueue.activity.BaseActivity;
-import in.gm.instaqueue.activity.LandingActivity;
 import in.gm.instaqueue.application.IQClientApplication;
 import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
 import in.gm.instaqueue.backend.myApi.MyApi;
 import in.gm.instaqueue.database.FirebaseDatabaseManager;
 import in.gm.instaqueue.model.User;
 import in.gm.instaqueue.preferences.IQSharedPreferences;
+import in.gm.instaqueue.tokens.TokensActivity;
 import in.gm.instaqueue.util.ApplicationConstants;
 
 public class DigitsSignInActivity extends BaseActivity {
@@ -122,7 +122,7 @@ public class DigitsSignInActivity extends BaseActivity {
 
                                     finish();
                                     //Launch the landing screen.
-                                    LandingActivity.start(DigitsSignInActivity.this);
+                                    TokensActivity.start(DigitsSignInActivity.this);
                                 }
                             }
 
@@ -140,8 +140,10 @@ public class DigitsSignInActivity extends BaseActivity {
     }
 
     private void writeNewUser(String userId, String name, String email, String phoneNumber) {
-        User user = new User(name, email, phoneNumber);
-        mFirebaseDatabaseManager.getDatabaseReference().child("users").child(userId).setValue(user);
+        //Save the registration token in the firebase user table.
+        String regId = FirebaseInstanceId.getInstance().getToken();
+//        User user = new User(userId, name, phoneNumber, email, regId);
+        mFirebaseDatabaseManager.getDatabaseReference().child("users").child(phoneNumber).setValue(regId);
     }
 
     class EndpointsAsyncTask extends AsyncTask<Pair<Context, DigitsSession>, Void, String> {

@@ -1,4 +1,4 @@
-package in.gm.instaqueue.model;
+package in.gm.instaqueue.backend;
 
 public class User {
     private String uId;

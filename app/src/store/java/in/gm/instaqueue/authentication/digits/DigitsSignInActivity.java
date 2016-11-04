@@ -37,7 +37,6 @@ import javax.inject.Named;
 
 import in.gm.instaqueue.BuildConfig;
 import in.gm.instaqueue.activity.BaseActivity;
-import in.gm.instaqueue.activity.LandingActivity;
 import in.gm.instaqueue.application.IQStoreApplication;
 import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
 import in.gm.instaqueue.backend.myApi.MyApi;

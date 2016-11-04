@@ -4,6 +4,10 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.extensions.android.json.AndroidJsonFactory;
+import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
+import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -14,17 +18,20 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import in.gm.instaqueue.backend.messaging.Messaging;
 import in.gm.instaqueue.model.Token;
 import in.gm.instaqueue.preferences.IQSharedPreferences;
 import in.gm.instaqueue.util.ApplicationConstants;
 import rx.Observable;
 import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
 public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String TAG = "FirebaseDatabaseManager";
@@ -33,6 +40,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String TOPICS_CHILD = "topics/";
 
     private DatabaseReference mDatabaseReference;
+    private Messaging messagingApiService = null;
 
     @Inject
     public FirebaseDatabaseManager(Context context) {
@@ -136,9 +144,12 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         {
                             String key = mDatabaseReference.child(TOKENS_CHILD)
                                     .push().getKey();
-                            Token newToken = new Token(key, token.getStoreId(), token.getPhoneNumber(), currentToken, mSharedPrefs.getSting((ApplicationConstants.PROFILE_PIC_URL_KEY)), mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY));
+
+                            final Token newToken = new Token(key, token.getStoreId(), token.getPhoneNumber(), currentToken, mSharedPrefs.getSting((ApplicationConstants.PROFILE_PIC_URL_KEY)), mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY));
+
                             mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
-                            updateTopicsForPushNotification(newToken);
+
+                            sendPushToClient(newToken.getuId(), newToken.getPhoneNumber());
 
                             subscriber.onNext(null);
                             subscriber.onCompleted();
@@ -175,6 +186,60 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .child(token.getStoreId())
                 .child("tokenCounter");
         tokenCounterRef.runTransaction(handler);
+    }
+
+    //send a push message to the client.
+    private void sendPushToClient(final String tokenId, final String phoneNumber) {
+        Observable.create(new Observable.OnSubscribe<Object>() {
+            @Override
+            public void call(Subscriber<? super Object> subscriber) {
+                try {
+                    if (messagingApiService == null) {  // Only do this once
+                        Messaging.Builder builder = new Messaging.Builder(AndroidHttp.newCompatibleTransport(),
+                                new AndroidJsonFactory(), null)
+                                // options for running against local devappserver
+                                // - 10.0.2.2 is localhost's IP address in Android emulator
+                                // - turn off compression when running against local devappserver
+                                .setRootUrl("https://instaqueue-9f086.appspot.com/_ah/api/")
+//                        .setRootUrl("http://192.168.1.6:8080/_ah/api/")
+                                .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                                    @Override
+                                    public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
+                                        abstractGoogleClientRequest.setDisableGZipContent(true);
+                                    }
+                                });
+                        // end options for devappserver
+
+                        messagingApiService = builder.build();
+                    }
+
+                    messagingApiService.pushMessage(tokenId, phoneNumber).execute();
+
+                    subscriber.onNext(null);
+                    subscriber.onCompleted();
+                } catch (IOException e) {
+                    subscriber.onError(e);
+                }
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Subscriber<Object>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.e(TAG, "FCM push completed!");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, "FCM push error!");
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onNext(Object o) {
+
+                    }
+                });
     }
 }
 
