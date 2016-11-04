@@ -17,7 +17,7 @@ public class IQStoreApplication extends IQApplication {
         if (applicationComponent == null) {
             applicationComponent = DaggerApplicationComponent
                     .builder()
-                    .databaseModule(new DatabaseModule())
+                    .databaseModule(new DatabaseModule(getApplicationContext()))
                     .authenticationModule(new AuthenticationModule())
                     .applicationModule(new ApplicationModule(this))
                     .tokensRepositoryModule(new TokensRepositoryModule())

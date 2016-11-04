@@ -1,5 +1,6 @@
 package in.gm.instaqueue.database;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -20,6 +21,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import in.gm.instaqueue.model.Token;
+import in.gm.instaqueue.preferences.IQSharedPreferences;
+import in.gm.instaqueue.util.ApplicationConstants;
 import rx.Observable;
 import rx.Subscriber;
 
@@ -32,9 +35,12 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private DatabaseReference mDatabaseReference;
 
     @Inject
-    public FirebaseDatabaseManager() {
+    public FirebaseDatabaseManager(Context context) {
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mSharedPrefs = new IQSharedPreferences(context);
     }
+
+    private IQSharedPreferences  mSharedPrefs;
 
     public DatabaseReference getDatabaseReference() {
         return mDatabaseReference;
@@ -130,7 +136,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         {
                             String key = mDatabaseReference.child(TOKENS_CHILD)
                                     .push().getKey();
-                            Token newToken = new Token(key, token.getStoreId(), token.getPhoneNumber(), currentToken);
+                            Token newToken = new Token(key, token.getStoreId(), token.getPhoneNumber(), currentToken, mSharedPrefs.getSting((ApplicationConstants.PROFILE_PIC_URL_KEY)), mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY));
                             mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
                             updateTopicsForPushNotification(newToken);
 

@@ -17,6 +17,8 @@ public class Token {
     private long timestamp;
     private int status;
     private int buzzCount;
+    private String senderPic;
+    private String senderName;
 
     public enum Status {
         ISSUED, READY, CANCELLED, COMPLETED
@@ -28,13 +30,15 @@ public class Token {
         // Default constructor required for calls to DataSnapshot.getValue(Token.class)
     }
 
-    public Token(String uId, String storeId, String phoneNumber, long tokenNumber) {
+    public Token(String uId, String storeId, String phoneNumber, long tokenNumber, String senderPic, String senderName) {
         this.uId = uId;
         this.storeId = storeId;
         this.phoneNumber = phoneNumber;
         this.tokenNumber = tokenNumber;
         this.status = Status.ISSUED.ordinal();
         this.buzzCount = 0;
+        this.senderPic = senderPic;
+        this.senderName = senderName;
     }
 
     public boolean needsBuzz() {
@@ -58,6 +62,22 @@ public class Token {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
+    }
+
+    public String getSenderPic() {
+        return senderPic;
+    }
+
+    public void setSenderPic(String senderPic) {
+        this.senderPic = senderPic;
     }
 
     public String getStoreId() {
@@ -126,7 +146,8 @@ public class Token {
         result.put("timestamp", ServerValue.TIMESTAMP);
         result.put("status", status);
         result.put("buzzCount", buzzCount);
-
+        result.put("senderName", senderName);
+        result.put("senderPic", senderPic);
         return result;
     }
 

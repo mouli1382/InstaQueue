@@ -3,6 +3,8 @@ package in.gm.instaqueue.authentication.google;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,6 +32,8 @@ import in.gm.instaqueue.activity.BaseActivity;
 import in.gm.instaqueue.activity.LandingActivity;
 import in.gm.instaqueue.application.IQStoreApplication;
 import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
+import in.gm.instaqueue.preferences.IQSharedPreferences;
+import in.gm.instaqueue.util.ApplicationConstants;
 
 
 public class GoogleSignInActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
@@ -43,6 +47,8 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
 
     private FirebaseAuth mFirebaseAuth;
     private GoogleApiClient mGoogleApiClient;
+    @Inject
+    IQSharedPreferences mSharedPrefs;
 
 
     public static void start(Context caller) {
@@ -86,9 +92,22 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+
+
+            GoogleSignInAccount acct = result.getSignInAccount();
+
             if (result.isSuccess()) {
                 // GAuth Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = result.getSignInAccount();
+                String personName = acct.getDisplayName();
+                String personGivenName = acct.getGivenName();
+                String personFamilyName = acct.getFamilyName();
+                String personEmail = acct.getEmail();
+                String personId = acct.getId();
+                Uri personPhoto = acct.getPhotoUrl();
+                mSharedPrefs.putString(ApplicationConstants.PROFILE_PIC_URL_KEY, personPhoto.toString());
+                mSharedPrefs.putString(ApplicationConstants.DISPLAY_NAME_KEY, personName.toString());
+
                 firebaseAuthWithGoogle(account);
             } else {
                 // GAuth Sign In failed
@@ -111,7 +130,7 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCredential", task.getException());
-                            Toast.makeText(GoogleSignInActivity.this, "Authentication failed.",
+                            Toast.makeText(GoogleSignInActivity.this, "GAuth Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             finish();

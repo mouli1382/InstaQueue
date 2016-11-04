@@ -79,6 +79,9 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
 
     @Override
     public void showTokensList() {
+        //todo: Find a better way to avoid crash
+        if (getActivity() == null)
+            return;
         getActivity().setResult(Activity.RESULT_OK);
         getActivity().finish();
     }
