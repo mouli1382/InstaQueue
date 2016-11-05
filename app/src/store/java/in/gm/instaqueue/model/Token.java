@@ -19,6 +19,7 @@ public class Token {
     private int buzzCount;
     private String senderPic;
     private String senderName;
+    private HashMap<String,String> mCustomMap;
 
     public enum Status {
         ISSUED, READY, CANCELLED, COMPLETED
@@ -95,6 +96,10 @@ public class Token {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+    public void  setCustomMap(HashMap <String, String> hashMap) {this.mCustomMap = hashMap;}
+
+    public HashMap<String, String> getCustomMap() { return this.mCustomMap; }
 
     public long getTokenNumber() {
         return tokenNumber;
