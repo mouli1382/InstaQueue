@@ -6,7 +6,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
-
     <!-- Remove unused -->
     <string name="add_token">New Token</string>
     <string name="edit_token">Edit Token</string>
@@ -52,6 +51,7 @@
     <string name="no_tokens_cancelled">You have no cancelled Tokens!</string>
     <string name="no_tokens_add">Add a Token item +</string>
     <string name="refresh">Refresh</string>
+    <string name="title_activity_custom_fields">CustomFields</string>
 
 
 </resources>

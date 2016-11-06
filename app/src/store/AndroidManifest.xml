@@ -17,6 +17,10 @@
         <activity
             android:name=".addedittoken.AddEditTokenActivity"
             android:theme="@style/AppTheme.Background" />
+        <activity
+            android:name=".activity.CustomFields"
+            android:label="@string/title_activity_custom_fields"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
