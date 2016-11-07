@@ -53,5 +53,9 @@
     <string name="refresh">Refresh</string>
     <string name="title_activity_custom_fields">CustomFields</string>
 
+    <string name="title_activity_idcard">IDCardActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
 
 </resources>

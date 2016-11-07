@@ -93,6 +93,9 @@ public class BaseDrawerActivity extends BaseActivity
             startActivity(intent);
 
         } else if (id == R.id.nav_gallery) {
+            Intent intent = new Intent(this, IDCardActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
 
         } else if (id == R.id.nav_slideshow) {
 

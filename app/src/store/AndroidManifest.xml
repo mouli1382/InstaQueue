@@ -20,7 +20,12 @@
         <activity
             android:name=".activity.CustomFields"
             android:label="@string/title_activity_custom_fields"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".activity.IDCardActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_idcard"
+            android:theme="@style/FullscreenTheme"></activity>
     </application>
 
 </manifest>
