@@ -1,6 +1,6 @@
 package in.gm.instaqueue.database;
 
-import android.content.Context;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -18,7 +18,12 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,14 +46,15 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     private DatabaseReference mDatabaseReference;
     private Messaging messagingApiService = null;
+    private IQSharedPreferences  mSharedPrefs;
 
     @Inject
-    public FirebaseDatabaseManager(Context context) {
+    public FirebaseDatabaseManager(IQSharedPreferences iqSharedPreferences) {
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
-        mSharedPrefs = new IQSharedPreferences(context);
+        mSharedPrefs = iqSharedPreferences;
     }
 
-    private IQSharedPreferences  mSharedPrefs;
+
 
     public DatabaseReference getDatabaseReference() {
         return mDatabaseReference;
@@ -149,7 +155,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
                             mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
 
-                            sendPushToClient(newToken.getuId(), newToken.getPhoneNumber());
+//                            sendPushToClient(newToken.getuId(), newToken.getPhoneNumber());
 
                             subscriber.onNext(null);
                             subscriber.onCompleted();
@@ -163,6 +169,69 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
             }
         });
+    }
+
+    private final static String mMsg91Url = "https://control.msg91.com/api/sendhttp.php?";
+
+    private void sendSMS(Token token) {
+        //Android SMS API integration code
+
+        //Your authentication key
+        String authkey = "128441AGQNt0b0eb2q580367e2";
+        //Multiple mobiles numbers separated by comma
+        String mobiles = token.getPhoneNumber();
+        //Sender ID,While using route4 sender id should be 6 characters long.
+        String senderId = "InstaQ";
+        //Your message to send, Add URL encoding here.
+        String message = "Your token number = " + token.getTokenNumber();
+        //define route
+        String route = "4"; //4 For transaction, check with msg91
+
+        URLConnection myURLConnection = null;
+        URL myURL = null;
+        BufferedReader reader = null;
+
+        //encoding message
+        String encoded_message = URLEncoder.encode(message);
+
+        //Send SMS API
+        String mainUrl = mMsg91Url;
+
+        //Prepare parameter string
+        StringBuilder sbPostData = new StringBuilder(mainUrl);
+        sbPostData.append("authkey=" + authkey);
+        sbPostData.append("&mobiles=" + mobiles);
+        sbPostData.append("&message=" + encoded_message);
+        sbPostData.append("&route=" + route);
+        sbPostData.append("&sender=" + senderId);
+
+        //final string
+        mainUrl = sbPostData.toString();
+        class SendSMSTask extends AsyncTask<String, Integer, Long> {
+            protected Long doInBackground(String... urls) {
+                try {
+                    //prepare connection
+                    URL myURL = new URL(urls[0]);
+                    URLConnection myURLConnection = myURL.openConnection();
+                    myURLConnection.connect();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(myURLConnection.getInputStream()));
+
+                    //reading response
+                    String response;
+                    while ((response = reader.readLine()) != null)
+                        //print response
+                        Log.d("RESPONSE", "" + response);
+
+                    //finally close connection
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return 0L;
+            }
+        }
+        //Uncomment this  to execute the send sms
+        //new SendSMSTask().execute(mainUrl);
     }
 
     private void updateTopicsForPushNotification(Token token) {

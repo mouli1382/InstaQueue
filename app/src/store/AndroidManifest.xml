@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="in.gm.instaqueue">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+
     <application
         android:name=".application.IQStoreApplication"
         android:allowBackup="true"
@@ -27,6 +30,20 @@
             android:name=".activity.StoreOnboarding"
             android:label="@string/title_activity_store_onboarding"
             android:theme="@style/AppTheme"></activity>
+        <activity
+            android:name=".activity.CreditsActivity"
+            android:label="@string/title_activity_credits"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.razorpay.CheckoutActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
+        <activity android:name=".activity.RazorPayActivity"></activity>
+        <!-- Add your API key here -->
+        <meta-data
+            android:name="com.razorpay.ApiKey"
+            android:value="rzp_test_0vql5D6J04VFkX"
+            />
+
     </application>
 
 </manifest>

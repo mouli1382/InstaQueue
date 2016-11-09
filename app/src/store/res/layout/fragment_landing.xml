@@ -6,12 +6,6 @@
     android:id="@+id/mainView"
     tools:context="in.gm.instaqueue.activity.LandingActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/tokenRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/linearLayout"/>
-
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
@@ -19,15 +13,60 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/linearLayouthorizontal1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:orientation="horizontal">
+        <TextView
+            android:text="Counter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView2"
+            android:textStyle="bold"
+            android:textSize="20dp"
+            android:layout_weight="1" />
+        <EditText
+            android:id="@+id/counterEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:inputType="numberDecimal" />
+
+
+    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/linearLayouthorizontal2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:orientation="horizontal">
+        <TextView
+            android:text="Mobile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView3"
+            android:layout_weight="1"
+            android:textStyle="bold"
+            android:textSize="20dp"
+            android:theme="@style/AppTheme" />
 
         <EditText
             android:id="@+id/phoneEditText"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
             android:inputType="phone" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/generateButton"
@@ -35,9 +74,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:enabled="false"
-            android:text="GENERATE" />
+            android:text="Issue Token" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/tokenRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme" />
 
     </LinearLayout>
+
 
     <ProgressBar
         android:id="@+id/progressBar"

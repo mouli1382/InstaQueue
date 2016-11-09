@@ -1,5 +1,6 @@
 package in.gm.instaqueue.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,33 +9,34 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.EditText;
 
 import in.gm.instaqueue.R;
 
-public class BaseDrawerActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class CreditsActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener
+        {
 
-    protected View mainContentView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_base_drawer);
+        setContentView(R.layout.activity_credits);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mainContentView = findViewById(R.id.content_base_drawer);
-
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -44,6 +46,17 @@ public class BaseDrawerActivity extends BaseActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        Button buttonBuy = (Button) findViewById(R.id.button2);
+        //final Button button = (Button) findViewById(R.id.button_id);
+        buttonBuy.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), RazorPayActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                EditText editCredit = (EditText) findViewById(R.id.creditEdit) ;
+                intent.putExtra("message", editCredit.getText().toString());
+                getApplicationContext().startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -59,7 +72,7 @@ public class BaseDrawerActivity extends BaseActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.base_drawer, menu);
+        getMenuInflater().inflate(R.menu.credits, menu);
         return true;
     }
 
@@ -82,12 +95,10 @@ public class BaseDrawerActivity extends BaseActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-
-        item.setTitle("credits        500");
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-
+            // Handle the camera action
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {

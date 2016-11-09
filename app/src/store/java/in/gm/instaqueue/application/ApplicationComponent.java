@@ -3,6 +3,7 @@ package in.gm.instaqueue.application;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import in.gm.instaqueue.activity.RazorPayActivity;
 import in.gm.instaqueue.activity.WelcomeActivity;
 import in.gm.instaqueue.authentication.AuthenticationModule;
 import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
@@ -17,6 +18,8 @@ import in.gm.instaqueue.database.DatabaseModule;
 public interface ApplicationComponent {
 
     void inject(WelcomeActivity welcomeActivity);
+
+    void inject(RazorPayActivity razorPayActivity);
 
     void inject(DigitsSignInActivity digitsSignInActivity);
 

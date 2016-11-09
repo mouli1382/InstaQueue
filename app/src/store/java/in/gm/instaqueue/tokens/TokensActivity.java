@@ -11,6 +11,7 @@ import javax.inject.Inject;
 
 import in.gm.instaqueue.R;
 import in.gm.instaqueue.activity.BaseDrawerActivity;
+import in.gm.instaqueue.activity.CreditsActivity;
 import in.gm.instaqueue.activity.CustomFields;
 import in.gm.instaqueue.activity.IDCardActivity;
 import in.gm.instaqueue.application.IQStoreApplication;
@@ -72,6 +73,9 @@ public class TokensActivity extends BaseDrawerActivity {
             startActivity(intent);
 
         } else if (id == R.id.nav_slideshow) {
+            Intent intent = new Intent(getApplicationContext(), CreditsActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getApplicationContext().startActivity(intent);
 
         } else if (id == R.id.nav_manage) {
 

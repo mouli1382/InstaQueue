@@ -20,6 +20,7 @@ public class Token {
     private String senderPic;
     private String senderName;
     private HashMap<String,String> mCustomMap;
+    private String counterName;
 
     public enum Status {
         ISSUED, READY, CANCELLED, COMPLETED
@@ -40,6 +41,7 @@ public class Token {
         this.buzzCount = 0;
         this.senderPic = senderPic;
         this.senderName = senderName;
+        this.counterName = counterName;
     }
 
     public boolean needsBuzz() {
@@ -47,6 +49,14 @@ public class Token {
             return true;
         }
         return false;
+    }
+
+    public String getCounterName() {
+        return counterName;
+    }
+
+    public void setCounterName(String counterName) {
+        this.counterName = counterName;
     }
 
     public String getuId() {
