@@ -25,7 +25,11 @@
             android:name=".activity.IDCardActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_idcard"
-            android:theme="@style/FullscreenTheme"></activity>
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activity.StoreOnboarding"
+            android:label="@string/title_activity_store_onboarding"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
