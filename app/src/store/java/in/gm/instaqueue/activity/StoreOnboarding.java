@@ -7,7 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import in.gm.instaqueue.store.R;
+import in.gm.instaqueue.R;
+
 
 public class StoreOnboarding extends AppCompatActivity {
 
