@@ -3,11 +3,16 @@ package in.gm.instaqueue.tokens;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.view.MenuItem;
 
 import javax.inject.Inject;
 
 import in.gm.instaqueue.R;
 import in.gm.instaqueue.activity.BaseDrawerActivity;
+import in.gm.instaqueue.activity.CustomFields;
+import in.gm.instaqueue.activity.IDCardActivity;
 import in.gm.instaqueue.application.IQStoreApplication;
 import in.gm.instaqueue.util.ActivityUtilities;
 
@@ -48,6 +53,35 @@ public class TokensActivity extends BaseDrawerActivity {
                     (TokensFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
             mTokensPresenter.setFiltering(currentFiltering);
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+            Intent intent = new Intent(this, CustomFields.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+
+        } else if (id == R.id.nav_gallery) {
+            Intent intent = new Intent(this, IDCardActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        return super.onNavigationItemSelected(item);
     }
 
     @Override
