@@ -40,7 +40,6 @@ public class StoreOnboarding extends BaseActivity {
     private static final int PICK_IMAGE_REQUEST = 9002;
 
     @Inject
-    @Named("gauth")
     FirebaseAuthenticationManager mAuthenticationManager;
 
 

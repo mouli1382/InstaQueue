@@ -25,7 +25,6 @@ public class WelcomeActivity extends BaseActivity {
     private static final String TAG = "WelcomeActivity";
 
     @Inject
-    @Named("digits")
     protected FirebaseAuthenticationManager mFirebaseAuth;
 
     @Override

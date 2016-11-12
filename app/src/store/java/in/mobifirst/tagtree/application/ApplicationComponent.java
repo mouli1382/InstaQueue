@@ -11,7 +11,6 @@ import in.mobifirst.tagtree.activity.StoreOnboarding;
 
 import in.mobifirst.tagtree.activity.WelcomeActivity;
 import in.mobifirst.tagtree.authentication.AuthenticationModule;
-import in.mobifirst.tagtree.authentication.digits.DigitsSignInActivity;
 import in.mobifirst.tagtree.data.token.TokensRepository;
 import in.mobifirst.tagtree.data.token.TokensRepositoryModule;
 
@@ -22,8 +21,6 @@ public interface ApplicationComponent {
     void inject(WelcomeActivity welcomeActivity);
 
     void inject(RazorPayActivity razorPayActivity);
-
-    void inject(DigitsSignInActivity digitsSignInActivity);
 
     void inject(GoogleSignInActivity googleSignInActivity);
 

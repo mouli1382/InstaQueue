@@ -41,7 +41,6 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
     private static final int RC_SIGN_IN = 9001;
 
     @Inject
-    @Named("gauth")
     FirebaseAuthenticationManager mAuthenticationManager;
 
     private FirebaseAuth mFirebaseAuth;
