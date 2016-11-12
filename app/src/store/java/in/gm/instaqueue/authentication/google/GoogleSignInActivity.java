@@ -29,6 +29,7 @@ import javax.inject.Named;
 
 import in.gm.instaqueue.R;
 import in.gm.instaqueue.activity.BaseActivity;
+import in.gm.instaqueue.activity.StoreOnboarding;
 import in.gm.instaqueue.application.IQStoreApplication;
 import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
 import in.gm.instaqueue.preferences.IQSharedPreferences;
@@ -135,9 +136,8 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             finish();
-
-                            //Launch the landing screen.
-                            TokensActivity.start(GoogleSignInActivity.this);
+                            //TokensActivity.start(GoogleSignInActivity.this);
+                            StoreOnboarding.start(GoogleSignInActivity.this);
                         }
                     }
                 });

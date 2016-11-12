@@ -3,6 +3,7 @@ package in.gm.instaqueue.application;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import in.gm.instaqueue.activity.StoreOnboarding;
 import in.gm.instaqueue.activity.WelcomeActivity;
 import in.gm.instaqueue.authentication.AuthenticationModule;
 import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
@@ -21,6 +22,8 @@ public interface ApplicationComponent {
     void inject(DigitsSignInActivity digitsSignInActivity);
 
     void inject(GoogleSignInActivity googleSignInActivity);
+
+    void inject(StoreOnboarding storeOnboarding);
 
     TokensRepository getTokensRepository();
 }
