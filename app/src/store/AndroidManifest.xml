@@ -26,6 +26,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_idcard"
             android:theme="@style/FullscreenTheme" />
+        <activity android:name=".authentication.google.GoogleSignInActivity" />
         <activity
             android:name=".activity.StoreOnboarding"
             android:label="@string/title_activity_store_onboarding"

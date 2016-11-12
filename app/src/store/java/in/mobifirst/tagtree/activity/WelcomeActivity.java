@@ -6,6 +6,9 @@ import android.animation.AnimatorSet;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.View;
+
+import com.google.android.gms.common.SignInButton;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -13,6 +16,8 @@ import javax.inject.Named;
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
+import in.mobifirst.tagtree.authentication.OnBoardingActivity;
+import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
 import in.mobifirst.tagtree.tokens.TokensActivity;
 
 /**
@@ -34,40 +39,20 @@ public class WelcomeActivity extends BaseActivity {
                 .getApplicationComponent()
                 .inject(this);
         setContentView(R.layout.activity_welcome);
+        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        signInButton.setSize(SignInButton.SIZE_WIDE);
+    }
+
+    private void loadGoogleSignInActivity() {
+        GoogleSignInActivity.start(WelcomeActivity.this);
+        finish();
     }
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        startAnimation();
-    }
-
-    private void startAnimation() {
-        AnimatorSet logoAnimator = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.entry_screen_animator);
-        logoAnimator.setTarget(findViewById(R.id.welcome_text));
-        logoAnimator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                bootUp();
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-
-        logoAnimator.start();
+        bootUp();
     }
 
     private void bootUp() {
@@ -76,11 +61,15 @@ public class WelcomeActivity extends BaseActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);
             finish();
-        } else {
-            Intent intent = new Intent(this, RequestPermissionsActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
-            startActivity(intent);
-            finish();
+        }
+        else {
+            SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+            signInButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    loadGoogleSignInActivity();
+                }
+            });
         }
     }
 }

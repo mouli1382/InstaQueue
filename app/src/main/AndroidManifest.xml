@@ -19,8 +19,8 @@
         <activity
             android:name=".activity.RequestPermissionsActivity"
             android:theme="@style/AppTheme.Background" />
-        <activity android:name=".authentication.OnBoardingActivity" />
         <activity android:name=".authentication.google.GoogleSignInActivity" />
+        <activity android:name=".authentication.OnBoardingActivity" />
         <activity android:name=".authentication.digits.DigitsSignInActivity" />
         <activity
             android:name=".activity.WelcomeActivity"

@@ -26,6 +26,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import javax.inject.Inject;
 
 import in.mobifirst.tagtree.activity.BaseActivity;
+import in.mobifirst.tagtree.activity.RequestPermissionsActivity;
 import in.mobifirst.tagtree.application.IQClientApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
@@ -75,7 +76,9 @@ public class DigitsSignInActivity extends BaseActivity {
                 Log.i(TAG, "email = " + session.getEmail().toString());
                 Log.i(TAG, "token = " + session.getAuthToken().token + " secret = " + session.getAuthToken().secret);
 
-                startSignIn(session.getAuthToken().token);
+                //startSignIn(session.getAuthToken().token);
+                startActivity(new Intent(DigitsSignInActivity.this, TokensActivity.class));
+                finish();
             }
 
             @Override
