@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,6 +28,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.util.ApplicationConstants;
@@ -36,18 +39,17 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String TAG = "FirebaseDatabaseManager";
 
     private static final String TOKENS_CHILD = "tokens/";
+    private static final String STORE_CHILD = "store/";
     private static final String TOPICS_CHILD = "topics/";
 
     private DatabaseReference mDatabaseReference;
-    private IQSharedPreferences  mSharedPrefs;
+    private IQSharedPreferences mSharedPrefs;
 
     @Inject
     public FirebaseDatabaseManager(IQSharedPreferences iqSharedPreferences) {
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mSharedPrefs = iqSharedPreferences;
     }
-
-
 
     public DatabaseReference getDatabaseReference() {
         return mDatabaseReference;
@@ -162,6 +164,26 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
             }
         });
+    }
+
+    public void addStore(final Store store, final Subscriber<? super String> subscriber) {
+        mDatabaseReference
+                .child(STORE_CHILD)
+                .child(store.getStoreId())
+                .setValue(store)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        subscriber.onNext(null);
+                        subscriber.onCompleted();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        subscriber.onError(e);
+                    }
+                });
     }
 
     private final static String mMsg91Url = "https://control.msg91.com/api/sendhttp.php?";

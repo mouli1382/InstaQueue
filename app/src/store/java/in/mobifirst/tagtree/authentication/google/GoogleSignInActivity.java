@@ -24,18 +24,18 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseActivity;
-import in.mobifirst.tagtree.activity.StoreOnboarding;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
+import in.mobifirst.tagtree.ftu.SettingsActivity;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 
 
-public class GoogleSignInActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class GoogleSignInActivity extends BaseActivity
+        implements GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "GoogleSignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -43,11 +43,11 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
     @Inject
     FirebaseAuthenticationManager mAuthenticationManager;
 
-    private FirebaseAuth mFirebaseAuth;
-    private GoogleApiClient mGoogleApiClient;
     @Inject
     IQSharedPreferences mSharedPrefs;
 
+    private FirebaseAuth mFirebaseAuth;
+    private GoogleApiClient mGoogleApiClient;
 
     public static void start(Context caller) {
         Intent intent = new Intent(caller, GoogleSignInActivity.class);
@@ -58,7 +58,7 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ((IQStoreApplication)getApplication())
+        ((IQStoreApplication) getApplication())
                 .getApplicationComponent()
                 .inject(this);
 
@@ -103,6 +103,7 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
                 String personEmail = acct.getEmail();
                 String personId = acct.getId();
                 Uri personPhoto = acct.getPhotoUrl();
+                mSharedPrefs.putString(ApplicationConstants.EMAIL_KEY, personEmail);
                 mSharedPrefs.putString(ApplicationConstants.PROFILE_PIC_URL_KEY, personPhoto.toString());
                 mSharedPrefs.putString(ApplicationConstants.DISPLAY_NAME_KEY, personName.toString());
 
@@ -132,8 +133,7 @@ public class GoogleSignInActivity extends BaseActivity implements GoogleApiClien
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             finish();
-                            //TokensActivity.start(GoogleSignInActivity.this);
-                            StoreOnboarding.start(GoogleSignInActivity.this);
+                            SettingsActivity.start(GoogleSignInActivity.this);
                         }
                     }
                 });

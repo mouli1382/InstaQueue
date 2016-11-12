@@ -4,18 +4,27 @@ import javax.inject.Singleton;
 
 import dagger.Component;
 
+import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
 import in.mobifirst.tagtree.database.DatabaseModule;
 import in.mobifirst.tagtree.activity.RazorPayActivity;
-import in.mobifirst.tagtree.activity.StoreOnboarding;
 
 import in.mobifirst.tagtree.activity.WelcomeActivity;
 import in.mobifirst.tagtree.authentication.AuthenticationModule;
 import in.mobifirst.tagtree.data.token.TokensRepository;
 import in.mobifirst.tagtree.data.token.TokensRepositoryModule;
+import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
+import in.mobifirst.tagtree.storage.FirebaseStorageManager;
+import in.mobifirst.tagtree.storage.StorageModule;
 
 @Singleton
-@Component(modules = {TokensRepositoryModule.class, ApplicationModule.class, AuthenticationModule.class, DatabaseModule.class})
+@Component(modules = {
+        TokensRepositoryModule.class,
+        ApplicationModule.class,
+        AuthenticationModule.class,
+        DatabaseModule.class,
+        StorageModule.class
+})
 public interface ApplicationComponent {
 
     void inject(WelcomeActivity welcomeActivity);
@@ -24,7 +33,12 @@ public interface ApplicationComponent {
 
     void inject(GoogleSignInActivity googleSignInActivity);
 
-    void inject(StoreOnboarding storeOnboarding);
-
     TokensRepository getTokensRepository();
+
+    FirebaseAuthenticationManager getFirebaseAuthenticationManager();
+
+    FirebaseDatabaseManager getFirebaseDatabaseManager();
+
+    FirebaseStorageManager getFirebaseStorageManager();
+
 }

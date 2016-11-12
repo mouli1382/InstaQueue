@@ -10,10 +10,7 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseDrawerActivity;
 import in.mobifirst.tagtree.activity.CreditsActivity;
-import in.mobifirst.tagtree.activity.IDCardActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
-import in.mobifirst.tagtree.tokens.DaggerTokensComponent;
-import in.mobifirst.tagtree.activity.CustomFields;
 import in.mobifirst.tagtree.util.ActivityUtilities;
 
 public class TokensActivity extends BaseDrawerActivity {
@@ -61,15 +58,8 @@ public class TokensActivity extends BaseDrawerActivity {
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            // Handle the camera action
-            Intent intent = new Intent(this, CustomFields.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
 
         } else if (id == R.id.nav_gallery) {
-            Intent intent = new Intent(this, IDCardActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
 
         } else if (id == R.id.nav_slideshow) {
             Intent intent = new Intent(getApplicationContext(), CreditsActivity.class);

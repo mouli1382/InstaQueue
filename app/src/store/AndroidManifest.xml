@@ -18,16 +18,10 @@
             android:name=".addedittoken.AddEditTokenActivity"
             android:theme="@style/AppTheme.Background" />
         <activity
-            android:name=".activity.CustomFields"
-            android:label="@string/title_activity_custom_fields"
+            android:name=".ftu.SettingsActivity"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".activity.IDCardActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_idcard"
-            android:theme="@style/FullscreenTheme" />
-        <activity
-            android:name=".activity.StoreOnboarding"
+            android:name=".ftu.StoreOnboarding"
             android:label="@string/title_activity_store_onboarding"
             android:theme="@style/AppTheme"></activity>
         <activity

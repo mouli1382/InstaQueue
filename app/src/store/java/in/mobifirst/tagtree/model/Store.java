@@ -1,11 +1,21 @@
 package in.mobifirst.tagtree.model;
 
+import android.text.TextUtils;
+
 public class Store {
 
     private String storeId;
     private String name;
+    private String website;
     private String logoUrl;
     private long credits;
+
+    public Store(String name, String website, String logoUrl, long credits) {
+        this.name = name;
+        this.website = website;
+        this.logoUrl = logoUrl;
+        this.credits = credits;
+    }
 
     public String getLogoUrl() {
         return logoUrl;
@@ -35,8 +45,20 @@ public class Store {
         return credits;
     }
 
-    public void setName(long credits) {
+    public void setCredits(long credits) {
         this.credits = credits;
     }
 
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public boolean isEmpty() {
+        return TextUtils.isEmpty(name)
+                || TextUtils.isEmpty(logoUrl);
+    }
 }

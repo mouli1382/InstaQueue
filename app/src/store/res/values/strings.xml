@@ -20,7 +20,7 @@
     <string name="navigation_view_header_title">Tokens</string>
     <string name="title_hint">Title</string>
     <string name="description_hint">Enter customer Phone Number here.</string>
-    <string name="empty_token_message">TO DOs cannot be empty</string>
+    <string name="empty_token_message">Token cannot be empty</string>
     <string name="successfully_saved_token_message">Token created</string>
     <string name="list_title">Token List</string>
     <string name="statistics_title">Statistics</string>
@@ -58,5 +58,11 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_store_onboarding">StoreOnboarding</string>
 
+
+    <!-- Store FTU -->
+    <string name="config_store">Settings</string>
+    <string name="empty_store_details">Kindly fill in the store details</string>
+    <string name="upload_failed_error">File upload failed</string>
+    <string name="add_store_failed">Failed to save store details</string>
 
 </resources>

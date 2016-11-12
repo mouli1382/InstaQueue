@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQStoreApplication;
