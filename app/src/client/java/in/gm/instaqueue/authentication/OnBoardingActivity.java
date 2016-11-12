@@ -1,9 +1,9 @@
-package in.gm.instaqueue.authentication;
+package in.mobifirst.tagtree.authentication;
 
 import android.os.Bundle;
 
-import in.gm.instaqueue.activity.BaseActivity;
-import in.gm.instaqueue.authentication.digits.DigitsSignInActivity;
+import in.mobifirst.tagtree.activity.BaseActivity;
+import in.mobifirst.tagtree.authentication.digits.DigitsSignInActivity;
 
 public class OnBoardingActivity extends BaseActivity {
 

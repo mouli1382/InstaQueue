@@ -1,4 +1,4 @@
-package in.gm.instaqueue.tokens;
+package in.mobifirst.tagtree.tokens;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -32,9 +32,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import in.gm.instaqueue.R;
-import in.gm.instaqueue.addedittoken.AddEditTokenActivity;
-import in.gm.instaqueue.model.Token;
+import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
+import in.mobifirst.tagtree.model.Token;
 
 public class TokensFragment extends Fragment implements TokensContract.View {
 

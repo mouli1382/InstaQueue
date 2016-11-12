@@ -1,4 +1,4 @@
-package in.gm.instaqueue.backend;
+package in.mobifirst.tagtree.backend;
 
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;

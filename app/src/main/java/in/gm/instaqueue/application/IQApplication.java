@@ -1,4 +1,4 @@
-package in.gm.instaqueue.application;
+package in.mobifirst.tagtree.application;
 
 import android.support.multidex.MultiDexApplication;
 

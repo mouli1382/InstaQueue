@@ -1,4 +1,4 @@
-package in.gm.instaqueue.activity;
+package in.mobifirst.tagtree.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
@@ -10,10 +10,10 @@ import android.support.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import in.gm.instaqueue.R;
-import in.gm.instaqueue.application.IQClientApplication;
-import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
-import in.gm.instaqueue.tokens.TokensActivity;
+import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.application.IQClientApplication;
+import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
+import in.mobifirst.tagtree.tokens.TokensActivity;
 
 /**
  * ToDo Show Welcome screen explaining the app functionality in a paginated view.

@@ -1,4 +1,4 @@
-package in.gm.instaqueue.activity;
+package in.mobifirst.tagtree.activity;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,7 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import in.gm.instaqueue.R;
+import in.mobifirst.tagtree.R;
 
 public class BaseDrawerActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {

@@ -1,4 +1,4 @@
-package in.gm.instaqueue.tokens;
+package in.mobifirst.tagtree.tokens;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,10 +6,10 @@ import android.os.Bundle;
 
 import javax.inject.Inject;
 
-import in.gm.instaqueue.R;
-import in.gm.instaqueue.activity.BaseDrawerActivity;
-import in.gm.instaqueue.application.IQClientApplication;
-import in.gm.instaqueue.util.ActivityUtilities;
+import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.activity.BaseDrawerActivity;
+import in.mobifirst.tagtree.application.IQClientApplication;
+import in.mobifirst.tagtree.util.ActivityUtilities;
 
 public class TokensActivity extends BaseDrawerActivity {
 

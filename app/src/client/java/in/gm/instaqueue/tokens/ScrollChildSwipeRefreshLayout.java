@@ -1,4 +1,4 @@
-package in.gm.instaqueue.tokens;
+package in.mobifirst.tagtree.tokens;
 
 import android.content.Context;
 import android.support.v4.view.ViewCompat;

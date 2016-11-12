@@ -1,4 +1,4 @@
-package in.gm.instaqueue.activity;
+package in.mobifirst.tagtree.activity;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -6,7 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import in.gm.instaqueue.R;
+import in.mobifirst.tagtree.R;
 
 public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
     private Drawable mDivider;

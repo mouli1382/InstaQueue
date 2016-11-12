@@ -1,4 +1,4 @@
-package in.gm.instaqueue.mvp;
+package in.mobifirst.tagtree.mvp;
 
 public interface BaseView<T> {
 

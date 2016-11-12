@@ -1,12 +1,12 @@
-package in.gm.instaqueue.tokens;
+package in.mobifirst.tagtree.tokens;
 
 import android.support.annotation.NonNull;
 
 import java.util.List;
 
-import in.gm.instaqueue.mvp.BasePresenter;
-import in.gm.instaqueue.mvp.BaseView;
-import in.gm.instaqueue.model.Token;
+import in.mobifirst.tagtree.mvp.BasePresenter;
+import in.mobifirst.tagtree.mvp.BaseView;
+import in.mobifirst.tagtree.model.Token;
 
 public interface TokensContract {
 

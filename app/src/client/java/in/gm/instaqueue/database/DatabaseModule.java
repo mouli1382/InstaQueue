@@ -1,4 +1,4 @@
-package in.gm.instaqueue.database;
+package in.mobifirst.tagtree.database;
 
 import javax.inject.Singleton;
 

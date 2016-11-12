@@ -1,4 +1,4 @@
-package in.gm.instaqueue.authentication;
+package in.mobifirst.tagtree.authentication;
 
 import com.digits.sdk.android.Digits;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -8,8 +8,8 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import in.gm.instaqueue.BuildConfig;
-import in.gm.instaqueue.application.IQClientApplication;
+import in.mobifirst.tagtree.BuildConfig;
+import in.mobifirst.tagtree.application.IQClientApplication;
 import io.fabric.sdk.android.Fabric;
 
 @Module

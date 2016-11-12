@@ -1,4 +1,4 @@
-package in.gm.instaqueue.authentication.google;
+package in.mobifirst.tagtree.authentication.google;
 
 
 import android.content.Context;
@@ -27,14 +27,14 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import in.gm.instaqueue.R;
-import in.gm.instaqueue.activity.BaseActivity;
-import in.gm.instaqueue.activity.StoreOnboarding;
-import in.gm.instaqueue.application.IQStoreApplication;
-import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
-import in.gm.instaqueue.preferences.IQSharedPreferences;
-import in.gm.instaqueue.util.ApplicationConstants;
-import in.gm.instaqueue.tokens.TokensActivity;
+import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.activity.BaseActivity;
+import in.mobifirst.tagtree.activity.StoreOnboarding;
+import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.util.ApplicationConstants;
+import in.mobifirst.tagtree.tokens.TokensActivity;
 
 
 

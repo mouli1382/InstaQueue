@@ -1,8 +1,8 @@
-package in.gm.instaqueue.addedittoken;
+package in.mobifirst.tagtree.addedittoken;
 
 import dagger.Component;
-import in.gm.instaqueue.application.ApplicationComponent;
-import in.gm.instaqueue.fragment.scope.FragmentScoped;
+import in.mobifirst.tagtree.application.ApplicationComponent;
+import in.mobifirst.tagtree.fragment.scope.FragmentScoped;
 
 @FragmentScoped
 @Component(dependencies = ApplicationComponent.class,

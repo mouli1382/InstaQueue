@@ -1,4 +1,4 @@
-package in.gm.instaqueue.activity;
+package in.mobifirst.tagtree.activity;
 
 
 import android.content.Intent;
@@ -8,13 +8,13 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 
-import in.gm.instaqueue.R;
-import in.gm.instaqueue.authentication.OnBoardingActivity;
+import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.authentication.OnBoardingActivity;
 
-import static in.gm.instaqueue.util.ApplicationConstants.PERMISSION_READ_PHONE_STATE;
-import static in.gm.instaqueue.util.ApplicationConstants.PERMISSION_RECEIVE_SMS;
-import static in.gm.instaqueue.util.ApplicationConstants.REQUEST_CODE_READ_PHONE_STATE;
-import static in.gm.instaqueue.util.ApplicationConstants.REQUEST_CODE_RECEIVE_SMS;
+import static in.mobifirst.tagtree.util.ApplicationConstants.PERMISSION_READ_PHONE_STATE;
+import static in.mobifirst.tagtree.util.ApplicationConstants.PERMISSION_RECEIVE_SMS;
+import static in.mobifirst.tagtree.util.ApplicationConstants.REQUEST_CODE_READ_PHONE_STATE;
+import static in.mobifirst.tagtree.util.ApplicationConstants.REQUEST_CODE_RECEIVE_SMS;
 
 public class RequestPermissionsActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 

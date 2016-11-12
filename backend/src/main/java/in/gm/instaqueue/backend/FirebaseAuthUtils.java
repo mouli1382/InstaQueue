@@ -1,4 +1,4 @@
-package in.gm.instaqueue.backend;
+package in.mobifirst.tagtree.backend;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;

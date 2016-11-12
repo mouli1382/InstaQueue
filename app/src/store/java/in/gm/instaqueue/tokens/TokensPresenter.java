@@ -1,4 +1,4 @@
-package in.gm.instaqueue.tokens;
+package in.mobifirst.tagtree.tokens;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
@@ -7,9 +7,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import in.gm.instaqueue.addedittoken.AddEditTokenActivity;
-import in.gm.instaqueue.data.token.TokensRepository;
-import in.gm.instaqueue.model.Token;
+import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
+import in.mobifirst.tagtree.data.token.TokensRepository;
+import in.mobifirst.tagtree.model.Token;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
@@ -70,7 +70,7 @@ final class TokensPresenter implements TokensContract.Presenter {
     }
 
     /**
-     * @param forceUpdate   Pass in true to refresh the data in the {@link in.gm.instaqueue.data.token.TokensDataSource}
+     * @param forceUpdate   Pass in true to refresh the data in the {@link in.mobifirst.tagtree.data.token.TokensDataSource}
      * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
     private void loadTokens(boolean forceUpdate, final boolean showLoadingUI) {

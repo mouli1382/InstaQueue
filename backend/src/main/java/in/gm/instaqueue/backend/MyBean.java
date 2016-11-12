@@ -1,4 +1,4 @@
-package in.gm.instaqueue.backend;
+package in.mobifirst.tagtree.backend;
 
 /**
  * The object model for the data we are sending through endpoints

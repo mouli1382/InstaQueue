@@ -1,4 +1,4 @@
-package in.gm.instaqueue.activity;
+package in.mobifirst.tagtree.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +16,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 
-import in.gm.instaqueue.R;
+import in.mobifirst.tagtree.R;
 
 public class CreditsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener

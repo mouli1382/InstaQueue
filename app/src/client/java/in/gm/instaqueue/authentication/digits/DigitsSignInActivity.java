@@ -1,4 +1,4 @@
-package in.gm.instaqueue.authentication.digits;
+package in.mobifirst.tagtree.authentication.digits;
 
 
 import android.content.Context;
@@ -33,15 +33,15 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
-import in.gm.instaqueue.activity.BaseActivity;
-import in.gm.instaqueue.application.IQClientApplication;
-import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
-import in.gm.instaqueue.backend.myApi.MyApi;
-import in.gm.instaqueue.database.FirebaseDatabaseManager;
-import in.gm.instaqueue.model.User;
-import in.gm.instaqueue.preferences.IQSharedPreferences;
-import in.gm.instaqueue.tokens.TokensActivity;
-import in.gm.instaqueue.util.ApplicationConstants;
+import in.mobifirst.tagtree.activity.BaseActivity;
+import in.mobifirst.tagtree.application.IQClientApplication;
+import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
+import in.mobifirst.tagtree.backend.myApi.MyApi;
+import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
+import in.mobifirst.tagtree.model.User;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.tokens.TokensActivity;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 
 public class DigitsSignInActivity extends BaseActivity {
 

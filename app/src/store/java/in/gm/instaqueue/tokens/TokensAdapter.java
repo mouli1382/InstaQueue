@@ -1,4 +1,4 @@
-package in.gm.instaqueue.tokens;
+package in.mobifirst.tagtree.tokens;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,8 +17,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
-import in.gm.instaqueue.R;
-import in.gm.instaqueue.model.Token;
+import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.model.Token;
 
 
 public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder> {

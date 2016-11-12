@@ -1,4 +1,4 @@
-package in.gm.instaqueue.util;
+package in.mobifirst.tagtree.util;
 
 import android.Manifest;
 

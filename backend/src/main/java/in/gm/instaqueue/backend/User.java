@@ -1,4 +1,4 @@
-package in.gm.instaqueue.backend;
+package in.mobifirst.tagtree.backend;
 
 public class User {
     private String uId;

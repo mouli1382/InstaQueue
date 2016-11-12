@@ -1,4 +1,4 @@
-package in.gm.instaqueue.addedittoken;
+package in.mobifirst.tagtree.addedittoken;
 
 import android.support.annotation.Nullable;
 

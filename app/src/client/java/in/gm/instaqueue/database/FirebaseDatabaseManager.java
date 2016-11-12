@@ -1,4 +1,4 @@
-package in.gm.instaqueue.database;
+package in.mobifirst.tagtree.database;
 
 import android.util.Log;
 
@@ -16,7 +16,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import in.gm.instaqueue.model.Token;
+import in.mobifirst.tagtree.model.Token;
 import rx.Observable;
 import rx.Subscriber;
 

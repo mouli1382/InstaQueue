@@ -1,4 +1,4 @@
-package in.gm.instaqueue;
+package in.mobifirst.tagtree;
 
 import android.util.Log;
 
@@ -12,9 +12,9 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
 
-import in.gm.instaqueue.application.IQClientApplication;
-import in.gm.instaqueue.backend.registration.Registration;
-import in.gm.instaqueue.util.ApplicationConstants;
+import in.mobifirst.tagtree.application.IQClientApplication;
+import in.mobifirst.tagtree.backend.registration.Registration;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 
 public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
 

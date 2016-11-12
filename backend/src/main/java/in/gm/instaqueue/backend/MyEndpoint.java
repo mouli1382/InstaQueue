@@ -1,4 +1,4 @@
-package in.gm.instaqueue.backend;
+package in.mobifirst.tagtree.backend;
 
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;

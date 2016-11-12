@@ -1,10 +1,10 @@
-package in.gm.instaqueue.data.token;
+package in.mobifirst.tagtree.data.token;
 
 import android.support.annotation.NonNull;
 
 import java.util.List;
 
-import in.gm.instaqueue.model.Token;
+import in.mobifirst.tagtree.model.Token;
 import rx.Observable;
 import rx.Subscriber;
 

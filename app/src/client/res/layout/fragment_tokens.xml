@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<in.gm.instaqueue.tokens.ScrollChildSwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<in.mobifirst.tagtree.tokens.ScrollChildSwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/refresh_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -66,5 +66,5 @@
 
         </LinearLayout>
     </RelativeLayout>
-</in.gm.instaqueue.tokens.ScrollChildSwipeRefreshLayout>
+</in.mobifirst.tagtree.tokens.ScrollChildSwipeRefreshLayout>
 

@@ -1,4 +1,4 @@
-package in.gm.instaqueue.data.token;
+package in.mobifirst.tagtree.data.token;
 
 import android.support.annotation.NonNull;
 
@@ -6,9 +6,9 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
-import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
-import in.gm.instaqueue.database.FirebaseDatabaseManager;
-import in.gm.instaqueue.model.Token;
+import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
+import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
+import in.mobifirst.tagtree.model.Token;
 import rx.Observable;
 import rx.Subscriber;
 

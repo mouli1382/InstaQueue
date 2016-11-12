@@ -1,9 +1,9 @@
-package in.gm.instaqueue.tokens;
+package in.mobifirst.tagtree.tokens;
 
 
 import dagger.Component;
-import in.gm.instaqueue.application.ApplicationComponent;
-import in.gm.instaqueue.fragment.scope.FragmentScoped;
+import in.mobifirst.tagtree.application.ApplicationComponent;
+import in.mobifirst.tagtree.fragment.scope.FragmentScoped;
 
 @FragmentScoped
 @Component(dependencies = ApplicationComponent.class, modules = TokensPresenterModule.class)

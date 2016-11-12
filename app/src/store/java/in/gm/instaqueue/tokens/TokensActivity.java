@@ -1,4 +1,4 @@
-package in.gm.instaqueue.tokens;
+package in.mobifirst.tagtree.tokens;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,13 +9,13 @@ import android.view.MenuItem;
 
 import javax.inject.Inject;
 
-import in.gm.instaqueue.R;
-import in.gm.instaqueue.activity.BaseDrawerActivity;
-import in.gm.instaqueue.activity.CreditsActivity;
-import in.gm.instaqueue.activity.CustomFields;
-import in.gm.instaqueue.activity.IDCardActivity;
-import in.gm.instaqueue.application.IQStoreApplication;
-import in.gm.instaqueue.util.ActivityUtilities;
+import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.activity.BaseDrawerActivity;
+import in.mobifirst.tagtree.activity.CreditsActivity;
+import in.mobifirst.tagtree.activity.CustomFields;
+import in.mobifirst.tagtree.activity.IDCardActivity;
+import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.util.ActivityUtilities;
 
 public class TokensActivity extends BaseDrawerActivity {
 

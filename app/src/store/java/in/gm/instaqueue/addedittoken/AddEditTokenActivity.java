@@ -1,4 +1,4 @@
-package in.gm.instaqueue.addedittoken;
+package in.mobifirst.tagtree.addedittoken;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -6,10 +6,10 @@ import android.support.v7.widget.Toolbar;
 
 import javax.inject.Inject;
 
-import in.gm.instaqueue.R;
-import in.gm.instaqueue.activity.BaseDrawerActivity;
-import in.gm.instaqueue.application.IQStoreApplication;
-import in.gm.instaqueue.util.ActivityUtilities;
+import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.activity.BaseDrawerActivity;
+import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.util.ActivityUtilities;
 
 public class AddEditTokenActivity extends BaseDrawerActivity {
 

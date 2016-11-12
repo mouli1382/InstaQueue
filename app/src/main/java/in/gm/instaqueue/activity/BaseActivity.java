@@ -1,4 +1,4 @@
-package in.gm.instaqueue.activity;
+package in.mobifirst.tagtree.activity;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -11,8 +11,8 @@ import android.view.View;
 
 import javax.inject.Inject;
 
-import in.gm.instaqueue.application.IQApplication;
-import in.gm.instaqueue.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.application.IQApplication;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 
 public class BaseActivity extends AppCompatActivity {
     private static final String TAG = "BaseActivity";

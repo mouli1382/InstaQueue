@@ -1,4 +1,4 @@
-package in.gm.instaqueue.activity;
+package in.mobifirst.tagtree.activity;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import in.gm.instaqueue.R;
-import in.gm.instaqueue.tokens.CustomFieldAdapter;
+import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.tokens.CustomFieldAdapter;
 
 public class CustomFields extends AppCompatActivity implements View.OnClickListener{
 

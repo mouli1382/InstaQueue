@@ -1,4 +1,4 @@
-package in.gm.instaqueue.authentication;
+package in.mobifirst.tagtree.authentication;
 
 import android.os.Bundle;
 import android.view.View;
@@ -6,10 +6,10 @@ import android.widget.Button;
 
 import com.google.android.gms.common.SignInButton;
 
-import in.gm.instaqueue.R;
-import in.gm.instaqueue.activity.BaseActivity;
-import in.gm.instaqueue.authentication.digits.DigitsSignInActivity;
-import in.gm.instaqueue.authentication.google.GoogleSignInActivity;
+import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.activity.BaseActivity;
+import in.mobifirst.tagtree.authentication.digits.DigitsSignInActivity;
+import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
 
 public class OnBoardingActivity extends BaseActivity {
 

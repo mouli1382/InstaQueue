@@ -1,4 +1,4 @@
-package in.gm.instaqueue.database;
+package in.mobifirst.tagtree.database;
 
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -30,10 +30,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import in.gm.instaqueue.backend.messaging.Messaging;
-import in.gm.instaqueue.model.Token;
-import in.gm.instaqueue.preferences.IQSharedPreferences;
-import in.gm.instaqueue.util.ApplicationConstants;
+import in.mobifirst.tagtree.backend.messaging.Messaging;
+import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 import rx.Observable;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;

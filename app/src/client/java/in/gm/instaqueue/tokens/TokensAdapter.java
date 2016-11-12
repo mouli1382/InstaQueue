@@ -1,4 +1,4 @@
-package in.gm.instaqueue.tokens;
+package in.mobifirst.tagtree.tokens;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,8 +8,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import in.gm.instaqueue.R;
-import in.gm.instaqueue.model.Token;
+import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.model.Token;
 
 public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder> {
 

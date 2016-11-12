@@ -1,4 +1,4 @@
-package in.gm.instaqueue.authentication;
+package in.mobifirst.tagtree.authentication;
 
 public interface AuthenticationManager {
 }

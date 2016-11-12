@@ -1,16 +1,16 @@
-package in.gm.instaqueue.application;
+package in.mobifirst.tagtree.application;
 
 import javax.inject.Singleton;
 
 import dagger.Component;
-import in.gm.instaqueue.activity.WelcomeActivity;
-import in.gm.instaqueue.authentication.AuthenticationModule;
-import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
-import in.gm.instaqueue.authentication.digits.DigitsSignInActivity;
-import in.gm.instaqueue.data.token.TokensRepository;
-import in.gm.instaqueue.data.token.TokensRepositoryModule;
-import in.gm.instaqueue.database.DatabaseModule;
-import in.gm.instaqueue.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.activity.WelcomeActivity;
+import in.mobifirst.tagtree.authentication.AuthenticationModule;
+import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
+import in.mobifirst.tagtree.authentication.digits.DigitsSignInActivity;
+import in.mobifirst.tagtree.data.token.TokensRepository;
+import in.mobifirst.tagtree.data.token.TokensRepositoryModule;
+import in.mobifirst.tagtree.database.DatabaseModule;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 
 @Singleton
 @Component(modules = {TokensRepositoryModule.class, ApplicationModule.class, AuthenticationModule.class, DatabaseModule.class})

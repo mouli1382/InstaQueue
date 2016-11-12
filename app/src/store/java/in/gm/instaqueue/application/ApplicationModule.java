@@ -1,10 +1,10 @@
-package in.gm.instaqueue.application;
+package in.mobifirst.tagtree.application;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import in.gm.instaqueue.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 
 @Module
 public class ApplicationModule {

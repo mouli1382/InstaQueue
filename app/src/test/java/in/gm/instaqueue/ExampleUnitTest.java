@@ -1,4 +1,4 @@
-package in.gm.instaqueue;
+package in.mobifirst.tagtree;
 
 import org.junit.Test;
 

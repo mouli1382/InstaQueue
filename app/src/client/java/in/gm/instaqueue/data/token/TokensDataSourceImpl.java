@@ -1,13 +1,13 @@
-package in.gm.instaqueue.data.token;
+package in.mobifirst.tagtree.data.token;
 
 import android.support.annotation.NonNull;
 
 import java.util.List;
 
-import in.gm.instaqueue.database.FirebaseDatabaseManager;
-import in.gm.instaqueue.model.Token;
-import in.gm.instaqueue.preferences.IQSharedPreferences;
-import in.gm.instaqueue.util.ApplicationConstants;
+import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
+import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 import rx.Observable;
 
 public class TokensDataSourceImpl implements TokensDataSource {

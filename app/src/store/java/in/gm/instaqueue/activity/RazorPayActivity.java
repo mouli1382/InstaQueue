@@ -1,4 +1,4 @@
-package in.gm.instaqueue.activity;
+package in.mobifirst.tagtree.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -16,10 +16,10 @@ import org.json.JSONObject;
 
 import javax.inject.Inject;
 
-import in.gm.instaqueue.R;
-import in.gm.instaqueue.application.IQStoreApplication;
-import in.gm.instaqueue.database.FirebaseDatabaseManager;
-import in.gm.instaqueue.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 
 public class RazorPayActivity extends Activity implements PaymentResultListener {
     private static final String TAG = RazorPayActivity.class.getSimpleName();

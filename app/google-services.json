@@ -1,43 +1,43 @@
 {
   "project_info": {
-    "project_number": "972886404622",
-    "firebase_url": "https://instaqueue-9f086.firebaseio.com",
-    "project_id": "instaqueue-9f086",
-    "storage_bucket": "instaqueue-9f086.appspot.com"
+    "project_number": "497218145163",
+    "firebase_url": "https://tagtree-4ef29.firebaseio.com",
+    "project_id": "tagtree-4ef29",
+    "storage_bucket": "tagtree-4ef29.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:972886404622:android:8ab752a50cff4928",
+        "mobilesdk_app_id": "1:497218145163:android:f5912d62c5026c4e",
         "android_client_info": {
-          "package_name": "in.gm.instaqueue.store"
+          "package_name": "in.mobifirst.tagtree"
         }
       },
       "oauth_client": [
         {
-          "client_id": "972886404622-me9l5pd9r8f8kt71cd7ep5o54uukmf3u.apps.googleusercontent.com",
+          "client_id": "497218145163-k985mo15cfqlburcgfklo5qpgfnach4o.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "in.gm.instaqueue.store",
-            "certificate_hash": "17C018CB0DCBDA1461EDE619918B916A28C1239E"
-          }
-        },
-        {
-          "client_id": "972886404622-g4r6vlbttb7lm7fc2tiqcaat47tkcb48.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "in.gm.instaqueue.store",
+            "package_name": "in.mobifirst.tagtree",
             "certificate_hash": "87562DDBBB724C4397082EA1E8F9D17E4158FAB5"
           }
         },
         {
-          "client_id": "972886404622-j810uuefjsqo1ntlkrah6q0h4j9uuqvm.apps.googleusercontent.com",
+          "client_id": "497218145163-vgtv6d62v4ctcrg4picle4bsvppufjtd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.mobifirst.tagtree",
+            "certificate_hash": "1813EF8A1A651D6C1A5AF6F6825D2EC7BCBA4E71"
+          }
+        },
+        {
+          "client_id": "497218145163-6j3ig1schjmk8ndre44orhalmt86n1pn.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCdo24zsfSZwrn7SrMvDQVNhI0Wh_WKGZE"
+          "current_key": "AIzaSyDgnCMRMaeiUt0pfGKvuAfJDul0wfsmtm4"
         }
       ],
       "services": {
@@ -48,7 +48,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "972886404622-j810uuefjsqo1ntlkrah6q0h4j9uuqvm.apps.googleusercontent.com",
+              "client_id": "497218145163-6j3ig1schjmk8ndre44orhalmt86n1pn.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
@@ -60,36 +60,36 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:972886404622:android:8e283e3a8423415b",
+        "mobilesdk_app_id": "1:497218145163:android:f7ff6007e7c61592",
         "android_client_info": {
-          "package_name": "in.gm.instaqueue.client"
+          "package_name": "in.mobifirst.tagtree.store"
         }
       },
       "oauth_client": [
         {
-          "client_id": "972886404622-7kranalodgcs1l6sd06fcm53oeuo7v5g.apps.googleusercontent.com",
+          "client_id": "497218145163-nf2ffnbf37k2udnkuetkn3s6bb7c9odk.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "in.gm.instaqueue.client",
-            "certificate_hash": "17C018CB0DCBDA1461EDE619918B916A28C1239E"
-          }
-        },
-        {
-          "client_id": "972886404622-9tp0ndhm14bi7oo983uids8fjdld0m20.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "in.gm.instaqueue.client",
+            "package_name": "in.mobifirst.tagtree.store",
             "certificate_hash": "87562DDBBB724C4397082EA1E8F9D17E4158FAB5"
           }
         },
         {
-          "client_id": "972886404622-j810uuefjsqo1ntlkrah6q0h4j9uuqvm.apps.googleusercontent.com",
+          "client_id": "497218145163-agqs08kdoermktmnhqotobaekian5fj1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.mobifirst.tagtree.store",
+            "certificate_hash": "1813EF8A1A651D6C1A5AF6F6825D2EC7BCBA4E71"
+          }
+        },
+        {
+          "client_id": "497218145163-6j3ig1schjmk8ndre44orhalmt86n1pn.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCdo24zsfSZwrn7SrMvDQVNhI0Wh_WKGZE"
+          "current_key": "AIzaSyDgnCMRMaeiUt0pfGKvuAfJDul0wfsmtm4"
         }
       ],
       "services": {
@@ -100,7 +100,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "972886404622-j810uuefjsqo1ntlkrah6q0h4j9uuqvm.apps.googleusercontent.com",
+              "client_id": "497218145163-6j3ig1schjmk8ndre44orhalmt86n1pn.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

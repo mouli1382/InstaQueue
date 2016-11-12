@@ -1,4 +1,4 @@
-package in.gm.instaqueue.util;
+package in.mobifirst.tagtree.util;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;

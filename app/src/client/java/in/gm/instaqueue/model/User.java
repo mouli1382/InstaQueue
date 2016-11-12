@@ -1,4 +1,4 @@
-package in.gm.instaqueue.model;
+package in.mobifirst.tagtree.model;
 
 public class User {
     private String uId;

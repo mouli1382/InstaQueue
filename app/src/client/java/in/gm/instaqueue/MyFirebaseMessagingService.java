@@ -1,4 +1,4 @@
-package in.gm.instaqueue;
+package in.mobifirst.tagtree;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -14,7 +14,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Map;
 
-import in.gm.instaqueue.tokens.TokensActivity;
+import in.mobifirst.tagtree.tokens.TokensActivity;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 

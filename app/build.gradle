@@ -17,7 +17,7 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId "in.gm.instaqueue"
+        applicationId "in.mobifirst.tagtree"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -55,7 +55,7 @@ android {
     }
     productFlavors {
         store {
-            applicationId "in.gm.instaqueue.store"
+            applicationId "in.mobifirst.tagtree.store"
             versionCode 1
             versionName "1.0"
             buildConfigField("String", "TWITTER_KEY", "\"1C1mNkwwXKrpoS1MnBeGBekzA\"")
@@ -63,7 +63,7 @@ android {
         }
 
         client {
-            applicationId "in.gm.instaqueue.client"
+            applicationId "in.mobifirst.tagtree"
             versionCode 1
             versionName "1.0"
             buildConfigField("String", "TWITTER_KEY", "\"uJ5rp39QWzZUgbPmJFCqRvcRE\"")

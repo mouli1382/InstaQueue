@@ -1,12 +1,12 @@
-package in.gm.instaqueue.addedittoken;
+package in.mobifirst.tagtree.addedittoken;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import javax.inject.Inject;
 
-import in.gm.instaqueue.data.token.TokensRepository;
-import in.gm.instaqueue.model.Token;
+import in.mobifirst.tagtree.data.token.TokensRepository;
+import in.mobifirst.tagtree.model.Token;
 import rx.Subscriber;
 import rx.subscriptions.CompositeSubscription;
 

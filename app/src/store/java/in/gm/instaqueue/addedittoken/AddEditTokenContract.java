@@ -1,8 +1,8 @@
-package in.gm.instaqueue.addedittoken;
+package in.mobifirst.tagtree.addedittoken;
 
 
-import in.gm.instaqueue.mvp.BasePresenter;
-import in.gm.instaqueue.mvp.BaseView;
+import in.mobifirst.tagtree.mvp.BasePresenter;
+import in.mobifirst.tagtree.mvp.BaseView;
 
 public interface AddEditTokenContract {
 

@@ -1,4 +1,4 @@
-package in.gm.instaqueue.tokens;
+package in.mobifirst.tagtree.tokens;
 
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.util.Pair;
@@ -11,7 +11,7 @@ import android.widget.EditText;
 import java.util.HashMap;
 import java.util.List;
 
-import in.gm.instaqueue.R;
+import in.mobifirst.tagtree.R;
 
 /**
  * Created by ngonapa on 11/5/2016.

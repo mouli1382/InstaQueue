@@ -1,4 +1,4 @@
-package in.gm.instaqueue.authentication;
+package in.mobifirst.tagtree.authentication;
 
 import com.google.firebase.auth.FirebaseAuth;
 

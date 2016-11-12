@@ -1,4 +1,4 @@
-package in.gm.instaqueue.fragment.scope;
+package in.mobifirst.tagtree.fragment.scope;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

@@ -1,11 +1,11 @@
-package in.gm.instaqueue.data.token;
+package in.mobifirst.tagtree.data.token;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
-import in.gm.instaqueue.database.FirebaseDatabaseManager;
+import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
+import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 
 @Module
 public class TokensRepositoryModule {

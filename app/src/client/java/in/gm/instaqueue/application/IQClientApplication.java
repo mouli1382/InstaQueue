@@ -1,8 +1,8 @@
-package in.gm.instaqueue.application;
+package in.mobifirst.tagtree.application;
 
-import in.gm.instaqueue.authentication.AuthenticationModule;
-import in.gm.instaqueue.data.token.TokensRepositoryModule;
-import in.gm.instaqueue.database.DatabaseModule;
+import in.mobifirst.tagtree.authentication.AuthenticationModule;
+import in.mobifirst.tagtree.data.token.TokensRepositoryModule;
+import in.mobifirst.tagtree.database.DatabaseModule;
 
 public class IQClientApplication extends IQApplication {
     private ApplicationComponent applicationComponent;

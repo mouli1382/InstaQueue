@@ -1,10 +1,10 @@
-package in.gm.instaqueue.preferences;
+package in.mobifirst.tagtree.preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 
-import in.gm.instaqueue.R;
+import in.mobifirst.tagtree.R;
 
 public class IQSharedPreferences {
 

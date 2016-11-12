@@ -13,8 +13,8 @@
         <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>in.gm.instaqueue.backend.MyEndpoint, in.gm.instaqueue.backend.RegistrationEndpoint,
-                in.gm.instaqueue.backend.MessagingEndpoint</param-value>
+            <param-value>in.mobifirst.tagtree.backend.MyEndpoint, in.mobifirst.tagtree.backend.RegistrationEndpoint,
+                in.mobifirst.tagtree.backend.MessagingEndpoint</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>

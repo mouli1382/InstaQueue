@@ -1,4 +1,4 @@
-package in.gm.instaqueue.activity;
+package in.mobifirst.tagtree.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import in.gm.instaqueue.R;
+import in.mobifirst.tagtree.R;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -35,13 +35,13 @@ import java.util.HashMap;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import in.gm.instaqueue.R;
-import in.gm.instaqueue.application.IQStoreApplication;
-import in.gm.instaqueue.authentication.FirebaseAuthenticationManager;
-import in.gm.instaqueue.database.FirebaseDatabaseManager;
-import in.gm.instaqueue.preferences.IQSharedPreferences;
-import in.gm.instaqueue.tokens.TokensActivity;
-import in.gm.instaqueue.util.ApplicationConstants;
+import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
+import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.tokens.TokensActivity;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 
 public class StoreOnboarding extends BaseActivity {
 

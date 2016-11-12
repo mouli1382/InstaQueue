@@ -1,4 +1,4 @@
-package in.gm.instaqueue.addedittoken;
+package in.mobifirst.tagtree.addedittoken;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -11,8 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import in.gm.instaqueue.R;
-import in.gm.instaqueue.fragment.BaseFragment;
+import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.fragment.BaseFragment;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
