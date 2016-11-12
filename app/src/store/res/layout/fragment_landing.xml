@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/mainView"
-    tools:context="in.mobifirst.tagtree.activity.LandingActivity">
+    tools:context=".activity.LandingActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout"
