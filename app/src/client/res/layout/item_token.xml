@@ -11,45 +11,90 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="191dp"
+        android:background="?android:attr/colorAccent"
+        android:elevation="15dp">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/storeImageView"
-            android:layout_width="51dp"
-            android:layout_height="85dp"
-            android:layout_margin="5dp"
-            android:adjustViewBounds="false"
-            android:src="@drawable/ic_account_circle_black_36dp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tokenStoreName"
+            android:layout_width="169dp"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
+            android:textSize="18sp"
+            android:typeface="monospace"
+            tools:text="State Bank of India"
+            android:textColorLink="@color/cardview_dark_background"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_margin="5dp"
-            android:layout_toRightOf="@id/storeImageView"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:textStyle="normal|bold" />
 
-            <TextView
-                android:id="@+id/tokenStoreName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                android:textColor="?android:attr/textColorPrimaryDisableOnly"
-                android:textSize="12sp"
-                android:typeface="monospace"
-                tools:text="786976136416768000-786976136416768000" />
+        <Chronometer
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/timeElapsedChrono"
+            android:textStyle="normal|bold"
+            android:textColor="@color/cardview_dark_background"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_alignBottom="@+id/tokenDate"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:textSize="18sp" />
 
-            <TextView
-                android:id="@+id/tokenTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                android:textColor="?android:attr/textColorPrimaryDisableOnly"
-                android:typeface="monospace"
-                tools:text="57" />
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/storeImageView"
+            android:adjustViewBounds="false"
+            android:src="@drawable/ic_account_circle_black_36dp"
+            android:layout_width="150dp"
+            android:layout_height="100dp"
+            android:layout_below="@+id/tokenStoreName"
+            android:layout_alignRight="@+id/tokenDate"
+            android:layout_alignEnd="@+id/tokenDate"
+            android:layout_marginRight="86dp"
+            android:layout_marginEnd="86dp" />
+
+        <TextView
+            android:text="50"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tokenNumberText"
+            android:textStyle="normal|bold"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
+            android:textSize="75sp"
+            android:layout_alignTop="@+id/tokenStoreName"
+            android:layout_alignRight="@+id/tokenStoreName"
+            android:layout_alignEnd="@+id/tokenStoreName" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="date"
+            android:ems="10"
+            android:id="@+id/tokenDate"
+            android:enabled="false"
+            tools:text="01/01/2016"
+            android:textColor="@android:color/background_dark"
+            android:clickable="false"
+            android:gravity="bottom"
+            android:layout_alignParentBottom="true"
+            android:layout_alignLeft="@+id/tokenStoreName"
+            android:layout_alignStart="@+id/tokenStoreName" />
 
 
     </RelativeLayout>

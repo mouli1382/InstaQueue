@@ -1,9 +1,15 @@
 package in.mobifirst.tagtree.activity;
 
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.google.android.gms.common.SignInButton;
 
@@ -42,6 +48,31 @@ public class WelcomeActivity extends BaseActivity {
         setContentView(R.layout.activity_welcome);
         SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_WIDE);
+
+        //final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) this
+                //.findViewById(android.R.id.content)).getChildAt(0);
+
+        if (isInternetConnected() == false)
+            showDialog();
+    }
+
+    private void showDialog()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Application needs to connect to Wifi or MobileData")
+                .setCancelable(false)
+                .setPositiveButton("Connect to Wifi", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                    }
+                })
+                .setNegativeButton("Connect to MobileData", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(Settings.ACTION_DATA_ROAMING_SETTINGS));
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private void loadGoogleSignInActivity() {
@@ -58,6 +89,7 @@ public class WelcomeActivity extends BaseActivity {
     }
 
     private void bootUp() {
+
         if (mFirebaseAuth.getAuthInstance().getCurrentUser() != null) {
             Intent intent;
             if (mIQSharedPreferences.getBoolean(ApplicationConstants.FTU_COMPLETED_KEY)) {
@@ -77,5 +109,14 @@ public class WelcomeActivity extends BaseActivity {
                 }
             });
         }
+    }
+
+    private boolean isInternetConnected()
+    {
+        ConnectivityManager cm = (ConnectivityManager) this.getSystemService(this.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+        return isConnected;
     }
 }

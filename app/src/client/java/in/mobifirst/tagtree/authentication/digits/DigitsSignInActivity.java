@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -25,6 +26,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 import javax.inject.Inject;
 
+import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseActivity;
 import in.mobifirst.tagtree.activity.RequestPermissionsActivity;
 import in.mobifirst.tagtree.application.IQClientApplication;
@@ -77,13 +79,21 @@ public class DigitsSignInActivity extends BaseActivity {
                 Log.i(TAG, "token = " + session.getAuthToken().token + " secret = " + session.getAuthToken().secret);
 
                 //startSignIn(session.getAuthToken().token);
-                startActivity(new Intent(DigitsSignInActivity.this, TokensActivity.class));
+                FirebaseUser user = mAuthenticationManager.getAuthInstance().getCurrentUser();
+                if (user != null) {
+                    mSharedPrefs.putString(ApplicationConstants.PHONE_NUMBER_KEY, mPhoneNumber);
+                    writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail(), mPhoneNumber);
+
+                    //Launch the landing screen.
+                    TokensActivity.start(DigitsSignInActivity.this);
+                }
                 finish();
             }
 
             @Override
             public void failure(DigitsException exception) {
                 Log.d("DigitsAuth", "Sign in with DigitsAuth failure", exception);
+                Snackbar.make(findViewById(R.id.auth_button).getRootView(), "Digits authentication faied", Snackbar.LENGTH_LONG).show();
             }
         };
 

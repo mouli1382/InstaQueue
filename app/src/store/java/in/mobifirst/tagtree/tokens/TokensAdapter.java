@@ -92,7 +92,6 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
         } catch(IOException e) {
             System.out.println(e);
         }
-        holder.mSenderPic.invalidate();
         holder.mSenderName.setText(token.getSenderName());
     }
 

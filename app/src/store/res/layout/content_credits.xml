@@ -56,7 +56,6 @@
         android:id="@+id/button2"
         android:background="@color/colorPrimaryDark"
         android:layout_below="@+id/textView6"
-        android:layout_toEndOf="@+id/textView2"
         android:layout_marginTop="217dp" />
 
     <EditText
@@ -68,6 +67,5 @@
         android:id="@+id/creditEdit"
         android:text="500"
         android:textSize="30sp"
-        android:layout_alignLeft="@+id/textView3"
-        android:layout_alignStart="@+id/textView3" />
+        />
 </RelativeLayout>
