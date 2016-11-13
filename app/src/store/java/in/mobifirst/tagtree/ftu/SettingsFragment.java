@@ -314,20 +314,20 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
 
 
     private boolean validateInput() {
-        if ((mStoreNameTextInputLayout.getError() == null
-                || mStoreNameTextInputLayout.getError().length() != 0))
+        if ((mStoreNameTextInputLayout.getError() != null
+                && mStoreNameTextInputLayout.getError().length() != 0))
             return false;
 
-        if ((mStoreAreaTextInputLayout.getError() == null
-                || mStoreAreaTextInputLayout.getError().length() != 0))
+        if ((mStoreAreaTextInputLayout.getError() != null
+                && mStoreAreaTextInputLayout.getError().length() != 0))
             return false;
 
-        if ((mStoreWebsiteTextInputLayout.getError() == null
-                || mStoreWebsiteTextInputLayout.getError().length() != 0))
+        if ((mStoreWebsiteTextInputLayout.getError() != null
+                && mStoreWebsiteTextInputLayout.getError().length() != 0))
             return false;
 
-        if ((mStoreCountersTextInputLayout.getError() == null
-                || mStoreCountersTextInputLayout.getError().length() != 0))
+        if ((mStoreCountersTextInputLayout.getError() != null
+                && mStoreCountersTextInputLayout.getError().length() != 0))
             return false;
 
         return true;

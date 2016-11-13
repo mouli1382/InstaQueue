@@ -2,7 +2,9 @@ package in.mobifirst.tagtree.tokens;
 
 import android.support.annotation.NonNull;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.mvp.BasePresenter;
@@ -15,6 +17,8 @@ public interface TokensContract {
         void setLoadingIndicator(boolean active);
 
         void showTokens(List<Token> tokens);
+
+        void showTokens(Map<Integer, Collection<Token>> tokenMap);
 
         void showAddToken();
 

@@ -19,8 +19,7 @@ public class Token {
     private int buzzCount;
     private String senderPic;
     private String senderName;
-    private HashMap<String,String> mCustomMap;
-    private String counterName;
+    private int counter;
 
     public enum Status {
         ISSUED, READY, CANCELLED, COMPLETED
@@ -32,7 +31,7 @@ public class Token {
         // Default constructor required for calls to DataSnapshot.getValue(Token.class)
     }
 
-    public Token(String uId, String storeId, String phoneNumber, long tokenNumber, String senderPic, String senderName) {
+    public Token(String uId, String storeId, String phoneNumber, long tokenNumber, String senderPic, String senderName, int counter) {
         this.uId = uId;
         this.storeId = storeId;
         this.phoneNumber = phoneNumber;
@@ -41,7 +40,7 @@ public class Token {
         this.buzzCount = 0;
         this.senderPic = senderPic;
         this.senderName = senderName;
-        this.counterName = counterName;
+        this.counter = counter;
     }
 
     public boolean needsBuzz() {
@@ -51,12 +50,12 @@ public class Token {
         return false;
     }
 
-    public String getCounterName() {
-        return counterName;
+    public int getCounter() {
+        return counter;
     }
 
-    public void setCounterName(String counterName) {
-        this.counterName = counterName;
+    public void setCounter(int counter) {
+        this.counter = counter;
     }
 
     public String getuId() {
@@ -107,10 +106,6 @@ public class Token {
         this.phoneNumber = phoneNumber;
     }
 
-    public void  setCustomMap(HashMap <String, String> hashMap) {this.mCustomMap = hashMap;}
-
-    public HashMap<String, String> getCustomMap() { return this.mCustomMap; }
-
     public long getTokenNumber() {
         return tokenNumber;
     }
@@ -140,7 +135,7 @@ public class Token {
     }
 
     public boolean isActive() {
-        return status == Status.READY.ordinal();
+        return status == Status.ISSUED.ordinal();
     }
 
     public boolean isCancelled() {
@@ -163,6 +158,7 @@ public class Token {
         result.put("buzzCount", buzzCount);
         result.put("senderName", senderName);
         result.put("senderPic", senderPic);
+        result.put("counter", counter);
         return result;
     }
 

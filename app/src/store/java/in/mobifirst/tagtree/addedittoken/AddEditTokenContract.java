@@ -21,7 +21,7 @@ public interface AddEditTokenContract {
 
     interface Presenter extends BasePresenter {
 
-        void addNewToken(String phoneNumber);
+        void addNewToken(String phoneNumber, int counterNumber);
 
 //        void populateToken();
     }

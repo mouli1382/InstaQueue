@@ -6,10 +6,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.fragment.BaseFragment;
@@ -17,11 +18,12 @@ import in.mobifirst.tagtree.fragment.BaseFragment;
 
 public class AddEditTokenFragment extends BaseFragment implements AddEditTokenContract.View {
 
-    public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
-
     private AddEditTokenContract.Presenter mPresenter;
 
-    private TextView mPhoneNumber;
+    private TextInputEditText mPhoneNumberEditText;
+    private TextInputEditText mCounterNumberEditText;
+    private TextInputLayout mPhoneNumberTextInputLayout;
+    private TextInputLayout mCounterNumberTextInputLayout;
 
     public static AddEditTokenFragment newInstance() {
         return new AddEditTokenFragment();
@@ -54,7 +56,7 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.addNewToken(mPhoneNumber.getText().toString());
+                mPresenter.addNewToken(mPhoneNumberEditText.getText().toString(), Integer.parseInt(mCounterNumberEditText.getText().toString()));
             }
         });
     }
@@ -64,7 +66,8 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_addtoken, container, false);
-        mPhoneNumber = (TextView) root.findViewById(R.id.add_phone_number);
+        mPhoneNumberEditText = (TextInputEditText) root.findViewById(R.id.add_phone_number);
+        mCounterNumberEditText = (TextInputEditText) root.findViewById(R.id.counterNumber);
 
         setHasOptionsMenu(true);
         setRetainInstance(true);
@@ -73,7 +76,7 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
 
     @Override
     public void showEmptyTokenError() {
-        Snackbar.make(mPhoneNumber, getString(R.string.empty_token_message), Snackbar.LENGTH_LONG).show();
+        Snackbar.make(getView(), getString(R.string.empty_token_message), Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -84,16 +87,6 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
         getActivity().setResult(Activity.RESULT_OK);
         getActivity().finish();
     }
-
-//    @Override
-//    public void setTitle(String title) {
-//        mPhoneNumber.setText(title);
-//    }
-//
-//    @Override
-//    public void setDescription(String description) {
-//        mDescription.setText(description);
-//    }
 
     @Override
     public boolean isActive() {

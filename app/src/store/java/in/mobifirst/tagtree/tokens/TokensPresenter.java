@@ -3,7 +3,9 @@ package in.mobifirst.tagtree.tokens;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -12,7 +14,7 @@ import in.mobifirst.tagtree.data.token.TokensDataSource;
 import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
 import in.mobifirst.tagtree.data.token.TokensRepository;
 import rx.Observable;
-import rx.Observer;
+import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
@@ -74,6 +76,60 @@ final class TokensPresenter implements TokensContract.Presenter {
      * @param forceUpdate   Pass in true to refresh the data in the {@link TokensDataSource}
      * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
+//    private void loadTokens(boolean forceUpdate, final boolean showLoadingUI) {
+//        if (showLoadingUI) {
+//            mTokensView.setLoadingIndicator(true);
+//        }
+//        if (forceUpdate) {
+//            mTokensRepository.refreshTokens();
+//        }
+//
+//        mSubscriptions.clear();
+//        Subscription subscription = mTokensRepository
+//                .getTokens()
+//                .flatMap(new Func1<List<Token>, Observable<Token>>() {
+//                    @Override
+//                    public Observable<Token> call(List<Token> tokens) {
+//                        return Observable.from(tokens);
+//                    }
+//                })
+//                .filter(new Func1<Token, Boolean>() {
+//                    @Override
+//                    public Boolean call(Token token) {
+//                        switch (mCurrentFiltering) {
+//                            case ACTIVE_TOKENS:
+//                                return token.isActive();
+//                            case COMPLETED_TOKENS:
+//                                return token.isCompleted();
+//                            case CANCELLED_TOKENS:
+//                                return token.isCancelled();
+//                            default:
+//                                return true;
+//                        }
+//                    }
+//                })
+//                .toList()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Observer<List<Token>>() {
+//                    @Override
+//                    public void onCompleted() {
+//                        mTokensView.setLoadingIndicator(false);
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        mTokensView.showLoadingTokensError();
+//                    }
+//
+//                    @Override
+//                    public void onNext(List<Token> tokens) {
+//                        processTokens(tokens);
+//                    }
+//                });
+//        mSubscriptions.add(subscription);
+//    }
+
     private void loadTokens(boolean forceUpdate, final boolean showLoadingUI) {
         if (showLoadingUI) {
             mTokensView.setLoadingIndicator(true);
@@ -94,22 +150,27 @@ final class TokensPresenter implements TokensContract.Presenter {
                 .filter(new Func1<Token, Boolean>() {
                     @Override
                     public Boolean call(Token token) {
-                        switch (mCurrentFiltering) {
-                            case ACTIVE_TOKENS:
+//                        switch (mCurrentFiltering) {
+//                            case ACTIVE_TOKENS:
                                 return token.isActive();
-                            case COMPLETED_TOKENS:
-                                return token.isCompleted();
-                            case CANCELLED_TOKENS:
-                                return token.isCancelled();
-                            default:
-                                return true;
-                        }
+//                            case COMPLETED_TOKENS:
+//                                return token.isCompleted();
+//                            case CANCELLED_TOKENS:
+//                                return token.isCancelled();
+//                            default:
+//                                return true;
+//                        }
                     }
                 })
-                .toList()
+                .toMultimap(new Func1<Token, Integer>() {
+                    @Override
+                    public Integer call(Token token) {
+                        return token.getCounter();
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<Token>>() {
+                .subscribe(new Subscriber<Map<Integer, Collection<Token>>>() {
                     @Override
                     public void onCompleted() {
                         mTokensView.setLoadingIndicator(false);
@@ -121,12 +182,26 @@ final class TokensPresenter implements TokensContract.Presenter {
                     }
 
                     @Override
-                    public void onNext(List<Token> tokens) {
-                        processTokens(tokens);
+                    public void onNext(Map<Integer, Collection<Token>> integerTokenMap) {
+                        //Pass it to the TokensFragment
+                        processTokens(integerTokenMap);
                     }
                 });
         mSubscriptions.add(subscription);
     }
+
+    private void processTokens(Map<Integer, Collection<Token>> tokenMap) {
+        if (tokenMap == null || tokenMap.size() == 0) {
+            // Show a message indicating there are no Tokens for that filter type.
+            processEmptyTokens();
+        } else {
+            // Show the list of Tokens
+            mTokensView.showTokens(tokenMap);
+            // Set the filter label's text.
+            showFilterLabel();
+        }
+    }
+
 
     private void processTokens(List<Token> Tokens) {
         if (Tokens.isEmpty()) {

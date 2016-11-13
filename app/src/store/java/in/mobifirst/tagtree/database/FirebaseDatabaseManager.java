@@ -146,7 +146,12 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                             String key = mDatabaseReference.child(TOKENS_CHILD)
                                     .push().getKey();
 
-                            final Token newToken = new Token(key, token.getStoreId(), token.getPhoneNumber(), currentToken, mSharedPrefs.getSting((ApplicationConstants.PROFILE_PIC_URL_KEY)), mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY));
+                            final Token newToken = new Token(key, token.getStoreId(),
+                                    token.getPhoneNumber(),
+                                    currentToken,
+                                    mSharedPrefs.getSting((ApplicationConstants.PROFILE_PIC_URL_KEY)),
+                                    mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY),
+                                    token.getCounter());
 
                             mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
 

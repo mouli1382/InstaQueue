@@ -30,7 +30,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
@@ -40,7 +42,7 @@ public class TokensFragment extends Fragment implements TokensContract.View {
 
     private TokensContract.Presenter mPresenter;
 
-    private TokensAdapter mTokensAdapter;
+    private SnapAdapter mSnapAdapter;
 
     private View mNoTokensView;
 
@@ -65,8 +67,10 @@ public class TokensFragment extends Fragment implements TokensContract.View {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mTokensAdapter = new TokensAdapter(new ArrayList<Token>(0), mItemListener);
+//        mSnapAdapter = new TokensAdapter(new ArrayList<Token>(0), mItemListener);
+         mSnapAdapter = new SnapAdapter();
     }
+
 
     @Override
     public void onResume() {
@@ -97,13 +101,14 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         View root = inflater.inflate(R.layout.fragment_tokens, container, false);
 
         // Set up Tokens view
-        RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.tokens_list);
+        RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
 //        linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(mTokensAdapter);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(mSnapAdapter);
 
-        initSwipe(recyclerView);
+//        initSwipe(recyclerView);
 
         mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
         mTokensView = (LinearLayout) root.findViewById(R.id.tokensLL);
@@ -250,8 +255,15 @@ public class TokensFragment extends Fragment implements TokensContract.View {
 
     @Override
     public void showTokens(List<Token> Tokens) {
-        mTokensAdapter.replaceData(Tokens);
+//        mSnapAdapter.replaceData(Tokens);
 
+        mTokensView.setVisibility(View.VISIBLE);
+        mNoTokensView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showTokens(Map<Integer, Collection<Token>> tokenMap) {
+        mSnapAdapter.replaceData(tokenMap);
         mTokensView.setVisibility(View.VISIBLE);
         mNoTokensView.setVisibility(View.GONE);
     }

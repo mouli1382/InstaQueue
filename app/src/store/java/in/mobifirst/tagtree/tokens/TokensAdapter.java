@@ -30,6 +30,10 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
         mTokenItemListener = tokenItemListener;
     }
 
+    public TokensAdapter(List<Token> items) {
+        setList(items);
+    }
+
     public void replaceData(List<Token> tokens) {
         setList(tokens);
         notifyDataSetChanged();

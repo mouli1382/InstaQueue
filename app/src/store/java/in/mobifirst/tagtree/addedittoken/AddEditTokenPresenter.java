@@ -52,9 +52,10 @@ public class AddEditTokenPresenter implements AddEditTokenContract.Presenter {
     }
 
     @Override
-    public void addNewToken(String phoneNumber) {
+    public void addNewToken(String phoneNumber, int counterNumber) {
         Token token = new Token();
         token.setPhoneNumber(phoneNumber);
+        token.setCounter(counterNumber);
         saveToken(token);
     }
 
