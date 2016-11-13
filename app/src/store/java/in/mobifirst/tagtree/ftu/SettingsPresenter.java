@@ -56,10 +56,6 @@ public class SettingsPresenter implements SettingsContract.Presenter {
     }
 
     @Override
-    public void result(int requestCode, int resultCode, byte[] data) {
-        uploadFile(data);
-    }
-
     public void uploadFile(byte[] bitmapData) {
         if (bitmapData == null || bitmapData.length == 0) {
             mSettingsView.showUploadFailedError();
@@ -78,7 +74,7 @@ public class SettingsPresenter implements SettingsContract.Presenter {
 
                         @Override
                         public void onNext(Uri uri) {
-
+                            mSettingsView.onFileUploadFinished(uri);
                         }
                     });
         }
@@ -89,7 +85,8 @@ public class SettingsPresenter implements SettingsContract.Presenter {
         if (store.isEmpty()) {
             mSettingsView.showEmptyStoreError();
         } else {
-            mFirebaseDatabaseManager.addStore(store, new Subscriber<String>() {
+            mFirebaseDatabaseManager.addStore(mFirebaseAuthenticationManager
+                    .getAuthInstance().getCurrentUser().getUid(), store, new Subscriber<String>() {
                 @Override
                 public void onCompleted() {
                     mSettingsView.showTokensList();

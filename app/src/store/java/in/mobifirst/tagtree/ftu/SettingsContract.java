@@ -1,6 +1,8 @@
 package in.mobifirst.tagtree.ftu;
 
 
+import android.net.Uri;
+
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.mvp.BasePresenter;
 import in.mobifirst.tagtree.mvp.BaseView;
@@ -10,6 +12,8 @@ public interface SettingsContract {
     interface View extends BaseView<Presenter> {
 
         void showUploadFailedError();
+
+        void onFileUploadFinished(Uri uri);
 
         void showEmptyStoreError();
 
@@ -21,7 +25,7 @@ public interface SettingsContract {
     }
 
     interface Presenter extends BasePresenter {
-        void result(int requestCode, int resultCode, byte[] data);
+        void uploadFile(byte[] bitmapData);
 
         void addStoreDetails(Store store);
     }

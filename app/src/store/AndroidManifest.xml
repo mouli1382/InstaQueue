@@ -21,10 +21,6 @@
             android:name=".ftu.SettingsActivity"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".ftu.StoreOnboarding"
-            android:label="@string/title_activity_store_onboarding"
-            android:theme="@style/AppTheme"></activity>
-        <activity
             android:name=".activity.CreditsActivity"
             android:label="@string/title_activity_credits"
             android:theme="@style/AppTheme.NoActionBar" />

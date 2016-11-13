@@ -6,12 +6,14 @@ public class Store {
 
     private String storeId;
     private String name;
+    private String area;
     private String website;
     private String logoUrl;
     private long credits;
 
-    public Store(String name, String website, String logoUrl, long credits) {
+    public Store(String name, String area, String website, String logoUrl, long credits) {
         this.name = name;
+        this.area = area;
         this.website = website;
         this.logoUrl = logoUrl;
         this.credits = credits;
@@ -60,5 +62,13 @@ public class Store {
     public boolean isEmpty() {
         return TextUtils.isEmpty(name)
                 || TextUtils.isEmpty(logoUrl);
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
     }
 }

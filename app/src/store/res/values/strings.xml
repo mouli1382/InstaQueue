@@ -65,5 +65,10 @@
     <string name="empty_store_details">Kindly fill in the store details</string>
     <string name="upload_failed_error">File upload failed</string>
     <string name="add_store_failed">Failed to save store details</string>
+    <string name="name">Store Name</string>
+    <string name="area">Area Name</string>
+    <string name="phone_number">Enter Phone Number</string>
+    <string name="website">Website URL</string>
+    <string name="upload">UPLOAD</string>
 
 </resources>

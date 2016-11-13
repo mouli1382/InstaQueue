@@ -14,6 +14,7 @@ import in.mobifirst.tagtree.authentication.AuthenticationModule;
 import in.mobifirst.tagtree.data.token.TokensRepository;
 import in.mobifirst.tagtree.data.token.TokensRepositoryModule;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.storage.FirebaseStorageManager;
 import in.mobifirst.tagtree.storage.StorageModule;
 
@@ -41,4 +42,5 @@ public interface ApplicationComponent {
 
     FirebaseStorageManager getFirebaseStorageManager();
 
+    IQSharedPreferences getIQSharedPreferences();
 }

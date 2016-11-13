@@ -166,10 +166,10 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         });
     }
 
-    public void addStore(final Store store, final Subscriber<? super String> subscriber) {
+    public void addStore(String uid, final Store store, final Subscriber<? super String> subscriber) {
         mDatabaseReference
                 .child(STORE_CHILD)
-                .child(store.getStoreId())
+                .child(uid)
                 .setValue(store)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

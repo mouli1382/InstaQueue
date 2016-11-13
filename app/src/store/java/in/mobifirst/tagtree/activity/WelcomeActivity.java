@@ -1,8 +1,5 @@
 package in.mobifirst.tagtree.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorSet;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,8 +12,8 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
-import in.mobifirst.tagtree.authentication.OnBoardingActivity;
 import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
+import in.mobifirst.tagtree.ftu.SettingsActivity;
 import in.mobifirst.tagtree.tokens.TokensActivity;
 
 /**
@@ -43,6 +40,7 @@ public class WelcomeActivity extends BaseActivity {
     }
 
     private void loadGoogleSignInActivity() {
+//        SettingsActivity.start(WelcomeActivity.this);
         GoogleSignInActivity.start(WelcomeActivity.this);
         finish();
     }

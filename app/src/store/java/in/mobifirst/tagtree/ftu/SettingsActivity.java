@@ -32,8 +32,9 @@ public class SettingsActivity extends BaseDrawerActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.hide();
+//        actionBar.setDisplayHomeAsUpEnabled(true);
+//        actionBar.setDisplayShowHomeEnabled(true);
 
         SettingsFragment settingsFragment =
                 (SettingsFragment) getSupportFragmentManager().findFragmentById(R.id.content_base_drawer);
@@ -46,7 +47,7 @@ public class SettingsActivity extends BaseDrawerActivity {
 //                        SettingsFragment.ARGUMENT_EDIT_TASK_ID);
 //                actionBar.setTitle(R.string.edit_token);
 //            } else {
-            actionBar.setTitle(R.string.config_store);
+//            actionBar.setTitle(R.string.config_store);
 //            }
 
             ActivityUtilities.addFragmentToActivity(getSupportFragmentManager(),
