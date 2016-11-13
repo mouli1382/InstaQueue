@@ -14,7 +14,9 @@ import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
 import in.mobifirst.tagtree.ftu.SettingsActivity;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.tokens.TokensActivity;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 
 /**
  * ToDo Show Welcome screen explaining the app functionality in a paginated view.
@@ -28,10 +30,13 @@ public class WelcomeActivity extends BaseActivity {
     @Inject
     protected FirebaseAuthenticationManager mFirebaseAuth;
 
+    @Inject
+    protected IQSharedPreferences mIQSharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((IQStoreApplication)getApplication())
+        ((IQStoreApplication) getApplication())
                 .getApplicationComponent()
                 .inject(this);
         setContentView(R.layout.activity_welcome);
@@ -54,12 +59,16 @@ public class WelcomeActivity extends BaseActivity {
 
     private void bootUp() {
         if (mFirebaseAuth.getAuthInstance().getCurrentUser() != null) {
-            Intent intent = new Intent(this, TokensActivity.class);
+            Intent intent;
+            if (mIQSharedPreferences.getBoolean(ApplicationConstants.FTU_COMPLETED_KEY)) {
+                intent = new Intent(this, TokensActivity.class);
+            } else {
+                intent = new Intent(this, SettingsActivity.class);
+            }
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);
             finish();
-        }
-        else {
+        } else {
             SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
             signInButton.setOnClickListener(new View.OnClickListener() {
                 @Override

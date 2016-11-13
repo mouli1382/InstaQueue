@@ -29,4 +29,13 @@ public class IQSharedPreferences {
         String value = mSharedPreferences.getString(key, null);
         return TextUtils.isEmpty(value) ? "" : value;
     }
+
+    public boolean putBoolean(String key, boolean value) {
+        mEditor.putBoolean(key, value);
+        return mEditor.commit();
+    }
+
+    public boolean getBoolean(String key) {
+        return mSharedPreferences.getBoolean(key, false);
+    }
 }

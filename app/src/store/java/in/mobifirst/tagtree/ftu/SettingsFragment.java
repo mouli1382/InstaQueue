@@ -10,13 +10,18 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
+import android.util.Patterns;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -40,21 +45,26 @@ import static android.app.Activity.RESULT_OK;
 public class SettingsFragment extends BaseFragment implements SettingsContract.View {
 
     private static final int PICK_IMAGE_REQUEST = 9002;
+
     private SettingsContract.Presenter mPresenter;
 
-    private String mStoreName;
-    private String mStoreAddress;
-    private String mStoreWebsite;
-    private String mProfilePic;
-    private ImageView mStorePic;
+    private String mProfilePicUri;
+
+    private ImageView mStoreImageView;
     private ProgressBar mProgressBar;
     private Button mUploadButton;
     private FloatingActionButton fab;
-    TextInputEditText storeName;
-    TextInputEditText storeArea;
-    TextInputEditText website;
+    private TextInputEditText mStoreNameEditText;
+    private TextInputEditText mStoreAreaEditText;
+    private TextInputEditText mWebsiteEditText;
+    private TextInputEditText mCountersEditText;
+    private TextInputLayout mStoreNameTextInputLayout;
+    private TextInputLayout mStoreAreaTextInputLayout;
+    private TextInputLayout mStoreWebsiteTextInputLayout;
+    private TextInputLayout mStoreCountersTextInputLayout;
 
     private byte[] bitmapData;
+    private IQSharedPreferences iqSharedPreferences;
 
 
     public static SettingsFragment newInstance() {
@@ -89,11 +99,13 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mStoreName = storeName.getText().toString();
-                mStoreAddress = storeArea.getText().toString();
-                mStoreWebsite = website.getText().toString();
-                Store store = new Store(mStoreName, mStoreAddress, mStoreWebsite, mProfilePic, 0);
-                mPresenter.addStoreDetails(store);
+                if (validateInput()) {
+                    Store store = new Store(mStoreNameEditText.getText().toString(),
+                            mStoreAreaEditText.getText().toString(),
+                            mWebsiteEditText.getText().toString(),
+                            mProfilePicUri, Integer.parseInt(mCountersEditText.getText().toString()), 0);
+                    mPresenter.addStoreDetails(store);
+                }
             }
         });
     }
@@ -104,12 +116,83 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_onboarding, container, false);
 
-        storeName = (TextInputEditText) root.findViewById(R.id.storeName);
-        storeArea = (TextInputEditText) root.findViewById(R.id.storeArea);
-        website = (TextInputEditText) root.findViewById(R.id.website);
+        mStoreNameTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeNameInputLayout);
+        mStoreAreaTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeAreaInputLayout);
+        mStoreWebsiteTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeWebsiteInputLayout);
+        mStoreCountersTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeCountersInputLayout);
+
+        mStoreNameEditText = (TextInputEditText) root.findViewById(R.id.storeName);
+        mStoreNameEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
+                    CharSequence storeName = mStoreNameEditText.getText();
+                    if (TextUtils.isEmpty(storeName)) {
+                        mStoreNameTextInputLayout.setError(getString(R.string.empty_store_name));
+                    } else {
+                        mStoreNameTextInputLayout.setError("");
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+        mStoreAreaEditText = (TextInputEditText) root.findViewById(R.id.storeArea);
+        mStoreAreaEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
+                    CharSequence storeArea = mStoreAreaEditText.getText();
+                    if (TextUtils.isEmpty(storeArea)) {
+                        mStoreAreaTextInputLayout.setError(getString(R.string.empty_store_area));
+                    } else {
+                        mStoreAreaTextInputLayout.setError("");
+                    }
+                }
+                return true;
+            }
+        });
+        mWebsiteEditText = (TextInputEditText) root.findViewById(R.id.website);
+        mWebsiteEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
+                    CharSequence website = mWebsiteEditText.getText();
+                    if (TextUtils.isEmpty(website)) {
+                        mStoreWebsiteTextInputLayout.setError(getString(R.string.empty_store_website));
+                    } else if (!Patterns.WEB_URL.matcher(website).matches()) {
+                        mStoreWebsiteTextInputLayout.setError(getString(R.string.invalid_store_website));
+                    } else {
+                        mStoreWebsiteTextInputLayout.setError("");
+                    }
+                }
+                return true;
+            }
+        });
+
+        mCountersEditText = (TextInputEditText) root.findViewById(R.id.counters);
+        mCountersEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
+                    CharSequence counters = mCountersEditText.getText();
+                    if (TextUtils.isEmpty(counters)) {
+                        mStoreCountersTextInputLayout.setError(getString(R.string.empty_store_counters));
+                    } else {
+                        int counterValue = Integer.parseInt(counters.toString());
+                        if (counterValue > 0 && counterValue < 100) {
+                            mStoreCountersTextInputLayout.setError("");
+                        } else {
+                            mStoreCountersTextInputLayout.setError(getString(R.string.invalid_store_counters));
+                        }
+                    }
+                }
+                return true;
+            }
+        });
 
         mProgressBar = (ProgressBar) root.findViewById(R.id.logoProgress);
-        mStorePic = (ImageView) root.findViewById(R.id.storeProfilePic);
+        mStoreImageView = (ImageView) root.findViewById(R.id.storeProfilePic);
         mUploadButton = (Button) root.findViewById(R.id.uploadButton);
         mUploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,31 +205,31 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
 
         //Get and load the store profile pic
         //ToDo inject sharedprefs
-        IQSharedPreferences iqSharedPreferences = ((IQStoreApplication) getActivity().getApplicationContext()).getApplicationComponent().getIQSharedPreferences();
-        String profilePicURL = iqSharedPreferences.getSting(ApplicationConstants.PROFILE_PIC_URL_KEY);
+        iqSharedPreferences = ((IQStoreApplication) getActivity().getApplicationContext()).getApplicationComponent().getIQSharedPreferences();
+        mProfilePicUri = iqSharedPreferences.getSting(ApplicationConstants.PROFILE_PIC_URL_KEY);
 
-        if (!TextUtils.isEmpty(profilePicURL)) {
-            mStorePic.setEnabled(false);
+        if (!TextUtils.isEmpty(mProfilePicUri)) {
+            mStoreImageView.setEnabled(false);
             Glide.with(getActivity())
-                    .load(profilePicURL)
+                    .load(mProfilePicUri)
                     .listener(new RequestListener<String, GlideDrawable>() {
                         @Override
                         public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
                             mProgressBar.setVisibility(View.GONE);
-                            mStorePic.setEnabled(true);
+                            mStoreImageView.setEnabled(true);
                             return false;
                         }
 
                         @Override
                         public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
                             mProgressBar.setVisibility(View.GONE);
-                            mStorePic.setEnabled(true);
+                            mStoreImageView.setEnabled(true);
                             return false;
                         }
                     })
-                    .into(mStorePic);
+                    .into(mStoreImageView);
         }
-        mStorePic.setOnClickListener(new View.OnClickListener() {
+        mStoreImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
@@ -172,12 +255,12 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
 
-                mStorePic.setImageBitmap(bitmap);
+                mStoreImageView.setImageBitmap(bitmap);
 
                 // Get the data from an ImageView as bytes
-                mStorePic.setDrawingCacheEnabled(true);
-                mStorePic.buildDrawingCache();
-                mStorePic.getDrawingCache();
+                mStoreImageView.setDrawingCacheEnabled(true);
+                mStoreImageView.buildDrawingCache();
+                mStoreImageView.getDrawingCache();
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 bitmapData = baos.toByteArray();
@@ -197,7 +280,8 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     @Override
     public void onFileUploadFinished(Uri uri) {
         mProgressBar.setVisibility(View.GONE);
-        mProfilePic = uri.toString();
+        mProfilePicUri = uri.toString();
+        mUploadButton.setEnabled(false);
         fab.setEnabled(true);
     }
 
@@ -217,6 +301,8 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
         if (getActivity() == null)
             return;
 
+        iqSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
+
         TokensActivity.start(getActivity());
         getActivity().finish();
     }
@@ -224,5 +310,26 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     @Override
     public boolean isActive() {
         return isAdded();
+    }
+
+
+    private boolean validateInput() {
+        if ((mStoreNameTextInputLayout.getError() == null
+                || mStoreNameTextInputLayout.getError().length() != 0))
+            return false;
+
+        if ((mStoreAreaTextInputLayout.getError() == null
+                || mStoreAreaTextInputLayout.getError().length() != 0))
+            return false;
+
+        if ((mStoreWebsiteTextInputLayout.getError() == null
+                || mStoreWebsiteTextInputLayout.getError().length() != 0))
+            return false;
+
+        if ((mStoreCountersTextInputLayout.getError() == null
+                || mStoreCountersTextInputLayout.getError().length() != 0))
+            return false;
+
+        return true;
     }
 }

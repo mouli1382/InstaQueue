@@ -170,7 +170,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         mDatabaseReference
                 .child(STORE_CHILD)
                 .child(uid)
-                .setValue(store)
+                .setValue(store.toMap())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

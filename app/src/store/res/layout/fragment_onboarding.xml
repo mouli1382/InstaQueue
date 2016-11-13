@@ -11,13 +11,19 @@
     <android.support.design.widget.TextInputLayout
         android:id="@+id/storeNameInputLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:errorEnabled="true">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/storeName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/name" />
+            android:hint="@string/name"
+            android:inputType="text"
+            android:imeOptions="actionNext"
+            android:maxLines="@integer/maxLines"
+            android:focusableInTouchMode="true"
+            android:clickable="true"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -25,13 +31,17 @@
         android:id="@+id/storeAreaInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/storeNameInputLayout">
+        android:layout_below="@+id/storeNameInputLayout"
+        app:errorEnabled="true">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/storeArea"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/area" />
+            android:hint="@string/area"
+            android:inputType="text"
+            android:maxLines="@integer/maxLines"
+            android:imeOptions="actionNext"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -39,20 +49,42 @@
         android:id="@+id/storeWebsiteInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/storeAreaInputLayout">
+        android:layout_below="@+id/storeAreaInputLayout"
+        app:errorEnabled="true">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/website"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/website" />
+            android:hint="@string/website"
+            android:inputType="text"
+            android:maxLines="@integer/maxLines"
+            android:imeOptions="actionNext"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/storeCountersInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/storeWebsiteInputLayout"
+        app:errorEnabled="true">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/counters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/counters"
+            android:inputType="numberDecimal"
+            android:maxLines="@integer/maxLines"
+            android:imeOptions="actionDone"/>
 
     </android.support.design.widget.TextInputLayout>
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/storeWebsiteInputLayout">
+        android:layout_below="@+id/storeCountersInputLayout">
 
         <RelativeLayout
             android:id="@+id/pic_layout"
@@ -78,8 +110,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
-            android:text="@string/upload"
-            android:enabled="false"/>
+            android:enabled="false"
+            android:text="@string/upload" />
 
     </RelativeLayout>
 

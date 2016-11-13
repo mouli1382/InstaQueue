@@ -2,6 +2,12 @@ package in.mobifirst.tagtree.model;
 
 import android.text.TextUtils;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.ServerValue;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class Store {
 
     private String storeId;
@@ -9,13 +15,15 @@ public class Store {
     private String area;
     private String website;
     private String logoUrl;
+    private int numberOfCounters;
     private long credits;
 
-    public Store(String name, String area, String website, String logoUrl, long credits) {
+    public Store(String name, String area, String website, String logoUrl, int numberOfCounters, long credits) {
         this.name = name;
         this.area = area;
         this.website = website;
         this.logoUrl = logoUrl;
+        this.numberOfCounters = numberOfCounters;
         this.credits = credits;
     }
 
@@ -70,5 +78,25 @@ public class Store {
 
     public void setArea(String area) {
         this.area = area;
+    }
+
+    public int getNumberOfCounters() {
+        return numberOfCounters;
+    }
+
+    public void setNumberOfCounters(int numberOfCounters) {
+        this.numberOfCounters = numberOfCounters;
+    }
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("storeId", storeId);
+        result.put("name", name);
+        result.put("area", area);
+        result.put("website", website);
+        result.put("logoUrl", logoUrl);
+        result.put("numberOfCounters", numberOfCounters);
+        result.put("credits", credits);
+        return result;
     }
 }
