@@ -15,4 +15,5 @@ public class ApplicationConstants {
     public static final int REQUEST_CODE_RECEIVE_SMS = 1;
     public static final int REQUEST_CODE_READ_PHONE_STATE = 2;
     public static String FTU_COMPLETED_KEY = "ftu_completed";
+    public static String NUMBER_OF_COUNTERS_KEY = "number_of_counters";
 }

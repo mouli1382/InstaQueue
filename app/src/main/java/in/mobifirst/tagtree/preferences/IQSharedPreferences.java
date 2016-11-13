@@ -10,7 +10,6 @@ public class IQSharedPreferences {
 
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
-    public static final String PHONE_NUMBER_KEY = "phone_number_key";
     public static final String UUID_KEY = "UUID_key";
 
     public IQSharedPreferences(Context context) {
@@ -37,5 +36,14 @@ public class IQSharedPreferences {
 
     public boolean getBoolean(String key) {
         return mSharedPreferences.getBoolean(key, false);
+    }
+
+    public boolean putInt(String key, int value) {
+        mEditor.putInt(key, value);
+        return mEditor.commit();
+    }
+
+    public int getInt(String key) {
+        return mSharedPreferences.getInt(key, 1);
     }
 }

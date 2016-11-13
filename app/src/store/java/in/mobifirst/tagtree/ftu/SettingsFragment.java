@@ -302,6 +302,7 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
             return;
 
         iqSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
+        iqSharedPreferences.putInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY, Integer.parseInt(mCountersEditText.getText().toString()));
 
         TokensActivity.start(getActivity());
         getActivity().finish();

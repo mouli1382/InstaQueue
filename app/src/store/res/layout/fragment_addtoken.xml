@@ -48,22 +48,12 @@
 
         </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/counterNumberInputLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:errorEnabled="true">
+        <Spinner
+            android:id="@+id/counter_spinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
 
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/counterNumber"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/counter_number_hint"
-                android:inputType="numberDecimal"
-                android:maxLines="@integer/maxLines"
-                android:imeOptions="actionDone"/>
 
-        </android.support.design.widget.TextInputLayout>
 
     </LinearLayout>
 </ScrollView>
