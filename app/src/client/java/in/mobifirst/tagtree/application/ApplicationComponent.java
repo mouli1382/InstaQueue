@@ -7,6 +7,7 @@ import in.mobifirst.tagtree.activity.WelcomeActivity;
 import in.mobifirst.tagtree.authentication.AuthenticationModule;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.authentication.digits.DigitsSignInActivity;
+import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
 import in.mobifirst.tagtree.token.TokensRepository;
 import in.mobifirst.tagtree.token.TokensRepositoryModule;
 import in.mobifirst.tagtree.database.DatabaseModule;
@@ -19,6 +20,8 @@ public interface ApplicationComponent {
     void inject(WelcomeActivity welcomeActivity);
 
     void inject(DigitsSignInActivity digitsSignInActivity);
+
+    void inject(GoogleSignInActivity googleSignInActivity);
 
     TokensRepository getTokensRepository();
 

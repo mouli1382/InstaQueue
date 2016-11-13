@@ -8,8 +8,11 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 
+import com.digits.sdk.android.Digits;
+
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.authentication.OnBoardingActivity;
+import in.mobifirst.tagtree.authentication.digits.DigitsSignInActivity;
 
 import static in.mobifirst.tagtree.util.ApplicationConstants.PERMISSION_READ_PHONE_STATE;
 import static in.mobifirst.tagtree.util.ApplicationConstants.PERMISSION_RECEIVE_SMS;
@@ -68,7 +71,7 @@ public class RequestPermissionsActivity extends BaseDrawerActivity implements Ac
     }
 
     private void startOnBoardingActivity() {
-        startActivity(new Intent(RequestPermissionsActivity.this, OnBoardingActivity.class));
+        startActivity(new Intent(RequestPermissionsActivity.this, DigitsSignInActivity.class));
         finish();
     }
 }
