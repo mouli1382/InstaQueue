@@ -10,7 +10,7 @@
         android:supportsRtl="true">
         <activity
             android:name=".tokens.TokensActivity"
-            android:theme="@style/AppTheme.Background"></activity>
+            ></activity>
 
         <service
             android:name=".MyFirebaseMessagingService">

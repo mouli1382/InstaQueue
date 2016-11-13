@@ -3,6 +3,7 @@ package in.mobifirst.tagtree.tokens;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 
 import javax.inject.Inject;
 
@@ -35,6 +36,9 @@ public class TokensActivity extends BaseDrawerActivity {
             ActivityUtilities.addFragmentToActivity(
                     getSupportFragmentManager(), tokensFragment, R.id.content_base_drawer);
         }
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById((R.id.fab));
+        fab.hide();
 
         // Create the presenter
         DaggerTokensComponent.builder()

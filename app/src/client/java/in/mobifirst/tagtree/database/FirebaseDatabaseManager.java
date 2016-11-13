@@ -17,10 +17,15 @@ import java.util.List;
 import javax.inject.Inject;
 
 import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 import rx.Observable;
 import rx.Subscriber;
 
 public class FirebaseDatabaseManager implements DatabaseManager {
+
+    private IQSharedPreferences  mSharedPrefs;
+
     private static final String TAG = "FirebaseDatabaseManager";
 
     private static final String TOKENS_CHILD = "tokens/";
@@ -28,8 +33,9 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private DatabaseReference mDatabaseReference;
 
     @Inject
-    public FirebaseDatabaseManager() {
+    public FirebaseDatabaseManager(IQSharedPreferences iqSharedPreferences) {
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mSharedPrefs = iqSharedPreferences;
     }
 
     public DatabaseReference getDatabaseReference() {
@@ -44,7 +50,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 Query query = mDatabaseReference
                         .child(TOKENS_CHILD)
                         .orderByChild("phoneNumber")
-                        .equalTo(uId);
+                        .equalTo(mSharedPrefs.getSting(ApplicationConstants.PHONE_NUMBER_KEY));
                 query.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
