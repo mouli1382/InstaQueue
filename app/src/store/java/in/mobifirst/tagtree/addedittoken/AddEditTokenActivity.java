@@ -7,11 +7,11 @@ import android.support.v7.widget.Toolbar;
 import javax.inject.Inject;
 
 import in.mobifirst.tagtree.R;
-import in.mobifirst.tagtree.activity.BaseDrawerActivity;
+import in.mobifirst.tagtree.activity.BaseActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.util.ActivityUtilities;
 
-public class AddEditTokenActivity extends BaseDrawerActivity {
+public class AddEditTokenActivity extends BaseActivity {
 
     public static final int REQUEST_ADD_TOKEN = 1;
 
@@ -21,6 +21,7 @@ public class AddEditTokenActivity extends BaseDrawerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_addtoken);
 
         // Set up the toolbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -30,22 +31,16 @@ public class AddEditTokenActivity extends BaseDrawerActivity {
         actionBar.setDisplayShowHomeEnabled(true);
 
         AddEditTokenFragment addEditTokenFragment =
-                (AddEditTokenFragment) getSupportFragmentManager().findFragmentById(R.id.content_base_drawer);
+                (AddEditTokenFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
 
         String tokenId = null;
         if (addEditTokenFragment == null) {
             addEditTokenFragment = AddEditTokenFragment.newInstance();
 
-//            if (getIntent().hasExtra(SettingsFragment.ARGUMENT_EDIT_TASK_ID)) {
-//                tokenId = getIntent().getStringExtra(
-//                        SettingsFragment.ARGUMENT_EDIT_TASK_ID);
-//                actionBar.setTitle(R.string.edit_token);
-//            } else {
-            actionBar.setTitle(R.string.add_token);
-//            }
+            actionBar.setTitle(R.string.issue_token);
 
             ActivityUtilities.addFragmentToActivity(getSupportFragmentManager(),
-                    addEditTokenFragment, R.id.content_base_drawer);
+                    addEditTokenFragment, R.id.contentFrame);
         }
 
         DaggerAddEditTokenComponent.builder()

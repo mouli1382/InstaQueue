@@ -78,5 +78,6 @@
     <string name="upload">UPLOAD</string>
     <string name="empty_store_counters">Empty Counters</string>
     <string name="invalid_store_counters">Enter between 1 - 100</string>
+    <string name="issue_token">Issue Token</string>
 
 </resources>

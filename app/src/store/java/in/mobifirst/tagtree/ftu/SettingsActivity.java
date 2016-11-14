@@ -27,6 +27,7 @@ public class SettingsActivity extends BaseDrawerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_settings);
 
         // Set up the toolbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -37,7 +38,7 @@ public class SettingsActivity extends BaseDrawerActivity {
 //        actionBar.setDisplayShowHomeEnabled(true);
 
         SettingsFragment settingsFragment =
-                (SettingsFragment) getSupportFragmentManager().findFragmentById(R.id.content_base_drawer);
+                (SettingsFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
 
         if (settingsFragment == null) {
             settingsFragment = SettingsFragment.newInstance();
@@ -51,7 +52,7 @@ public class SettingsActivity extends BaseDrawerActivity {
 //            }
 
             ActivityUtilities.addFragmentToActivity(getSupportFragmentManager(),
-                    settingsFragment, R.id.content_base_drawer);
+                    settingsFragment, R.id.contentFrame);
         }
 
         DaggerSettingsComponent.builder()

@@ -16,7 +16,14 @@
             android:theme="@style/AppTheme.Background" />
         <activity
             android:name=".addedittoken.AddEditTokenActivity"
-            android:theme="@style/AppTheme.Background" />
+            android:parentActivityName=".tokens.TokensActivity"
+            android:theme="@style/AppTheme.Background">
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".tokens.TokensActivity" />
+        </activity>
         <activity
             android:name=".ftu.SettingsActivity"
             android:theme="@style/AppTheme" />
@@ -31,8 +38,7 @@
         <!-- Add your API key here -->
         <meta-data
             android:name="com.razorpay.ApiKey"
-            android:value="rzp_test_0vql5D6J04VFkX"
-            />
+            android:value="rzp_test_0vql5D6J04VFkX" />
 
     </application>
 
