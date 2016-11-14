@@ -1,11 +1,6 @@
 package in.mobifirst.tagtree.tokens;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,25 +11,18 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.util.TimeUtils;
 
 public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder> {
 
     private List<Token> mTokens;
-    private TokensFragment.TokenItemListener mTokenItemListener;
 
-    public TokensAdapter(List<Token> items, TokensFragment.TokenItemListener tokenItemListener) {
+    public TokensAdapter(List<Token> items) {
         setList(items);
-        mTokenItemListener = tokenItemListener;
     }
 
     public void replaceData(List<Token> tokens) {
@@ -53,82 +41,21 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
         return new ViewHolder(view);
     }
 
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
-
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
-        }
-    }
-
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Token token = mTokens.get(position);
         holder.mTokenNumber.setText(token.getTokenNumber() + "");
         holder.mStoreName.setText(token.getSenderName() + "");
 
-        /*Glide.with().load(Uri.parse(token.getSenderPic()))
+        Glide.with(holder.mImageView.getContext()).load(token.getSenderPic())
                 .centerCrop().placeholder(R.drawable.ic_account_circle_black_36dp).crossFade()
-                .into(holder.mImageView);*/
+                .into(holder.mImageView);
 
-
-
-        try {
-            if (token.getSenderPic() == null)
-                return;
-            //holder.mSenderPic.setImageURI(Uri.parse(token.getSenderPic()));
-            URL url = new URL(token.getSenderPic());
-            new DownloadImageTask(holder.mImageView)
-                    .execute(token.getSenderPic());
-
-        } catch(IOException e) {
-            System.out.println(e);
-        }
-
-        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-        cal.setTimeInMillis(token.getTimestamp());
-        String date = DateFormat.format("dd-MM-yyyy", cal).toString();
-
-        holder.mDate.setText(date);
-        holder.mChronoMeter.setFormat("H:MM:SS");
+        holder.mDate.setText(TimeUtils.getDate(token.getTimestamp()));
+        holder.mChronoMeter.setFormat("HH:mm:ss");
         holder.mChronoMeter.setBase(token.getTimestamp());
         holder.mChronoMeter.start();
-
-
     }
-
-//    private String getDateAndAuthor(String date, String author) {
-//        Date parsed = null;
-//        try {
-//            parsed = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(date);
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//        StringBuilder sb = new StringBuilder(author + "\n");
-//        if (parsed != null)
-//            sb.append(android.text.format.DateFormat.format("MMMM dd, yyyy", parsed.getTime()));
-//        else
-//            sb.append(date);
-//
-//        return sb.toString();
-//    }
 
     @Override
     public int getItemCount() {

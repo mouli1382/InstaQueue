@@ -1,13 +1,11 @@
 package in.mobifirst.tagtree.tokens;
 
-import android.support.annotation.NonNull;
-
 import java.util.List;
 
 import javax.inject.Inject;
 
-import in.mobifirst.tagtree.token.TokensRepository;
 import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.token.TokensRepository;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
@@ -92,8 +90,6 @@ final class TokensPresenter implements TokensContract.Presenter {
                                 return token.isActive();
                             case COMPLETED_TOKENS:
                                 return token.isCompleted();
-                            case CANCELLED_TOKENS:
-                                return token.isCancelled();
                             default:
                                 return true;
                         }
@@ -111,6 +107,7 @@ final class TokensPresenter implements TokensContract.Presenter {
                     @Override
                     public void onError(Throwable e) {
                         mTokensView.showLoadingTokensError();
+                        mTokensView.setLoadingIndicator(false);
                     }
 
                     @Override
@@ -141,9 +138,6 @@ final class TokensPresenter implements TokensContract.Presenter {
             case COMPLETED_TOKENS:
                 mTokensView.showCompletedFilterLabel();
                 break;
-            case CANCELLED_TOKENS:
-                mTokensView.showCancelledFilterLabel();
-                break;
             default:
                 mTokensView.showAllFilterLabel();
                 break;
@@ -158,18 +152,10 @@ final class TokensPresenter implements TokensContract.Presenter {
             case COMPLETED_TOKENS:
                 mTokensView.showNoCompletedTokens();
                 break;
-            case CANCELLED_TOKENS:
-                mTokensView.showNoCancelledTokens();
-                break;
             default:
                 mTokensView.showNoTokens();
                 break;
         }
-    }
-
-    @Override
-    public void openTokenDetails(@NonNull Token requestedToken) {
-//        mTokensView.showTokenDetailsUi(requestedToken.getId());
     }
 
     @Override

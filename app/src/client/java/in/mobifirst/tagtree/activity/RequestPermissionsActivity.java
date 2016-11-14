@@ -8,8 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 
-import com.digits.sdk.android.Digits;
-
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.authentication.digits.DigitsSignInActivity;
 

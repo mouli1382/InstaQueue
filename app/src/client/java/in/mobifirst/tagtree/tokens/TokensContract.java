@@ -1,12 +1,10 @@
 package in.mobifirst.tagtree.tokens;
 
-import android.support.annotation.NonNull;
-
 import java.util.List;
 
+import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.mvp.BasePresenter;
 import in.mobifirst.tagtree.mvp.BaseView;
-import in.mobifirst.tagtree.model.Token;
 
 public interface TokensContract {
 
@@ -15,16 +13,6 @@ public interface TokensContract {
         void setLoadingIndicator(boolean active);
 
         void showTokens(List<Token> tokens);
-
-        void showTokenDetailsUi(String tokenId);
-
-        void showTokenMarkedComplete();
-
-        void showTokenMarkedActive();
-
-        void showTokenMarkedCancel();
-
-        void showCompletedTokensCleared();
 
         void showLoadingTokensError();
 
@@ -36,13 +24,9 @@ public interface TokensContract {
 
         void showAllFilterLabel();
 
-        void showCancelledFilterLabel();
-
         void showNoActiveTokens();
 
         void showNoCompletedTokens();
-
-        void showNoCancelledTokens();
 
         boolean isActive();
 
@@ -54,8 +38,6 @@ public interface TokensContract {
         void result(int requestCode, int resultCode);
 
         void loadTokens(boolean forceUpdate);
-
-        void openTokenDetails(@NonNull Token requestedToken);
 
         void setFiltering(TokensFilterType requestType);
 

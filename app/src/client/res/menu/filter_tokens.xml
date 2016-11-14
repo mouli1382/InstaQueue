@@ -23,7 +23,4 @@
     <item
         android:id="@+id/completed"
         android:title="@string/nav_completed" />
-    <item
-        android:id="@+id/cancelled"
-        android:title="@string/nav_cancelled" />
 </menu>

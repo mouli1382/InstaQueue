@@ -16,11 +16,7 @@
         <activity
             android:name=".activity.BaseDrawerActivity"
             android:theme="@style/AppTheme.Background" />
-        <activity
-            android:name=".activity.RequestPermissionsActivity"
-            android:theme="@style/AppTheme.Background" />
         <activity android:name=".authentication.google.GoogleSignInActivity" />
-        <activity android:name=".authentication.digits.DigitsSignInActivity" />
         <activity
             android:name=".activity.WelcomeActivity"
             android:theme="@style/AppTheme.NoTitleBar.Fullscreen">
@@ -30,12 +26,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="da7a69f0dee3ffe21c69c8e4aff9bdff1db53059" />
-
-
     </application>
 
 </manifest>

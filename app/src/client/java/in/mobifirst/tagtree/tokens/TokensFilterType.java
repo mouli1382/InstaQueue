@@ -6,7 +6,5 @@ public enum TokensFilterType {
 
     ACTIVE_TOKENS,
 
-    CANCELLED_TOKENS,
-
     COMPLETED_TOKENS
 }

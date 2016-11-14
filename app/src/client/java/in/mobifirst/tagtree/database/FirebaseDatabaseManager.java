@@ -2,6 +2,7 @@ package in.mobifirst.tagtree.database;
 
 import android.util.Log;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,7 +25,7 @@ import rx.Subscriber;
 
 public class FirebaseDatabaseManager implements DatabaseManager {
 
-    private IQSharedPreferences  mSharedPrefs;
+    private IQSharedPreferences mSharedPrefs;
 
     private static final String TAG = "FirebaseDatabaseManager";
 
@@ -40,6 +41,13 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     public DatabaseReference getDatabaseReference() {
         return mDatabaseReference;
+    }
+
+    public Query getTokenRef() {
+        return mDatabaseReference
+                .child(TOKENS_CHILD)
+                .orderByChild("phoneNumber")
+                .equalTo(mSharedPrefs.getSting(ApplicationConstants.PHONE_NUMBER_KEY));
     }
 
     //ToDo limit by date and status.
@@ -60,9 +68,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                             if (tokens != null) {
                                 subscriber.onNext(new ArrayList<>(tokens.values()));
                                 subscriber.onCompleted();
-                            } else {
-                                subscriber.onError(new Exception("Empty Tokens."));
-                                subscriber.onCompleted();
                             }
                         } else {
                             subscriber.onError(new Exception("Empty Tokens."));
@@ -81,27 +86,26 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         });
     }
 
-    public Observable<List<Token>> observeTokens() {
-        return Observable.create(new Observable.OnSubscribe<List<Token>>() {
+    public Observable<Token> observeNewTokens() {
+        return Observable.create(new Observable.OnSubscribe<Token>() {
             @Override
-            public void call(final Subscriber<? super List<Token>> subscriber) {
+            public void call(final Subscriber<? super Token> subscriber) {
                 Query query = mDatabaseReference
                         .child(TOKENS_CHILD)
                         .orderByChild("phoneNumber")
                         .equalTo(mSharedPrefs.getSting(ApplicationConstants.PHONE_NUMBER_KEY));
-                query.addValueEventListener(new ValueEventListener() {
+                query.addChildEventListener(new ChildEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         if (dataSnapshot != null) {
-                            HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
-                            });
-                            if (tokens != null) {
-                                subscriber.onNext(new ArrayList<>(tokens.values()));
+                            Token token = dataSnapshot.getValue(Token.class);
+                            if (token != null) {
+                                subscriber.onNext(token);
                                 subscriber.onCompleted();
-                            } else {
+                            } /*else {
                                 subscriber.onError(new Exception("Empty Tokens."));
                                 subscriber.onCompleted();
-                            }
+                            }*/
                         } else {
                             subscriber.onError(new Exception("Empty Tokens."));
                             subscriber.onCompleted();
@@ -109,9 +113,24 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                     }
 
                     @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        Log.e(TAG, "[fetch All Tokens] onCancelled:" + databaseError);
-                        subscriber.onError(new Exception("Empty Tokens."));
+                        Log.e(TAG, "[fetch New Token] onCancelled:" + databaseError);
+                        subscriber.onError(databaseError.toException());
                         subscriber.onCompleted();
                     }
                 });

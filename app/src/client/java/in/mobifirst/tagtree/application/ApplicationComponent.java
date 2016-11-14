@@ -12,6 +12,7 @@ import in.mobifirst.tagtree.token.TokensRepository;
 import in.mobifirst.tagtree.token.TokensRepositoryModule;
 import in.mobifirst.tagtree.database.DatabaseModule;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.tokens.TokensFragment;
 
 @Singleton
 @Component(modules = {TokensRepositoryModule.class, ApplicationModule.class, AuthenticationModule.class, DatabaseModule.class})
@@ -22,6 +23,8 @@ public interface ApplicationComponent {
     void inject(DigitsSignInActivity digitsSignInActivity);
 
     void inject(GoogleSignInActivity googleSignInActivity);
+
+    void inject(TokensFragment tokensFragment);
 
     TokensRepository getTokensRepository();
 

@@ -1,6 +1,9 @@
 package in.mobifirst.tagtree.tokens;
 
 import android.content.Intent;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,21 +20,40 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Chronometer;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.bumptech.glide.Glide;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.List;
 
+import javax.inject.Inject;
+
 import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.application.IQClientApplication;
+import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.util.TimeUtils;
 
 public class TokensFragment extends Fragment implements TokensContract.View {
 
-    private TokensContract.Presenter mPresenter;
+    @Inject
+    protected FirebaseDatabaseManager mFirebaseDatabaseManager;
 
-    private TokensAdapter mTokensAdapter;
+    private FirebaseRecyclerAdapter<Token, FirebaseViewHolder>
+            mFirebaseAdapter;
+
+    private List<Token> mTokens;
+
+    private TokensContract.Presenter mPresenter;
 
     private View mNoTokensView;
 
@@ -56,7 +78,8 @@ public class TokensFragment extends Fragment implements TokensContract.View {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mTokensAdapter = new TokensAdapter(new ArrayList<Token>(0), mItemListener);
+        ((IQClientApplication) getActivity().getApplicationContext()).getApplicationComponent()
+                .inject(this);
     }
 
     @Override
@@ -87,12 +110,8 @@ public class TokensFragment extends Fragment implements TokensContract.View {
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_tokens, container, false);
 
-        // Set up Tokens view
         RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.tokens_list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-//        linearLayoutManager.setStackFromEnd(true);
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(mTokensAdapter);
 
         mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
         mTokensView = (LinearLayout) root.findViewById(R.id.tokensLL);
@@ -102,18 +121,6 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         mNoTokenIcon = (ImageView) root.findViewById(R.id.notokensIcon);
         mNoTokenMainView = (TextView) root.findViewById(R.id.notokensMain);
         mNoTokenAddView = (TextView) root.findViewById(R.id.notokensAdd);
-
-        // Set up floating action button
-//        FloatingActionButton fab =
-//                (FloatingActionButton) getActivity().findViewById(R.id.fab);
-//
-//        fab.setImageResource(R.drawable.ic_add);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mPresenter.addNewToken();
-//            }
-//        });
 
         // Set up progress indicator
         final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
@@ -129,9 +136,77 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mPresenter.loadTokens(false);
+//                mPresenter.loadTokens(false);
             }
         });
+
+        setLoadingIndicator(true);
+
+        Query query = mFirebaseDatabaseManager.getTokenRef();
+        mFirebaseAdapter = new FirebaseRecyclerAdapter<Token,
+                FirebaseViewHolder>(
+                Token.class,
+                R.layout.item_token,
+                FirebaseViewHolder.class,
+                query) {
+
+
+            @Override
+            protected void populateViewHolder(FirebaseViewHolder holder, final Token token, int position) {
+                setLoadingIndicator(false);
+                holder.mTokenNumber.setText(token.getTokenNumber() + "");
+                holder.mStoreName.setText(token.getSenderName() + "");
+
+                Glide.with(getActivity()).load(token.getSenderPic())
+                        .centerCrop().placeholder(R.drawable.ic_account_circle_black_36dp).crossFade()
+                        .into(holder.mImageView);
+
+                holder.mDate.setText(TimeUtils.getDate(token.getTimestamp()));
+                holder.mChronoMeter.setFormat("HH:mm:ss");
+                holder.mChronoMeter.setBase(token.getTimestamp());
+                holder.mChronoMeter.start();
+            }
+        };
+
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(mFirebaseAdapter);
+
+        mFirebaseAdapter
+                .registerAdapterDataObserver(
+                        new RecyclerView.AdapterDataObserver() {
+
+                            @Override
+                            public void onItemRangeChanged(int positionStart, int itemCount, Object payload) {
+
+                                //Look for only one changed item.
+//                                if (itemCount == 1 && payload != null) {
+//                                    Token newToken = (Token) payload;
+                                    Token oldToken = mFirebaseAdapter.getItem(positionStart);
+                                    if (oldToken.needsBuzz() /*&& (oldToken.getBuzzCount() < newToken.getBuzzCount())*/) {
+                                        playSound();
+                                    }
+//                                }
+
+                                super.onItemRangeChanged(positionStart, itemCount, payload);
+                            }
+                        }
+
+                );
+
+        query.addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        setLoadingIndicator(false);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        setLoadingIndicator(false);
+                    }
+                }
+
+        );
 
         setHasOptionsMenu(true);
 
@@ -141,14 +216,8 @@ public class TokensFragment extends Fragment implements TokensContract.View {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_clear:
-//                mPresenter.clearCompletedTokens();
-                break;
             case R.id.menu_filter:
                 showFilteringPopUpMenu();
-                break;
-            case R.id.menu_refresh:
-                mPresenter.loadTokens(true);
                 break;
         }
         return true;
@@ -173,9 +242,6 @@ public class TokensFragment extends Fragment implements TokensContract.View {
                     case R.id.completed:
                         mPresenter.setFiltering(TokensFilterType.COMPLETED_TOKENS);
                         break;
-                    case R.id.cancelled:
-                        mPresenter.setFiltering(TokensFilterType.CANCELLED_TOKENS);
-                        break;
                     default:
                         mPresenter.setFiltering(TokensFilterType.ALL_TOKENS);
                         break;
@@ -188,30 +254,6 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         popup.show();
     }
 
-    /**
-     * Listener for clicks on Tokens in the ListView.
-     */
-    TokenItemListener mItemListener = new TokenItemListener() {
-        @Override
-        public void onTokenClick(Token clickedToken) {
-            mPresenter.openTokenDetails(clickedToken);
-        }
-
-        @Override
-        public void onCompleteTokenClick(Token completedToken) {
-//            mPresenter.completeToken(completedToken);
-        }
-
-        @Override
-        public void onActivateTokenClick(Token activatedToken) {
-//            mPresenter.activateToken(activatedToken);
-        }
-
-        @Override
-        public void onCancelTokenClick(Token cancelledToken) {
-//            mPresenter.cancelToken(cancelledToken);
-        }
-    };
 
     @Override
     public void setLoadingIndicator(final boolean active) {
@@ -233,7 +275,7 @@ public class TokensFragment extends Fragment implements TokensContract.View {
 
     @Override
     public void showTokens(List<Token> Tokens) {
-        mTokensAdapter.replaceData(Tokens);
+//        mTokensAdapter.replaceData(Tokens);
 
         mTokensView.setVisibility(View.VISIBLE);
         mNoTokensView.setVisibility(View.GONE);
@@ -266,15 +308,6 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         );
     }
 
-    @Override
-    public void showNoCancelledTokens() {
-        showNoTokensViews(
-                getResources().getString(R.string.no_tokens_completed),
-                R.drawable.ic_verified_user_24dp,
-                false
-        );
-    }
-
     private void showNoTokensViews(String mainText, int iconRes, boolean showAddView) {
         mTokensView.setVisibility(View.GONE);
         mNoTokensView.setVisibility(View.VISIBLE);
@@ -300,40 +333,6 @@ public class TokensFragment extends Fragment implements TokensContract.View {
     }
 
     @Override
-    public void showCancelledFilterLabel() {
-        mFilteringLabelView.setText(getResources().getString(R.string.label_completed));
-    }
-
-    @Override
-    public void showTokenDetailsUi(String TokenId) {
-        // in it's own Activity, since it makes more sense that way and it gives us the flexibility
-        // to show some Intent stubbing.
-//        Intent intent = new Intent(getContext(), TokenDetailActivity.class);
-//        intent.putExtra(TokenDetailActivity.EXTRA_Token_ID, TokenId);
-//        startActivity(intent);
-    }
-
-    @Override
-    public void showTokenMarkedComplete() {
-        showMessage(getString(R.string.token_marked_complete));
-    }
-
-    @Override
-    public void showTokenMarkedActive() {
-        showMessage(getString(R.string.token_marked_active));
-    }
-
-    @Override
-    public void showTokenMarkedCancel() {
-        showMessage(getString(R.string.token_marked_cancel));
-    }
-
-    @Override
-    public void showCompletedTokensCleared() {
-        showMessage(getString(R.string.completed_tokens_cleared));
-    }
-
-    @Override
     public void showLoadingTokensError() {
         showMessage(getString(R.string.loading_tokens_error));
     }
@@ -347,15 +346,30 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         return isAdded();
     }
 
+    private static class FirebaseViewHolder extends RecyclerView.ViewHolder {
+        protected TextView mTokenNumber;
+        protected TextView mStoreName;
+        protected ImageView mImageView;
+        protected Chronometer mChronoMeter;
+        protected EditText mDate;
 
-    public interface TokenItemListener {
+        public FirebaseViewHolder(View view) {
+            super(view);
+            mTokenNumber = (TextView) view.findViewById(R.id.tokenNumberText);
+            mDate = (EditText) view.findViewById(R.id.tokenDate);
+            mStoreName = (TextView) view.findViewById(R.id.tokenStoreName);
+            mImageView = (ImageView) view.findViewById(R.id.storeImageView);
+            mChronoMeter = (Chronometer) view.findViewById(R.id.timeElapsedChrono);
+        }
+    }
 
-        void onTokenClick(Token clickedToken);
+    private void playSound() {
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Ringtone ringtone = RingtoneManager.getRingtone(getActivity(), defaultSoundUri);
+        ringtone.play();
 
-        void onCompleteTokenClick(Token completedToken);
-
-        void onActivateTokenClick(Token activatedToken);
-
-        void onCancelTokenClick(Token activatedToken);
+        //Requires vibrate permission.
+        //        Vibrator vibrator = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+        //        vibrator.vibrate(200);
     }
 }
