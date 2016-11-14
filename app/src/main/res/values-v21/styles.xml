@@ -7,7 +7,21 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
-    <style name="MyTheme" parent="android:Theme.Material.Light.NoActionBar" >
+    <style name="MyTheme" parent="Theme.AppCompat.NoActionBar" >
         <item name="android:colorBackground">?android:attr/windowBackground</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+    </style>
+
+    <style name="AppTheme.Background">
+        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
+        <item name="android:colorBackground">@color/tw__solid_white</item>
+        <item name="colorPrimary">@color/dgts__purple_pressed</item>
+        <item name="android:colorForeground">@color/cardview_shadow_end_color</item>
+        <item name="android:textColorSecondary">@color/common_google_signin_btn_text_dark_focused
+        </item>
+        <item name="colorAccent">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/cardview_light_background</item>
+        <item name="android:textColorPrimary">@color/cardview_dark_background</item>
+        <item name="android:statusBarColor">@color/common_google_signin_btn_text_dark_focused</item>
     </style>
 </resources>
