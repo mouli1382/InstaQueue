@@ -22,6 +22,11 @@
             </intent-filter>
         </service>
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="da7a69f0dee3ffe21c69c8e4aff9bdff1db53059"
+            />
+        
         <service
             android:name=".MyFirebaseInstanceIdService">
             <intent-filter>

@@ -85,6 +85,9 @@ dependencies {
     compile('com.digits.sdk.android:digits:2.0.2@aar') {
         transitive = true;
     }
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
+        transitive = true;
+    }
     compile "com.google.firebase:firebase-database:$rootProject.firebaseVersion"
     compile "com.google.firebase:firebase-core:$rootProject.firebaseVersion"
     compile "com.google.firebase:firebase-auth:$rootProject.firebaseVersion"
@@ -117,3 +120,4 @@ dependencies {
 }
 
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'io.fabric'

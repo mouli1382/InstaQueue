@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.SignInButton;
 import com.google.firebase.crash.FirebaseCrash;
 
@@ -23,6 +24,7 @@ import in.mobifirst.tagtree.application.IQClientApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
 import in.mobifirst.tagtree.tokens.TokensActivity;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * ToDo Show Welcome screen explaining the app functionality in a paginated view.
@@ -42,7 +44,8 @@ public class WelcomeActivity extends BaseActivity {
         ((IQClientApplication)getApplication())
                 .getApplicationComponent()
                 .inject(this);
-    setContentView(R.layout.activity_welcome);
+        Fabric.with(this, new Crashlytics());
+        setContentView(R.layout.activity_welcome);
     SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
     signInButton.setSize(SignInButton.SIZE_WIDE);
 
