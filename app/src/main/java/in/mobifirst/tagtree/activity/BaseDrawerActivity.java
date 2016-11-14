@@ -16,13 +16,15 @@ public class BaseDrawerActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private ActionBarDrawerToggle mDrawerToggle;
-
+    protected View mainContentView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base_drawer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mainContentView = findViewById(R.id.content_base_drawer);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(
