@@ -2,6 +2,7 @@ package in.mobifirst.tagtree.tokens;
 
 
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
@@ -22,11 +23,11 @@ import in.mobifirst.tagtree.model.Token;
 
 public class SnapAdapter extends RecyclerView.Adapter<SnapAdapter.ViewHolder> implements GravitySnapHelper.SnapListener {
 
-//    public static final int VERTICAL = 0;
+    //    public static final int VERTICAL = 0;
     public static final int HORIZONTAL = 1;
 
     private Map<Integer, Collection<Token>> mTokenMap;
-//    private ArrayList<Snap> mTokenMap;
+    //    private ArrayList<Snap> mTokenMap;
     // Disable touch detection for parent recyclerView if we use vertical nested recyclerViews
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
@@ -90,10 +91,11 @@ public class SnapAdapter extends RecyclerView.Adapter<SnapAdapter.ViewHolder> im
         holder.snapTextView.setText("Counter " + (tokens.get(0).getCounter() + 1));
 
 //        if (snap.getGravity() == Gravity.START /*|| snap.getGravity() == Gravity.END*/) {
-            holder.recyclerView.setLayoutManager(new LinearLayoutManager(holder
-                    .recyclerView.getContext(), LinearLayoutManager.HORIZONTAL, false));
-            holder.recyclerView.setOnFlingListener(null);
-            new GravitySnapHelper(Gravity.START, false, this).attachToRecyclerView(holder.recyclerView);
+        holder.recyclerView.setLayoutManager(new LinearLayoutManager(holder
+                .recyclerView.getContext(), LinearLayoutManager.HORIZONTAL, false));
+        holder.recyclerView.setOnFlingListener(null);
+        new LinearSnapHelper().attachToRecyclerView(holder.recyclerView);
+//            new GravitySnapHelper(Gravity.START, false, this).attachToRecyclerView(holder.recyclerView);
         /*} else if (snap.getGravity() == Gravity.CENTER_HORIZONTAL
                 || snap.getGravity() == Gravity.CENTER_VERTICAL
                 || snap.getGravity() == Gravity.CENTER) {
