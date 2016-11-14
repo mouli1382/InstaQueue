@@ -109,7 +109,7 @@ public class SnapAdapter extends RecyclerView.Adapter<SnapAdapter.ViewHolder> im
             new GravitySnapHelper(snap.getGravity()).attachToRecyclerView(holder.recyclerView);
         }*/
 
-        holder.recyclerView.setAdapter(new TokensAdapter(/*snap.getGravity() == Gravity.START
+        holder.recyclerView.setAdapter(new TokensIssueAdapter(/*snap.getGravity() == Gravity.START
                 || snap.getGravity() == Gravity.END
                 || snap.getGravity() == Gravity.CENTER_HORIZONTAL,*/ tokens));
     }

@@ -123,7 +123,7 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
 
         public ViewHolder(View view) {
             super(view);
-            mTokenNumber = (TextView) view.findViewById(R.id.tokenTextView);
+            mTokenNumber = (TextView) view.findViewById(R.id.token_number);
             mSenderName = (TextView) view.findViewById(R.id.senderName);
             mSenderPic = (ImageView) view.findViewById(R.id.senderImage);
         }

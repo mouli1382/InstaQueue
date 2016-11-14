@@ -6,66 +6,61 @@
     android:layout_height="wrap_content"
     android:layout_gravity="left"
     android:layout_margin="5dp"
-    card_view:cardCornerRadius="10dp"
-    card_view:cardElevation="@dimen/cardview_default_elevation"
+    android:paddingBottom="5dp"
     android:paddingTop="5dp"
-    android:paddingBottom="5dp">
+    card_view:cardCornerRadius="10dp"
+    card_view:cardElevation="@dimen/cardview_default_elevation">
+
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:weightSum="1"
-            android:gravity="center|fill">
-        <ImageView
-            android:layout_width="172dp"
-            android:layout_height="123dp"
-            card_view:srcCompat="@drawable/common_google_signin_btn_icon_dark"
-            android:id="@+id/senderImage"
-            android:layout_gravity="left"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp" />
-        <TextView
-            android:id="@+id/tokenTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            android:textColor="?android:attr/textColorPrimaryDisableOnly"
-            android:textStyle="normal|bold"
-            android:typeface="sans"
-            android:padding="5dp"
-            tools:text="80"
-            android:layout_weight="0.80"
-            android:gravity="center_vertical|center_horizontal"
-            android:layout_gravity="center"
-            android:elegantTextHeight="true" />
+            android:gravity="center|fill"
+            android:orientation="horizontal"
+            android:weightSum="1">
 
+            <ImageView
+                android:id="@+id/senderImage"
+                android:layout_width="172dp"
+                android:layout_height="123dp"
+                android:layout_gravity="left"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                card_view:srcCompat="@drawable/common_google_signin_btn_icon_dark" />
 
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            card_view:srcCompat="@drawable/ic_account_circle_black_36dp"
-            android:layout_gravity="left"
-            android:id="@+id/senderPic" />
+            <TextView
+                android:id="@+id/token_number"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="0.80"
+                android:elegantTextHeight="true"
+                android:gravity="center_vertical|center_horizontal"
+                android:padding="5dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                android:textColor="?android:attr/textColorPrimaryDisableOnly"
+                android:textStyle="normal|bold"
+                android:typeface="sans"
+                tools:text="80" />
+
         </LinearLayout>
 
 
-
-    <TextView
-        android:id="@+id/senderName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:textColor="?android:attr/textColorPrimaryDisableOnly"
-        android:textStyle="normal"
-        android:typeface="sans"
-        android:layout_gravity="left"
-        android:padding="5dp"
-        tools:text="Yashodha hospital" />
-
-
+        <TextView
+            android:id="@+id/senderName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:padding="5dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor="?android:attr/textColorPrimaryDisableOnly"
+            android:textStyle="normal"
+            android:typeface="sans"
+            tools:text="Yashodha hospital" />
 
 
     </LinearLayout>
