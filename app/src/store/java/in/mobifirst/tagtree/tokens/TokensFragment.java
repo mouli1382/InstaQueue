@@ -123,19 +123,6 @@ public class TokensFragment extends Fragment implements TokensContract.View {
             }
         });
 
-        // Set up floating action button
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab);
-
-//        fab.setImageResource(R.drawable.ic_add);
-        fab.setVisibility(View.GONE);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mPresenter.addNewToken();
-//            }
-//        });
-
         // Set up progress indicator
         final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
                 (ScrollChildSwipeRefreshLayout) root.findViewById(R.id.refresh_layout);
