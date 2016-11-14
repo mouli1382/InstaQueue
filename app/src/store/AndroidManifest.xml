@@ -40,6 +40,11 @@
             android:name="com.razorpay.ApiKey"
             android:value="rzp_test_0vql5D6J04VFkX" />
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="da7a69f0dee3ffe21c69c8e4aff9bdff1db53059"
+            />
+
     </application>
 
 </manifest>

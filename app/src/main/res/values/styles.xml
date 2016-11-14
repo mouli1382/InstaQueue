@@ -3,8 +3,8 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">?android:attr/colorBackground</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/DarkPink</item>
+        <item name="colorPrimaryDark">@color/DarkPink</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:colorForeground">@color/foreground_material_light</item>
         <item name="android:colorBackground">@color/colorPrimaryDark</item>
@@ -20,15 +20,16 @@
     </style>
 
     <style name="AppTheme.Background">
-        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
-        <item name="android:colorBackground">@color/tw__solid_white</item>
-        <item name="colorPrimary">@color/dgts__purple_pressed</item>
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:colorBackground">@android:color/background_light</item>
+        <item name="colorPrimary">@color/DarkPink</item>
         <item name="android:colorForeground">@color/cardview_shadow_end_color</item>
-        <item name="android:textColorSecondary">@color/common_google_signin_btn_text_dark_focused
-        </item>
-        <item name="colorAccent">@color/colorPrimaryDark</item>
-        <item name="colorPrimaryDark">@color/cardview_light_background</item>
-        <item name="android:textColorPrimary">@color/cardview_dark_background</item>
+        <item name="android:textColorSecondary">@android:color/primary_text_light_nodisable</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimaryDark">@color/DarkPink</item>
+        <item name="android:textColorPrimary">@android:color/background_dark</item>
+        <item name="android:textColorPrimaryInverse">@android:color/secondary_text_dark</item>
+        <item name="android:textColorSecondaryInverse">@android:color/darker_gray</item>
     </style>
 
     <style name="NavDrawerTheme" parent="ThemeOverlay.AppCompat.Dark"/>

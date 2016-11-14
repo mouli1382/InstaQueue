@@ -5,12 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 
+import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
+
 import javax.inject.Inject;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseDrawerActivity;
 import in.mobifirst.tagtree.application.IQClientApplication;
 import in.mobifirst.tagtree.util.ActivityUtilities;
+import io.fabric.sdk.android.Fabric;
 
 public class TokensActivity extends BaseDrawerActivity {
 
@@ -28,6 +32,7 @@ public class TokensActivity extends BaseDrawerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
 
         TokensFragment tokensFragment =
                 (TokensFragment) getSupportFragmentManager().findFragmentById(R.id.content_base_drawer);
