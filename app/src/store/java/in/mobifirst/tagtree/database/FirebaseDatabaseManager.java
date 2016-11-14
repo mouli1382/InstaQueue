@@ -75,10 +75,12 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                 subscriber.onCompleted();
                             } else {
                                 subscriber.onError(new Exception("Empty Tokens."));
+                                FirebaseCrash.report(new Exception("Empty Tokens"));
                                 subscriber.onCompleted();
                             }
                         } else {
                             subscriber.onError(new Exception("Empty Tokens."));
+                            FirebaseCrash.report(new Exception("Empty Tokens"));
                             subscriber.onCompleted();
                         }
                     }
@@ -87,6 +89,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                     public void onCancelled(DatabaseError databaseError) {
                         Log.e(TAG, "[fetch All Tokens] onCancelled:" + databaseError);
                         subscriber.onError(new Exception("Empty Tokens."));
+                        FirebaseCrash.report(new Exception("Empty Tokens"));
                         subscriber.onCompleted();
                     }
                 });
@@ -162,6 +165,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         }
                     } else {
                         subscriber.onError(databaseError.toException());
+
                     }
                 } else {
                     subscriber.onError(databaseError.toException());
@@ -187,6 +191,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         subscriber.onError(e);
+                        FirebaseCrash.report(new Exception("On Failure");
                     }
                 });
     }
@@ -246,6 +251,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                     reader.close();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    FirebaseCrash.report(new Exception("Error in Sending SMS: " + e.getMessage()));
                 }
                 return 0L;
             }

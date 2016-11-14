@@ -91,6 +91,7 @@ public class RazorPayActivity extends Activity implements PaymentResultListener 
             Toast.makeText(activity, "Error in payment: " + e.getMessage(), Toast.LENGTH_SHORT)
                     .show();
             e.printStackTrace();
+            FirebaseCrash.report(new Exception("Error in payment: " + e.getMessage()));
         }
     }
 
@@ -108,6 +109,7 @@ public class RazorPayActivity extends Activity implements PaymentResultListener 
                     .push().setValue(mCredits);
         } catch (Exception e) {
             Log.e(TAG, "Exception in onPaymentSuccess", e);
+            FirebaseCrash.report(new Exception("Exception in razor pay onPaymentError"));
         }
     }
 
@@ -123,6 +125,7 @@ public class RazorPayActivity extends Activity implements PaymentResultListener 
             Toast.makeText(this, "Payment failed: " + code + " " + response, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Log.e(TAG, "Exception in onPaymentError", e);
+            FirebaseCrash.report(new Exception("Exception in razor pay onPaymentError"));
         }
     }
 }

@@ -14,6 +14,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 
 import com.google.android.gms.common.SignInButton;
+import com.google.firebase.crash.FirebaseCrash;
 
 import javax.inject.Inject;
 

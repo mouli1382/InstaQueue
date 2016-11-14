@@ -90,6 +90,7 @@ dependencies {
     compile "com.google.firebase:firebase-auth:$rootProject.firebaseVersion"
     compile "com.google.firebase:firebase-messaging:$rootProject.firebaseVersion"
     compile "com.google.firebase:firebase-storage:$rootProject.firebaseVersion"
+    compile "com.google.firebase:firebase-crash:$rootProject.firebaseVersion"
 
     compile "com.google.android.gms:play-services-auth:$rootProject.firebaseVersion"
 

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import javax.inject.Inject;
 
 import in.mobifirst.tagtree.R;
