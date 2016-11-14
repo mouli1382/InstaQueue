@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -191,7 +192,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         subscriber.onError(e);
-                        FirebaseCrash.report(new Exception("On Failure");
+                        FirebaseCrash.report(new Exception("On Failure"));
                     }
                 });
     }
