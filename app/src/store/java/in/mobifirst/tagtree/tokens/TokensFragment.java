@@ -42,7 +42,8 @@ public class TokensFragment extends Fragment implements TokensContract.View {
 
     private TokensContract.Presenter mPresenter;
 
-    private SnapAdapter mSnapAdapter;
+    //private SnapAdapter mSnapAdapter;
+    private TokensAdapter mSnapAdapter;
 
     private View mNoTokensView;
 
@@ -67,8 +68,8 @@ public class TokensFragment extends Fragment implements TokensContract.View {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        mSnapAdapter = new TokensAdapter(new ArrayList<Token>(0), mItemListener);
-         mSnapAdapter = new SnapAdapter();
+       mSnapAdapter = new TokensAdapter(new ArrayList<Token>(0), mItemListener);
+         //mSnapAdapter = new SnapAdapter();
     }
 
 
@@ -263,7 +264,10 @@ public class TokensFragment extends Fragment implements TokensContract.View {
 
     @Override
     public void showTokens(Map<Integer, Collection<Token>> tokenMap) {
-        mSnapAdapter.replaceData(tokenMap);
+        //Todo: This is a temp change
+        Integer key = 0;
+        mSnapAdapter.replaceData((List)tokenMap.get(key));
+        //Todo: temp change ends here
         mTokensView.setVisibility(View.VISIBLE);
         mNoTokensView.setVisibility(View.GONE);
     }

@@ -20,8 +20,15 @@
     </style>
 
     <style name="AppTheme.Background">
-        <item name="android:windowBackground">@color/foreground_material_light</item>
-        <item name="android:colorBackground">@color/foreground_material_light</item>
+        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
+        <item name="android:colorBackground">@color/tw__solid_white</item>
+        <item name="colorPrimary">@color/dgts__purple_pressed</item>
+        <item name="android:colorForeground">@color/cardview_shadow_end_color</item>
+        <item name="android:textColorSecondary">@color/common_google_signin_btn_text_dark_focused
+        </item>
+        <item name="colorAccent">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/cardview_light_background</item>
+        <item name="android:textColorPrimary">@color/cardview_dark_background</item>
     </style>
 
     <style name="NavDrawerTheme" parent="ThemeOverlay.AppCompat.Dark"/>
