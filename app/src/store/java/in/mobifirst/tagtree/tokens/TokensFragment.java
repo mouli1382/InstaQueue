@@ -155,8 +155,6 @@ public class TokensFragment extends Fragment implements TokensContract.View {
             }
         });
 
-//        setHasOptionsMenu(true);
-
         return root;
     }
 
