@@ -63,6 +63,8 @@ public interface TokensContract {
 
         void loadTokens(boolean forceUpdate);
 
+        void loadTokensMap(boolean forceUpdate);
+
         void addNewToken();
 
         void openTokenDetails(@NonNull Token requestedToken);

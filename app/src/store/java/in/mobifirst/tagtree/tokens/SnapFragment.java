@@ -22,7 +22,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +30,11 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
 import in.mobifirst.tagtree.model.Token;
 
-public class TokensFragment extends Fragment implements TokensContract.View {
+public class SnapFragment extends Fragment implements TokensContract.View {
 
     private TokensContract.Presenter mPresenter;
 
-    private TokensAdapter mTokensAdapter;
+    private SnapAdapter mSnapAdapter;
 
     private View mNoTokensView;
 
@@ -49,18 +48,18 @@ public class TokensFragment extends Fragment implements TokensContract.View {
 
     private TextView mFilteringLabelView;
 
-    public TokensFragment() {
+    public SnapFragment() {
         // Requires empty public constructor
     }
 
-    public static TokensFragment newInstance() {
-        return new TokensFragment();
+    public static SnapFragment newInstance() {
+        return new SnapFragment();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mTokensAdapter = new TokensAdapter(new ArrayList<Token>(0), mItemListener);
+        mSnapAdapter = new SnapAdapter();
     }
 
 
@@ -93,20 +92,28 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         // Set up floating action button
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab);
-        fab.setVisibility(View.GONE);
+
+        fab.setImageResource(R.drawable.ic_add);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresenter.addNewToken();
+            }
+        });
+        fab.setVisibility(View.VISIBLE);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_tokens, container, false);
+        View root = inflater.inflate(R.layout.fragment_issuetokens, container, false);
 
         RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(mTokensAdapter);
+        recyclerView.setAdapter(mSnapAdapter);
 
         mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
         mTokensView = (LinearLayout) root.findViewById(R.id.tokensLL);
@@ -123,19 +130,6 @@ public class TokensFragment extends Fragment implements TokensContract.View {
             }
         });
 
-        // Set up floating action button
-        FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab);
-
-//        fab.setImageResource(R.drawable.ic_add);
-        fab.setVisibility(View.GONE);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mPresenter.addNewToken();
-//            }
-//        });
-
         // Set up progress indicator
         final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
                 (ScrollChildSwipeRefreshLayout) root.findViewById(R.id.refresh_layout);
@@ -150,7 +144,7 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mPresenter.loadTokens(false);
+                mPresenter.loadTokensMap(false);
             }
         });
 
@@ -167,7 +161,7 @@ public class TokensFragment extends Fragment implements TokensContract.View {
                 showFilteringPopUpMenu();
                 break;
             case R.id.menu_refresh:
-                mPresenter.loadTokens(true);
+                mPresenter.loadTokensMap(true);
                 break;
         }
         return true;
@@ -199,7 +193,7 @@ public class TokensFragment extends Fragment implements TokensContract.View {
                         mPresenter.setFiltering(TokensFilterType.ALL_TOKENS);
                         break;
                 }
-                mPresenter.loadTokens(false);
+                mPresenter.loadTokensMap(false);
                 return true;
             }
         });
@@ -252,14 +246,13 @@ public class TokensFragment extends Fragment implements TokensContract.View {
 
     @Override
     public void showTokens(List<Token> Tokens) {
-        mTokensAdapter.replaceData(Tokens);
-
-        mTokensView.setVisibility(View.VISIBLE);
-        mNoTokensView.setVisibility(View.GONE);
     }
 
     @Override
     public void showTokens(Map<Integer, Collection<Token>> tokenMap) {
+        mSnapAdapter.replaceData(tokenMap);
+        mTokensView.setVisibility(View.VISIBLE);
+        mNoTokensView.setVisibility(View.GONE);
     }
 
     @Override

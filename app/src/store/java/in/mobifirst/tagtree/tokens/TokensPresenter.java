@@ -9,11 +9,12 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import in.mobifirst.tagtree.model.Token;
-import in.mobifirst.tagtree.data.token.TokensDataSource;
 import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
+import in.mobifirst.tagtree.data.token.TokensDataSource;
 import in.mobifirst.tagtree.data.token.TokensRepository;
+import in.mobifirst.tagtree.model.Token;
 import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -48,7 +49,11 @@ final class TokensPresenter implements TokensContract.Presenter {
 
     @Override
     public void subscribe() {
-        loadTokens(false);
+        if(mTokensView instanceof SnapFragment) {
+            loadTokensMap(false);
+        } else {
+            loadTokens(false);
+        }
     }
 
     @Override
@@ -72,65 +77,72 @@ final class TokensPresenter implements TokensContract.Presenter {
         mFirstLoad = false;
     }
 
+    @Override
+    public void loadTokensMap(boolean forceUpdate) {
+        // Simplification for sample: a network reload will be forced on first load.
+        loadTokensMap(forceUpdate || mFirstLoad, true);
+        mFirstLoad = false;
+    }
+
     /**
      * @param forceUpdate   Pass in true to refresh the data in the {@link TokensDataSource}
      * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
-//    private void loadTokens(boolean forceUpdate, final boolean showLoadingUI) {
-//        if (showLoadingUI) {
-//            mTokensView.setLoadingIndicator(true);
-//        }
-//        if (forceUpdate) {
-//            mTokensRepository.refreshTokens();
-//        }
-//
-//        mSubscriptions.clear();
-//        Subscription subscription = mTokensRepository
-//                .getTokens()
-//                .flatMap(new Func1<List<Token>, Observable<Token>>() {
-//                    @Override
-//                    public Observable<Token> call(List<Token> tokens) {
-//                        return Observable.from(tokens);
-//                    }
-//                })
-//                .filter(new Func1<Token, Boolean>() {
-//                    @Override
-//                    public Boolean call(Token token) {
-//                        switch (mCurrentFiltering) {
-//                            case ACTIVE_TOKENS:
-//                                return token.isActive();
-//                            case COMPLETED_TOKENS:
-//                                return token.isCompleted();
-//                            case CANCELLED_TOKENS:
-//                                return token.isCancelled();
-//                            default:
-//                                return true;
-//                        }
-//                    }
-//                })
-//                .toList()
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Observer<List<Token>>() {
-//                    @Override
-//                    public void onCompleted() {
-//                        mTokensView.setLoadingIndicator(false);
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        mTokensView.showLoadingTokensError();
-//                    }
-//
-//                    @Override
-//                    public void onNext(List<Token> tokens) {
-//                        processTokens(tokens);
-//                    }
-//                });
-//        mSubscriptions.add(subscription);
-//    }
-
     private void loadTokens(boolean forceUpdate, final boolean showLoadingUI) {
+        if (showLoadingUI) {
+            mTokensView.setLoadingIndicator(true);
+        }
+        if (forceUpdate) {
+            mTokensRepository.refreshTokens();
+        }
+
+        mSubscriptions.clear();
+        Subscription subscription = mTokensRepository
+                .getTokens()
+                .flatMap(new Func1<List<Token>, Observable<Token>>() {
+                    @Override
+                    public Observable<Token> call(List<Token> tokens) {
+                        return Observable.from(tokens);
+                    }
+                })
+                .filter(new Func1<Token, Boolean>() {
+                    @Override
+                    public Boolean call(Token token) {
+                        switch (mCurrentFiltering) {
+                            case ACTIVE_TOKENS:
+                                return token.isActive();
+                            case COMPLETED_TOKENS:
+                                return token.isCompleted();
+                            case CANCELLED_TOKENS:
+                                return token.isCancelled();
+                            default:
+                                return true;
+                        }
+                    }
+                })
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Token>>() {
+                    @Override
+                    public void onCompleted() {
+                        mTokensView.setLoadingIndicator(false);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        mTokensView.showLoadingTokensError();
+                    }
+
+                    @Override
+                    public void onNext(List<Token> tokens) {
+                        processTokens(tokens);
+                    }
+                });
+        mSubscriptions.add(subscription);
+    }
+
+    private void loadTokensMap(boolean forceUpdate, final boolean showLoadingUI) {
         if (showLoadingUI) {
             mTokensView.setLoadingIndicator(true);
         }

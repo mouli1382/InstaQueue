@@ -22,6 +22,7 @@ public class BaseDrawerActivity extends BaseActivity
         setContentView(R.layout.activity_base_drawer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setTitle("");
 
         mainContentView = findViewById(R.id.content_base_drawer);
 

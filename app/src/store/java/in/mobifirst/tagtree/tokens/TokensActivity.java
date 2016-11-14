@@ -3,7 +3,9 @@ package in.mobifirst.tagtree.tokens;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
 
 import javax.inject.Inject;
 
@@ -30,19 +32,47 @@ public class TokensActivity extends BaseDrawerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        TokensFragment tokensFragment =
-                (TokensFragment) getSupportFragmentManager().findFragmentById(R.id.content_base_drawer);
-        if (tokensFragment == null) {
-            tokensFragment = TokensFragment.newInstance();
-            ActivityUtilities.addFragmentToActivity(
-                    getSupportFragmentManager(), tokensFragment, R.id.content_base_drawer);
-        }
+        SwitchCompat flow = (SwitchCompat) findViewById(R.id.switchCompat);
+        flow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean issueFlow) {
+                if (compoundButton.getId() == R.id.switchCompat) {
+                    if (!issueFlow) {
+                        SnapFragment snapFragment = SnapFragment.newInstance();
+                        ActivityUtilities.replaceFragmentToActivity(
+                                getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
 
-        // Create the presenter
-        DaggerTokensComponent.builder()
-                .applicationComponent(((IQStoreApplication)getApplication()).getApplicationComponent())
-                .tokensPresenterModule(new TokensPresenterModule(tokensFragment)).build()
-                .inject(this);
+                        // Create the presenter
+                        DaggerTokensComponent.builder()
+                                .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
+                                .tokensPresenterModule(new TokensPresenterModule(snapFragment)).build()
+                                .inject(TokensActivity.this);
+
+                    } else {
+                        TokensFragment tokensFragment = TokensFragment.newInstance();
+                        ActivityUtilities.replaceFragmentToActivity(
+                                getSupportFragmentManager(), tokensFragment, R.id.content_base_drawer);
+
+                        // Create the presenter
+                        DaggerTokensComponent.builder()
+                                .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
+                                .tokensPresenterModule(new TokensPresenterModule(tokensFragment)).build()
+                                .inject(TokensActivity.this);
+                    }
+                }
+            }
+        });
+        if(!flow.isChecked()) {
+            SnapFragment snapFragment = SnapFragment.newInstance();
+            ActivityUtilities.replaceFragmentToActivity(
+                    getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
+
+            // Create the presenter
+            DaggerTokensComponent.builder()
+                    .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
+                    .tokensPresenterModule(new TokensPresenterModule(snapFragment)).build()
+                    .inject(TokensActivity.this);
+        }
 
         // Load previously saved state, if available.
         if (savedInstanceState != null) {
@@ -79,7 +109,8 @@ public class TokensActivity extends BaseDrawerActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putSerializable(CURRENT_FILTERING_KEY, mTokensPresenter.getFiltering());
+        if(mTokensPresenter != null)
+            outState.putSerializable(CURRENT_FILTERING_KEY, mTokensPresenter.getFiltering());
 
         super.onSaveInstanceState(outState);
     }

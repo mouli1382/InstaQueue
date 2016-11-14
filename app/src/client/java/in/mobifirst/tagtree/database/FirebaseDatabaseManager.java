@@ -81,11 +81,49 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         });
     }
 
+    public Observable<List<Token>> observeTokens() {
+        return Observable.create(new Observable.OnSubscribe<List<Token>>() {
+            @Override
+            public void call(final Subscriber<? super List<Token>> subscriber) {
+                Query query = mDatabaseReference
+                        .child(TOKENS_CHILD)
+                        .orderByChild("phoneNumber")
+                        .equalTo(mSharedPrefs.getSting(ApplicationConstants.PHONE_NUMBER_KEY));
+                query.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot != null) {
+                            HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
+                            });
+                            if (tokens != null) {
+                                subscriber.onNext(new ArrayList<>(tokens.values()));
+                                subscriber.onCompleted();
+                            } else {
+                                subscriber.onError(new Exception("Empty Tokens."));
+                                subscriber.onCompleted();
+                            }
+                        } else {
+                            subscriber.onError(new Exception("Empty Tokens."));
+                            subscriber.onCompleted();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e(TAG, "[fetch All Tokens] onCancelled:" + databaseError);
+                        subscriber.onError(new Exception("Empty Tokens."));
+                        subscriber.onCompleted();
+                    }
+                });
+            }
+        });
+    }
+
     public void getTokenById(String tokenId, ValueEventListener valueEventListener) {
         DatabaseReference tokenRef = mDatabaseReference
                 .child(TOKENS_CHILD)
                 .child(tokenId);
-        tokenRef.addValueEventListener(valueEventListener);
+        tokenRef.addListenerForSingleValueEvent(valueEventListener);
     }
 
     public Observable<Token> getTokenById(final String tokenId) {

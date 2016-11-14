@@ -9,11 +9,11 @@ import android.support.v7.widget.Toolbar;
 import javax.inject.Inject;
 
 import in.mobifirst.tagtree.R;
-import in.mobifirst.tagtree.activity.BaseDrawerActivity;
+import in.mobifirst.tagtree.activity.BaseActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.util.ActivityUtilities;
 
-public class SettingsActivity extends BaseDrawerActivity {
+public class SettingsActivity extends BaseActivity {
 
     @Inject
     SettingsPresenter mSettingsPresenter;
