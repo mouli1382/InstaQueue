@@ -19,6 +19,7 @@ public class Token {
     private int buzzCount;
     private String senderPic;
     private String senderName;
+    private String areaName;
     private int counter;
 
     public enum Status {
@@ -31,7 +32,7 @@ public class Token {
         // Default constructor required for calls to DataSnapshot.getValue(Token.class)
     }
 
-    public Token(String uId, String storeId, String phoneNumber, long tokenNumber, String senderPic, String senderName, int counter) {
+    public Token(String uId, String storeId, String phoneNumber, long tokenNumber, String senderPic, String senderName, int counter, String areaName) {
         this.uId = uId;
         this.storeId = storeId;
         this.phoneNumber = phoneNumber;
@@ -40,6 +41,7 @@ public class Token {
         this.buzzCount = 0;
         this.senderPic = senderPic;
         this.senderName = senderName;
+        this.areaName = areaName;
         this.counter = counter;
     }
 
@@ -72,6 +74,14 @@ public class Token {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getAreaName() {
+        return areaName;
+    }
+
+    public void setAreaName (String senderName) {
+        this.areaName = areaName;
     }
 
     public String getSenderName() {
@@ -159,6 +169,7 @@ public class Token {
         result.put("senderName", senderName);
         result.put("senderPic", senderPic);
         result.put("counter", counter);
+        result.put("areaName", areaName);
         return result;
     }
 
@@ -175,6 +186,7 @@ public class Token {
         if (!getuId().equals(token.getuId())) return false;
         if (!getStoreId().equals(token.getStoreId())) return false;
         if (!getPhoneNumber().equals(token.getPhoneNumber())) return false;
+        if (!getAreaName().equals(token.getAreaName())) return false;
         return getTimestamp() != (token.getTimestamp());
 
     }
@@ -188,6 +200,7 @@ public class Token {
         result = 31 * result + (int) (getTimestamp() ^ (getTimestamp() >>> 32));
         result = 31 * result + getStatus();
         result = 31 * result + getBuzzCount();
+        result = 31 * result + getAreaName().hashCode();
         return result;
     }
 }

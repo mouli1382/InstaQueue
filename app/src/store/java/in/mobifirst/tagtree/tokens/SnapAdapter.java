@@ -88,6 +88,10 @@ public class SnapAdapter extends RecyclerView.Adapter<SnapAdapter.ViewHolder> im
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         List<Token> tokens = new ArrayList<>(mTokenMap.get(position));
+        if (tokens == null || tokens.size() <= 0)
+            return ;
+
+
         holder.snapTextView.setText("Counter " + (tokens.get(0).getCounter() + 1));
 
 //        if (snap.getGravity() == Gravity.START /*|| snap.getGravity() == Gravity.END*/) {

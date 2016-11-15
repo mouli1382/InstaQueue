@@ -12,6 +12,9 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
+    public User() {
+        // Default constructor required for calls to DataSnapshot.getValue(Token.class)
+    }
 
     public String getName() {
         return name;

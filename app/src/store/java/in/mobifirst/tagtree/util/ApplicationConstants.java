@@ -9,6 +9,7 @@ public class ApplicationConstants {
     public static final String PHONE_NUMBER_KEY = "phone_number_key";
     public static final String PROFILE_PIC_URL_KEY = "profile_url_key";
     public static final String DISPLAY_NAME_KEY = "display_name_key";
+    public static final String AREA_NAME_KEY = "area_name_key";
     public static final String EMAIL_KEY = "email_key";
     public static final String STORE_DETAILS_UPLOADED = "store_details_uploaded";
 

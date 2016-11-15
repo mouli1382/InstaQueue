@@ -27,6 +27,10 @@ public class Store {
         this.credits = credits;
     }
 
+    public Store() {
+        // Default constructor required for calls to DataSnapshot.getValue(Token.class)
+    }
+
     public String getLogoUrl() {
         return logoUrl;
     }

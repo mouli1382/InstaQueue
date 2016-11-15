@@ -145,21 +145,44 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
                 if (databaseError == null) {
                     if (committed) {
-                        Long currentToken = (Long) dataSnapshot.getValue();
                         {
-                            String key = mDatabaseReference.child(TOKENS_CHILD)
-                                    .push().getKey();
+                            final Long currentToken = (Long) dataSnapshot.getValue();
+                            DatabaseReference storeRef = mDatabaseReference.getRef()
+                                    .child("store")
+                                    .child(token.getStoreId());
 
-                            final Token newToken = new Token(key, token.getStoreId(),
-                                    token.getPhoneNumber(),
-                                    currentToken,
-                                    mSharedPrefs.getSting((ApplicationConstants.PROFILE_PIC_URL_KEY)),
-                                    mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY),
-                                    token.getCounter());
 
-                            mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
+                            storeRef.addListenerForSingleValueEvent(new ValueEventListener() {
 
-//                            sendPushToClient(newToken.getuId(), newToken.getPhoneNumber());
+                                @Override
+                                public void onDataChange(DataSnapshot storeDataSnapshot) {
+                                    if (storeDataSnapshot != null) {
+
+                                        String key = mDatabaseReference.child(TOKENS_CHILD)
+                                                .push().getKey();
+                                        Store store = storeDataSnapshot.getValue(Store.class);
+                                        String areaName = store.getArea();
+                                        final Token newToken = new Token(key, token.getStoreId(),
+                                                token.getPhoneNumber(),
+                                                currentToken,
+                                                mSharedPrefs.getSting((ApplicationConstants.PROFILE_PIC_URL_KEY)),
+                                                mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY),
+                                                token.getCounter(),
+                                                areaName);
+
+                                        mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
+                                    }
+                                    else
+                                    {
+                                        Log.e(TAG, "Snapshot is null");
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    Log.e(TAG, "[fetch Area name] onCancelled:" + databaseError);
+                                }
+                            });
 
                             subscriber.onNext(null);
                             subscriber.onCompleted();
