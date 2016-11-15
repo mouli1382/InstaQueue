@@ -42,9 +42,6 @@ public class TokensActivity extends BaseDrawerActivity {
                     getSupportFragmentManager(), tokensFragment, R.id.content_base_drawer);
         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById((R.id.fab));
-        fab.hide();
-
         // Create the presenter
         DaggerTokensComponent.builder()
                 .applicationComponent(((IQClientApplication) getApplication()).getApplicationComponent())
