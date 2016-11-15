@@ -9,7 +9,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true">
         <activity
-            android:name=".tokens.TokensActivity"></activity>
+            android:name=".tokens.LandingActivity"></activity>
         <activity
             android:name=".activity.RequestPermissionsActivity"
             android:theme="@style/AppTheme.Background" />

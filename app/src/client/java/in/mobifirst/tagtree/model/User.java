@@ -1,5 +1,10 @@
 package in.mobifirst.tagtree.model;
 
+import com.google.firebase.database.Exclude;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class User {
     private String uId;
     private String name;
@@ -53,5 +58,15 @@ public class User {
 
     public void setRegId(String regId) {
         this.regId = regId;
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("name", name);
+        result.put("phoneNumber", phoneNumber);
+        result.put("email", email);
+        result.put("regId", regId);
+        return result;
     }
 }

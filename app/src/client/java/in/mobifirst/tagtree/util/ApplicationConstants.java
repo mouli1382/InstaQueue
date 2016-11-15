@@ -11,6 +11,7 @@ public class ApplicationConstants {
     public static final String DISPLAY_NAME_KEY = "display_name_key";
     public static final String USER_DETAILS_UPLOADED = "user_details_uploaded";
 
+    public static String FTU_COMPLETED_KEY = "ftu_completed";
     public static final int REQUEST_CODE_RECEIVE_SMS = 1;
     public static final int REQUEST_CODE_READ_PHONE_STATE = 2;
 }

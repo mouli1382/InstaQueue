@@ -1,8 +1,5 @@
 package in.mobifirst.tagtree.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorSet;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -15,7 +12,6 @@ import android.view.View;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.SignInButton;
-import com.google.firebase.crash.FirebaseCrash;
 
 import javax.inject.Inject;
 
@@ -23,7 +19,9 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQClientApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
-import in.mobifirst.tagtree.tokens.TokensActivity;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.tokens.LandingActivity;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 import io.fabric.sdk.android.Fabric;
 
 /**
@@ -38,23 +36,25 @@ public class WelcomeActivity extends BaseActivity {
     @Inject
     protected FirebaseAuthenticationManager mFirebaseAuth;
 
+    @Inject
+    protected IQSharedPreferences mIQSharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((IQClientApplication)getApplication())
+        ((IQClientApplication) getApplication())
                 .getApplicationComponent()
                 .inject(this);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_welcome);
-    SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
-    signInButton.setSize(SignInButton.SIZE_WIDE);
+        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        signInButton.setSize(SignInButton.SIZE_WIDE);
 
-    if (isInternetConnected() == false)
-        showDialog();
-}
+        if (isInternetConnected() == false)
+            showDialog();
+    }
 
-    private void showDialog()
-    {
+    private void showDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Application needs to connect to Wifi or MobileData")
                 .setCancelable(false)
@@ -86,12 +86,16 @@ public class WelcomeActivity extends BaseActivity {
 
     private void bootUp() {
         if (mFirebaseAuth.getAuthInstance().getCurrentUser() != null) {
-            Intent intent = new Intent(this, RequestPermissionsActivity.class);
+            Intent intent;
+            if (mIQSharedPreferences.getBoolean(ApplicationConstants.FTU_COMPLETED_KEY)) {
+                intent = new Intent(this, LandingActivity.class);
+            } else {
+                intent = new Intent(this, RequestPermissionsActivity.class);
+            }
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);
             finish();
-        }
-        else {
+        } else {
             SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
             signInButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -102,8 +106,7 @@ public class WelcomeActivity extends BaseActivity {
         }
     }
 
-    private boolean isInternetConnected()
-    {
+    private boolean isInternetConnected() {
         ConnectivityManager cm = (ConnectivityManager) this.getSystemService(this.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null &&

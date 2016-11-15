@@ -6,63 +6,77 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:layout_margin="5dp"
-    card_view:cardCornerRadius="@dimen/cardview_default_radius"
+    card_view:cardCornerRadius="5dp"
     card_view:cardElevation="@dimen/cardview_default_elevation">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:background="@color/DarkPink"
-        android:elevation="15dp">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/tokenStoreName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:padding="2dp"
+            android:background="@color/colorPrimary"
+            android:padding="5dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            android:textColor="@color/common_google_signin_btn_text_dark_focused"
-            android:textColorLink="@color/cardview_dark_background"
+            android:textColor="@color/tw__solid_white"
             android:textSize="18sp"
             android:textStyle="normal|bold"
             android:typeface="sans"
             tools:text="Name" />
+
 
         <RelativeLayout
             android:id="@+id/linearLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tokenStoreName"
+            android:layout_marginTop="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:orientation="horizontal">
 
-            <ImageView
-                android:id="@+id/storeImageView"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:padding="5dp"
-                android:adjustViewBounds="false"
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_account_circle_black_36dp" />
+                android:orientation="vertical">
+                <ImageView
+                    android:id="@+id/storeImageView"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:adjustViewBounds="false"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_account_circle_black_36dp" />
+
+                <TextView
+                    android:id="@+id/areaName"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:text="Kondapur" />
+
+            </LinearLayout>
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:layout_alignParentRight="true"
-                android:layout_centerHorizontal="true">
+                android:layout_centerHorizontal="true"
+                android:layout_margin="5dp">
 
                 <TextView
                     android:id="@+id/tokenNumberText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="5dp"
                     android:padding="2dp"
                     android:text="3000"
                     android:textColor="@color/common_google_signin_btn_text_dark_focused"
-                    android:textSize="75sp"
+                    android:textSize="50sp"
                     android:textStyle="normal|bold" />
 
                 <TextView
@@ -72,8 +86,7 @@
                     android:layout_below="@+id/tokenNumberText"
                     android:layout_centerHorizontal="true"
                     android:padding="2dp"
-                    android:text="Counter Number"
-                    android:textColor="@color/common_google_signin_btn_text_dark_focused" />
+                    android:text="Counter" />
 
                 <TextView
                     android:id="@+id/counterNumber"
@@ -81,11 +94,11 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/counterText"
                     android:layout_centerHorizontal="true"
-                    android:textStyle="normal|bold"
                     android:padding="2dp"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused"
                     android:textSize="25sp"
-                    tools:text="1"
-                    android:textColor="@color/common_google_signin_btn_text_dark_focused" />
+                    android:textStyle="normal|bold"
+                    tools:text="100" />
             </RelativeLayout>
 
         </RelativeLayout>
@@ -94,22 +107,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/linearLL"
+            android:layout_marginBottom="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:layout_marginBottom="5dp"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/tokenDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="5dp"
                 android:ems="10"
-                android:enabled="false"
-                android:focusableInTouchMode="false"
                 android:gravity="bottom"
                 android:inputType="date"
-                android:textColor="@android:color/background_dark"
+                android:padding="5dp"
                 tools:text="01/01/2016" />
 
             <TextView
@@ -118,7 +128,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:padding="5dp"
-                android:textColor="@color/common_google_signin_btn_text_dark_focused"
                 tools:text="23:59:59" />
         </RelativeLayout>
 

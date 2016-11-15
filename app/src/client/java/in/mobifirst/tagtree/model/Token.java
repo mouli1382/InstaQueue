@@ -2,12 +2,6 @@ package in.mobifirst.tagtree.model;
 
 import android.text.TextUtils;
 
-import com.google.firebase.database.Exclude;
-import com.google.firebase.database.ServerValue;
-
-import java.util.HashMap;
-import java.util.Map;
-
 public class Token {
 
     private String uId;
@@ -20,6 +14,8 @@ public class Token {
     private String senderPic;
     private String senderName;
     private int counter;
+    private String areaName;
+
 
     public enum Status {
         ISSUED, READY, COMPLETED
@@ -29,18 +25,6 @@ public class Token {
 
     public Token() {
         // Default constructor required for calls to DataSnapshot.getValue(Token.class)
-    }
-
-    public Token(String uId, String storeId, String phoneNumber, long tokenNumber, String senderPic, String senderName, int counter) {
-        this.uId = uId;
-        this.storeId = storeId;
-        this.phoneNumber = phoneNumber;
-        this.tokenNumber = tokenNumber;
-        this.status = Status.ISSUED.ordinal();
-        this.buzzCount = 0;
-        this.senderPic = senderPic;
-        this.senderName = senderName;
-        this.counter = counter;
     }
 
     public boolean needsBuzz() {
@@ -142,20 +126,12 @@ public class Token {
         return TextUtils.isEmpty(phoneNumber);
     }
 
-    @Exclude
-    public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("uId", uId);
-        result.put("storeId", storeId);
-        result.put("phoneNumber", phoneNumber);
-        result.put("tokenNumber", tokenNumber);
-        result.put("timestamp", ServerValue.TIMESTAMP);
-        result.put("status", status);
-        result.put("buzzCount", buzzCount);
-        result.put("senderName", senderName);
-        result.put("senderPic", senderPic);
-        result.put("counter", counter);
-        return result;
+    public String getAreaName() {
+        return areaName;
+    }
+
+    public void setAreaName(String areaName) {
+        this.areaName = areaName;
     }
 
     @Override

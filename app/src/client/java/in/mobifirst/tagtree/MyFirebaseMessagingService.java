@@ -14,7 +14,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Map;
 
-import in.mobifirst.tagtree.tokens.TokensActivity;
+import in.mobifirst.tagtree.tokens.LandingActivity;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
@@ -34,7 +34,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendNotification(String message) {
-        Intent intent = new Intent(this, TokensActivity.class);
+        Intent intent = new Intent(this, LandingActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);

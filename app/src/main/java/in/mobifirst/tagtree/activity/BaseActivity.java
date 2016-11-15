@@ -36,7 +36,7 @@ public class BaseActivity extends AppCompatActivity {
             if (ActivityCompat.shouldShowRequestPermissionRationale(appCompatActivity,
                     permission)) {
 
-                Snackbar.make(view, "Accept the damn permissions!",
+                Snackbar.make(view, "Accept the requested permissions!",
                         Snackbar.LENGTH_INDEFINITE)
                         .setAction(android.R.string.ok, new View.OnClickListener() {
                             @Override
