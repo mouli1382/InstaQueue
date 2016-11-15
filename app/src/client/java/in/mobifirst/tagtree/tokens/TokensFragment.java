@@ -20,8 +20,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Chronometer;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -162,10 +160,11 @@ public class TokensFragment extends Fragment implements TokensContract.View {
                         .into(holder.mImageView);
 
                 holder.mDate.setText(TimeUtils.getDate(token.getTimestamp()));
+                holder.mTime.setText(TimeUtils.getTime(token.getTimestamp()));
                 //holder.mChronoMeter.setFormat("HH:mm:ss");
                 //holder.mChronoMeter.setBase(token.getTimestamp());
                 //holder.mChronoMeter.start();
-                holder.mCounterNumber.setText(token.getCounter());
+                holder.mCounterNumber.setText(""+ token.getCounter());
             }
         };
 
@@ -347,20 +346,22 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         return isAdded();
     }
 
-    private static class FirebaseViewHolder extends RecyclerView.ViewHolder {
+    public static class FirebaseViewHolder extends RecyclerView.ViewHolder {
         protected TextView mTokenNumber;
         protected TextView mStoreName;
         protected ImageView mImageView;
-        protected EditText mDate;
+        protected TextView mDate;
         protected TextView mCounterNumber;
+        protected TextView mTime;
 
         public FirebaseViewHolder(View view) {
             super(view);
             mTokenNumber = (TextView) view.findViewById(R.id.tokenNumberText);
-            mDate = (EditText) view.findViewById(R.id.tokenDate);
+            mDate = (TextView) view.findViewById(R.id.tokenDate);
+            mTime = (TextView) view.findViewById(R.id.tokenTime);
             mStoreName = (TextView) view.findViewById(R.id.tokenStoreName);
             mImageView = (ImageView) view.findViewById(R.id.storeImageView);
-            mCounterNumber = (TextView) view.findViewById(R.id.counterToken);
+            mCounterNumber = (TextView) view.findViewById(R.id.counterNumber);
         }
     }
 
