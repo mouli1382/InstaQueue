@@ -162,9 +162,10 @@ public class TokensFragment extends Fragment implements TokensContract.View {
                         .into(holder.mImageView);
 
                 holder.mDate.setText(TimeUtils.getDate(token.getTimestamp()));
-                holder.mChronoMeter.setFormat("HH:mm:ss");
-                holder.mChronoMeter.setBase(token.getTimestamp());
-                holder.mChronoMeter.start();
+                //holder.mChronoMeter.setFormat("HH:mm:ss");
+                //holder.mChronoMeter.setBase(token.getTimestamp());
+                //holder.mChronoMeter.start();
+                holder.mCounterNumber.setText(token.getCounter());
             }
         };
 
@@ -350,8 +351,8 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         protected TextView mTokenNumber;
         protected TextView mStoreName;
         protected ImageView mImageView;
-        protected Chronometer mChronoMeter;
         protected EditText mDate;
+        protected TextView mCounterNumber;
 
         public FirebaseViewHolder(View view) {
             super(view);
@@ -359,7 +360,7 @@ public class TokensFragment extends Fragment implements TokensContract.View {
             mDate = (EditText) view.findViewById(R.id.tokenDate);
             mStoreName = (TextView) view.findViewById(R.id.tokenStoreName);
             mImageView = (ImageView) view.findViewById(R.id.storeImageView);
-            mChronoMeter = (Chronometer) view.findViewById(R.id.timeElapsedChrono);
+            mCounterNumber = (TextView) view.findViewById(R.id.counterToken);
         }
     }
 

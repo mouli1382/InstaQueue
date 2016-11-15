@@ -52,9 +52,11 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
                 .into(holder.mImageView);
 
         holder.mDate.setText(TimeUtils.getDate(token.getTimestamp()));
-        holder.mChronoMeter.setFormat("HH:mm:ss");
+        holder.mCounterNumber.setText(token.getCounter());
+
+        /*holder.mChronoMeter.setFormat("HH:mm:ss");
         holder.mChronoMeter.setBase(token.getTimestamp());
-        holder.mChronoMeter.start();
+        holder.mChronoMeter.start();*/
     }
 
     @Override
@@ -66,8 +68,8 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
         protected TextView mTokenNumber;
         protected TextView mStoreName;
         protected ImageView mImageView;
-        protected Chronometer mChronoMeter;
         protected EditText mDate;
+        protected TextView mCounterNumber;
 
         public ViewHolder(View view) {
             super(view);
@@ -75,7 +77,7 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
             mDate = (EditText) view.findViewById(R.id.tokenDate);
             mStoreName = (TextView) view.findViewById(R.id.tokenStoreName);
             mImageView = (ImageView) view.findViewById(R.id.storeImageView);
-            mChronoMeter = (Chronometer) view.findViewById(R.id.timeElapsedChrono);
+            mTokenNumber = (TextView) view.findViewById(R.id.counterToken);
         }
     }
 }
