@@ -288,6 +288,7 @@ public class TokensFragment extends Fragment implements TokensContract.View {
     @Override
     public void showSuccessfullySavedMessage() {
         showMessage(getString(R.string.successfully_saved_token_message));
+        mPresenter.loadTokens(false);
     }
 
     private void showNoTokensViews(String mainText, int iconRes, boolean showAddView) {

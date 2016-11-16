@@ -49,6 +49,10 @@ final class TokensPresenter implements TokensContract.Presenter {
 
     @Override
     public void subscribe() {
+        initiateLoading();
+    }
+
+    private void initiateLoading() {
         if(mTokensView instanceof SnapFragment) {
             loadTokensMap(false);
         } else {
@@ -108,16 +112,18 @@ final class TokensPresenter implements TokensContract.Presenter {
                 .filter(new Func1<Token, Boolean>() {
                     @Override
                     public Boolean call(Token token) {
-                        switch (mCurrentFiltering) {
-                            case ACTIVE_TOKENS:
-                                return token.isActive();
-                            case COMPLETED_TOKENS:
-                                return token.isCompleted();
-                            case CANCELLED_TOKENS:
-                                return token.isCancelled();
-                            default:
-                                return true;
-                        }
+//                        switch (mCurrentFiltering) {
+//                            case ACTIVE_TOKENS:
+//                                return token.isActive();
+//                            case COMPLETED_TOKENS:
+//                                return token.isCompleted();
+//                            case CANCELLED_TOKENS:
+//                                return token.isCancelled();
+//                            default:
+//                                return true;
+//                        }
+
+                        return !token.isCompleted();
                     }
                 })
                 .toList()
@@ -159,12 +165,12 @@ final class TokensPresenter implements TokensContract.Presenter {
                         return Observable.from(tokens);
                     }
                 })
-                .filter(new Func1<Token, Boolean>() {
-                    @Override
-                    public Boolean call(Token token) {
+//                .filter(new Func1<Token, Boolean>() {
+//                    @Override
+//                    public Boolean call(Token token) {
 //                        switch (mCurrentFiltering) {
 //                            case ACTIVE_TOKENS:
-                                return token.isActive();
+//                                return token.isActive();
 //                            case COMPLETED_TOKENS:
 //                                return token.isCompleted();
 //                            case CANCELLED_TOKENS:
@@ -172,8 +178,8 @@ final class TokensPresenter implements TokensContract.Presenter {
 //                            default:
 //                                return true;
 //                        }
-                    }
-                })
+//                    }
+//                })
                 .toMultimap(new Func1<Token, Integer>() {
                     @Override
                     public Integer call(Token token) {
