@@ -173,8 +173,9 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                 areaName);
 
                                         mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
+                                        sendSMS(newToken,false);
                                     }
-                                    else
+
                                     {
                                         Log.e(TAG, "Snapshot is null");
                                     }
@@ -232,18 +233,19 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         //Multiple mobiles numbers separated by comma
         String mobiles = token.getPhoneNumber();
         //Sender ID,While using route4 sender id should be 6 characters long.
-        String senderId = "TagTree";
+        String senderId = "TagTre";
+        String message="";
         //Your message to send, Add URL encoding here.
         if  (status == false) {
-            String message = "You have received a token from " + token.getSenderName() + " "
-                    + "Token number = " + token.getTokenNumber() + ", Counter Number = " + token.getCounter()
-                    + ", Date = " + token.getTimestamp() + ". Please download http://play.google.com/store/apps/details?id=com.google.android.apps.maps for real time updates on Android.";
+            message = "You have received a token from " + token.getSenderName() + " "
+                    + token.getAreaName() + " branch"                   + ". Token number = " + token.getTokenNumber() + ", Counter Number = " + token.getCounter()
+                    + ". Please download https://play.google.com/apps/testing/in.mobifirst.tagtree.client for real time updates on Android.";
         }
         else
         {
-            String message = "Please report at the counter for " + token.getSenderName() + " "
+            message = "Please report at the counter for " + token.getSenderName() + " " + token.getAreaName() + " branch."
                     + "Token number = " + token.getTokenNumber() + ", Counter Number = " + token.getCounter()
-                    + ", Date = " + token.getTimestamp() + ". Get real time updates through app @ http://play.google.com/store/apps/details?id=com.google.android.apps.maps.";
+                    + ". Get more real time updates through app @ https://play.google.com/apps/testing/in.mobifirst.tagtree.client.";
         }
         //define route
         String route = "4"; //4 For transaction, check with msg91

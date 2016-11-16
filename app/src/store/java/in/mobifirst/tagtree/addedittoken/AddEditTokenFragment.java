@@ -62,7 +62,7 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.addNewToken(mPhoneNumberEditText.getText().toString(), mCounterSpinner.getSelectedItemPosition());
+                mPresenter.addNewToken(mPhoneNumberEditText.getText().toString(), mCounterSpinner.getSelectedItemPosition() + 1);
             }
         });
     }
