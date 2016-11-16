@@ -324,6 +324,25 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         }
         //Uncomment this  to execute the send sms
         //new SendSMSTask().execute(mainUrl);
+        incrementSMS(token, new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Long currentValue = mutableData.getValue(Long.class);
+                if (currentValue == null) {
+                    mutableData.setValue(1);
+                } else {
+                    mutableData.setValue(currentValue + 1);
+                }
+
+
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+
+            }
+        });
     }
 
     private void updateTopicsForPushNotification(Token token) {
@@ -351,6 +370,15 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .child("store")
                 .child(token.getStoreId())
                 .child("credits");
+        creditsRef.runTransaction(handler);
+
+    }
+
+    private void incrementSMS(Token token, @NonNull Transaction.Handler handler) {
+        DatabaseReference creditsRef = mDatabaseReference
+                .child("store")
+                .child(token.getStoreId())
+                .child("smsCounter");
         creditsRef.runTransaction(handler);
 
     }
