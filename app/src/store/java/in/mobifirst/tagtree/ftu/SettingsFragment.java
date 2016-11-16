@@ -103,7 +103,7 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
                     Store store = new Store(mStoreNameEditText.getText().toString(),
                             mStoreAreaEditText.getText().toString(),
                             mWebsiteEditText.getText().toString(),
-                            mProfilePicUri, Integer.parseInt(mCountersEditText.getText().toString()), 0);
+                            mProfilePicUri, Integer.parseInt(mCountersEditText.getText().toString()), 1000, 0, 0);
                     mPresenter.addStoreDetails(store);
                 }
             }

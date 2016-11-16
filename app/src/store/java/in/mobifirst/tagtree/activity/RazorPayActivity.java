@@ -82,8 +82,8 @@ public class RazorPayActivity extends Activity implements PaymentResultListener 
             options.put("amount", mCreditsInr);
 
             JSONObject preFill = new JSONObject();
-            preFill.put("email", "gnm444@gmail.com");
-            preFill.put("contact", "9177901022");
+            preFill.put("email", "");
+            preFill.put("contact", "");
 
             options.put("prefill", preFill);
 

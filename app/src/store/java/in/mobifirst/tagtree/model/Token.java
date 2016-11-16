@@ -80,7 +80,7 @@ public class Token {
         return areaName;
     }
 
-    public void setAreaName (String senderName) {
+    public void setAreaName (String areaName) {
         this.areaName = areaName;
     }
 

@@ -45,6 +45,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String TOKENS_CHILD = "tokens/";
     private static final String STORE_CHILD = "store/";
     private static final String TOPICS_CHILD = "topics/";
+    private final static String mMsg91Url = "https://control.msg91.com/api/sendhttp.php?";
 
     private DatabaseReference mDatabaseReference;
     private IQSharedPreferences mSharedPrefs;
@@ -159,7 +160,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
                                 @Override
                                 public void onDataChange(DataSnapshot storeDataSnapshot) {
-                                    if (storeDataSnapshot != null) {
+                                    if (storeDataSnapshot.exists()) {
 
                                         String key = mDatabaseReference.child(TOKENS_CHILD)
                                                 .push().getKey();
@@ -174,38 +175,8 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                 areaName);
 
                                         mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
-
-                                        Query query = mDatabaseReference.getRef()
-                                                .child("users")
-                                                .orderByChild("phoneNumber")
-                                                .equalTo(token.getPhoneNumber());
-                                        query.addListenerForSingleValueEvent(new ValueEventListener() {
-
-
-                                            @Override
-                                            public void onDataChange(DataSnapshot usersnapshot) {
-                                                if (usersnapshot == null)
-                                                {
-                                                    //user is not present
-                                                    sendSMS(newToken,false);
-                                                }
-                                                else {
-                                                    //User user = usersnapshot.getValue(User.class);
-                                                    //User is already present
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onCancelled(DatabaseError userdatabaseerror) {
-                                                Log.e(TAG, "[fetch User] onCancelled:" + userdatabaseerror);
-
-                                            }
-
-                                        } );
-
-                                    }
-                                    else
-                                    {
+                                        checkSMSSending(newToken, false);
+                                    } else {
                                         Log.e(TAG, "Snapshot is null");
                                     }
                                 }
@@ -252,9 +223,39 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 });
     }
 
-    private final static String mMsg91Url = "https://control.msg91.com/api/sendhttp.php?";
+
+    private void checkSMSSending(final Token token, final boolean status) {
+
+        Query query = mDatabaseReference.getRef()
+                .child("users")
+                .orderByChild("phoneNumber")
+                .equalTo(token.getPhoneNumber());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+
+
+            @Override
+            public void onDataChange(DataSnapshot usersnapshot) {
+                if (usersnapshot == null || !usersnapshot.exists()) {
+                    //user is not present
+                    sendSMS(token, status);
+                } else {
+                    //User user = usersnapshot.getValue(User.class);
+                    //User is already present
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError userdatabaseerror) {
+                Log.e(TAG, "[fetch User] onCancelled:" + userdatabaseerror);
+
+            }
+
+        });
+    }
 
     private void sendSMS(Token token, boolean status) {
+
+
         //Android SMS API integration code
 
         //Your authentication key
@@ -263,18 +264,16 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         String mobiles = token.getPhoneNumber();
         //Sender ID,While using route4 sender id should be 6 characters long.
         String senderId = "TagTre";
-        String message="";
+        String message = "";
         //Your message to send, Add URL encoding here.
-        if  (status == false) {
+        if (status == false) {
             message = "You have received a token from " + token.getSenderName() + " "
-                    + token.getAreaName() + " branch"                   + ". Token number = " + token.getTokenNumber() + ", Counter Number = " + token.getCounter()
+                    + token.getAreaName() + " branch" + ". Token number = " + (token.getTokenNumber()) + ", Counter Number = " + token.getCounter()
                     + ". Please download https://play.google.com/apps/testing/in.mobifirst.tagtree.client for real time updates on Android.";
-        }
-        else
-        {
-            message = "Please report at the counter for " + token.getSenderName() + " " + token.getAreaName() + " branch."
+        } else {
+            message = "Please report at the counter in " + token.getSenderName() + " " + token.getAreaName() + " branch."
                     + "Token number = " + token.getTokenNumber() + ", Counter Number = " + token.getCounter()
-                    + ". Get more real time updates through app @ https://play.google.com/apps/testing/in.mobifirst.tagtree.client.";
+                    + ". Get more real time updates through app @ https://play.google.com/apps/testing/in.mobifirst.tagtree.client";
         }
         //define route
         String route = "4"; //4 For transaction, check with msg91
@@ -324,7 +323,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             }
         }
         //Uncomment this  to execute the send sms
-        new SendSMSTask().execute(mainUrl);
+        //new SendSMSTask().execute(mainUrl);
     }
 
     private void updateTopicsForPushNotification(Token token) {
@@ -336,10 +335,24 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     public void updateToken(Token token) {
+        //Check for network connectivity
+        if (token.getBuzzCount() == 1) {
+            //Inform user if he is not present in the user table
+            checkSMSSending(token, true);
+        }
         mDatabaseReference
                 .child(TOKENS_CHILD)
                 .child(token.getuId())
                 .setValue(token);
+    }
+
+    private void decrementCredits(Token token, @NonNull Transaction.Handler handler) {
+        DatabaseReference creditsRef = mDatabaseReference
+                .child("store")
+                .child(token.getStoreId())
+                .child("credits");
+        creditsRef.runTransaction(handler);
+
     }
 
     private void incrementTokenCounter(Token token, @NonNull Transaction.Handler handler) {
@@ -348,6 +361,29 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .child(token.getStoreId())
                 .child("tokenCounter");
         tokenCounterRef.runTransaction(handler);
+
+
+        decrementCredits(token, new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Long currentValue = mutableData.getValue(Long.class);
+                if (currentValue == null) {
+                    mutableData.setValue(1000);
+                } else {
+                    mutableData.setValue(currentValue - 1);
+                }
+
+
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+
+            }
+        });
+
+
     }
 }
 
