@@ -29,6 +29,7 @@ import in.mobifirst.tagtree.application.IQClientApplication;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.tokens.viewholder.FirebaseViewHolder;
 import in.mobifirst.tagtree.util.TimeUtils;
 
 public class LandingFragment extends BaseFragment {
@@ -121,7 +122,7 @@ public class LandingFragment extends BaseFragment {
                             @Override
                             public void onChanged() {
                                 super.onChanged();
-                                if(mFirebaseAdapter.getItemCount() == 0) {
+                                if (mFirebaseAdapter.getItemCount() == 0) {
                                     showNoTokens();
                                 } else {
                                     showTokens();
@@ -136,7 +137,7 @@ public class LandingFragment extends BaseFragment {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         setLoadingIndicator(false);
-                        if(dataSnapshot == null) {
+                        if (dataSnapshot == null) {
                             showNoTokens();
                         }
                     }
@@ -144,7 +145,7 @@ public class LandingFragment extends BaseFragment {
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         setLoadingIndicator(false);
-                        if(databaseError != null) {
+                        if (databaseError != null) {
                             showLoadingTokensError();
                         }
                     }
@@ -188,27 +189,6 @@ public class LandingFragment extends BaseFragment {
 
     private void showMessage(String message) {
         Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
-    }
-
-    public static class FirebaseViewHolder extends RecyclerView.ViewHolder {
-        protected TextView mTokenNumber;
-        protected TextView mStoreName;
-        protected ImageView mImageView;
-        protected TextView mDate;
-        protected TextView mCounterNumber;
-        protected TextView mTime;
-        protected TextView mArea;
-
-        public FirebaseViewHolder(View view) {
-            super(view);
-            mTokenNumber = (TextView) view.findViewById(R.id.tokenNumberText);
-            mDate = (TextView) view.findViewById(R.id.tokenDate);
-            mTime = (TextView) view.findViewById(R.id.tokenTime);
-            mStoreName = (TextView) view.findViewById(R.id.tokenStoreName);
-            mImageView = (ImageView) view.findViewById(R.id.storeImageView);
-            mCounterNumber = (TextView) view.findViewById(R.id.counterNumber);
-            mArea = (TextView) view.findViewById(R.id.areaName);
-        }
     }
 
     private void playSound() {
