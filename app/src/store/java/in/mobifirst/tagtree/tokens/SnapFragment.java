@@ -249,8 +249,8 @@ public class SnapFragment extends Fragment implements TokensContract.View {
     }
 
     @Override
-    public void showTokens(Map<Integer, Collection<Token>> tokenMap) {
-        mSnapAdapter.replaceData(tokenMap);
+    public void showSnaps(List<Snap> snaps) {
+        mSnapAdapter.replaceData(snaps);
         mTokensView.setVisibility(View.VISIBLE);
         mNoTokensView.setVisibility(View.GONE);
     }
@@ -294,7 +294,6 @@ public class SnapFragment extends Fragment implements TokensContract.View {
     @Override
     public void showSuccessfullySavedMessage() {
         showMessage(getString(R.string.successfully_saved_token_message));
-        mPresenter.loadTokensMap(false);
     }
 
     private void showNoTokensViews(String mainText, int iconRes, boolean showAddView) {

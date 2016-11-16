@@ -1,50 +1,33 @@
 package in.mobifirst.tagtree.tokens;
 
 
-import android.view.Gravity;
-
 import java.util.List;
-import java.util.Map;
 
 import in.mobifirst.tagtree.model.Token;
 
 public class Snap {
 
-    private int mGravity;
-    private String mCounter;
-    private List<Token> mTokens;
+    private int counter;
+    private List<Token> tokenList;
 
-    public Snap(int gravity, String counter, List<Token> apps) {
-        mGravity = gravity;
-        mCounter = counter;
-        mTokens = apps;
+    public Snap(int counter, List<Token> tokens) {
+        this.counter = counter;
+        tokenList = tokens;
     }
 
-    public Snap(String counter, List<Token> apps) {
-        mGravity = Gravity.START;
-        mCounter = counter;
-        mTokens = apps;
+    public int getCounter() {
+        return counter;
     }
 
-    public Snap(Map<String, Token> stringTokenMap) {
-
+    public void setCounter(int counter) {
+        this.counter = counter;
     }
 
-    public String getCounter() {
-        return mCounter;
+    public List<Token> getTokenList() {
+        return tokenList;
     }
 
-    public void setCounter(String mCounter) {
-        this.mCounter = mCounter;
+    public void setTokenList(List<Token> tokenList) {
+        this.tokenList = tokenList;
     }
-
-
-    public int getGravity() {
-        return mGravity;
-    }
-
-    public List<Token> getTokens() {
-        return mTokens;
-    }
-
 }

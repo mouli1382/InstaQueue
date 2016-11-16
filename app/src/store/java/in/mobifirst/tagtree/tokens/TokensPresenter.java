@@ -3,7 +3,9 @@ package in.mobifirst.tagtree.tokens;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +21,7 @@ import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -53,7 +56,7 @@ final class TokensPresenter implements TokensContract.Presenter {
     }
 
     private void initiateLoading() {
-        if(mTokensView instanceof SnapFragment) {
+        if (mTokensView instanceof SnapFragment) {
             loadTokensMap(false);
         } else {
             loadTokens(false);
@@ -100,7 +103,6 @@ final class TokensPresenter implements TokensContract.Presenter {
             mTokensRepository.refreshTokens();
         }
 
-        mSubscriptions.clear();
         Subscription subscription = mTokensRepository
                 .getTokens()
                 .flatMap(new Func1<List<Token>, Observable<Token>>() {
@@ -156,7 +158,6 @@ final class TokensPresenter implements TokensContract.Presenter {
             mTokensRepository.refreshTokens();
         }
 
-        mSubscriptions.clear();
         Subscription subscription = mTokensRepository
                 .getTokens()
                 .flatMap(new Func1<List<Token>, Observable<Token>>() {
@@ -165,9 +166,21 @@ final class TokensPresenter implements TokensContract.Presenter {
                         return Observable.from(tokens);
                     }
                 })
-//                .filter(new Func1<Token, Boolean>() {
-//                    @Override
-//                    public Boolean call(Token token) {
+                .toSortedList(new Func2<Token, Token, Integer>() {
+                    @Override
+                    public Integer call(Token token, Token token2) {
+                        return new Long(token.getTokenNumber()).compareTo(token2.getTokenNumber());
+                    }
+                })
+                .flatMap(new Func1<List<Token>, Observable<Token>>() {
+                    @Override
+                    public Observable<Token> call(List<Token> tokens) {
+                        return Observable.from(tokens);
+                    }
+                })
+                .filter(new Func1<Token, Boolean>() {
+                    @Override
+                    public Boolean call(Token token) {
 //                        switch (mCurrentFiltering) {
 //                            case ACTIVE_TOKENS:
 //                                return token.isActive();
@@ -178,17 +191,32 @@ final class TokensPresenter implements TokensContract.Presenter {
 //                            default:
 //                                return true;
 //                        }
-//                    }
-//                })
+
+                        return !token.isCompleted();
+                    }
+                })
                 .toMultimap(new Func1<Token, Integer>() {
                     @Override
                     public Integer call(Token token) {
                         return token.getCounter();
                     }
                 })
+                .map(new Func1<Map<Integer, Collection<Token>>, List<Snap>>() {
+                    @Override
+                    public List<Snap> call(Map<Integer, Collection<Token>> integerCollectionMap) {
+                        ArrayList<Snap> snaps = new ArrayList<>(integerCollectionMap.size());
+                        Iterator<Integer> keyIterator = integerCollectionMap.keySet().iterator();
+                        while (keyIterator.hasNext()) {
+                            int key = keyIterator.next();
+                            Snap snap = new Snap(key, new ArrayList<>(integerCollectionMap.get(key)));
+                            snaps.add(snap);
+                        }
+                        return snaps;
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Map<Integer, Collection<Token>>>() {
+                .subscribe(new Subscriber<List<Snap>>() {
                     @Override
                     public void onCompleted() {
                         mTokensView.setLoadingIndicator(false);
@@ -200,34 +228,33 @@ final class TokensPresenter implements TokensContract.Presenter {
                     }
 
                     @Override
-                    public void onNext(Map<Integer, Collection<Token>> integerTokenMap) {
-                        //Pass it to the TokensFragment
-                        processTokens(integerTokenMap);
+                    public void onNext(List<Snap> snaps) {
+                        processSnaps(snaps);
                     }
                 });
         mSubscriptions.add(subscription);
     }
 
-    private void processTokens(Map<Integer, Collection<Token>> tokenMap) {
-        if (tokenMap == null || tokenMap.size() == 0) {
+    private void processSnaps(List<Snap> snaps) {
+        if (snaps == null || snaps.size() == 0) {
             // Show a message indicating there are no Tokens for that filter type.
             processEmptyTokens();
         } else {
             // Show the list of Tokens
-            mTokensView.showTokens(tokenMap);
+            mTokensView.showSnaps(snaps);
             // Set the filter label's text.
             showFilterLabel();
         }
     }
 
 
-    private void processTokens(List<Token> Tokens) {
-        if (Tokens.isEmpty()) {
+    private void processTokens(List<Token> tokens) {
+        if (tokens.isEmpty()) {
             // Show a message indicating there are no Tokens for that filter type.
             processEmptyTokens();
         } else {
             // Show the list of Tokens
-            mTokensView.showTokens(Tokens);
+            mTokensView.showTokens(tokens);
             // Set the filter label's text.
             showFilterLabel();
         }

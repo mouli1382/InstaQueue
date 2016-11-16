@@ -18,7 +18,7 @@ public interface TokensContract {
 
         void showTokens(List<Token> tokens);
 
-        void showTokens(Map<Integer, Collection<Token>> tokenMap);
+        void showSnaps(List<Snap> snaps);
 
         void showAddToken();
 
