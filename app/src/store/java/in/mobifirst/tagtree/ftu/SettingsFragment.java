@@ -31,6 +31,8 @@ import com.bumptech.glide.request.target.Target;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import javax.inject.Inject;
+
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.fragment.BaseFragment;
@@ -64,7 +66,9 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     private TextInputLayout mStoreCountersTextInputLayout;
 
     private byte[] bitmapData;
-    private IQSharedPreferences iqSharedPreferences;
+
+    @Inject
+    IQSharedPreferences mIQSharedPreferences;
 
 
     public static SettingsFragment newInstance() {
@@ -86,6 +90,13 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     @Override
     public void setPresenter(@NonNull SettingsContract.Presenter presenter) {
         mPresenter = presenter;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ((IQStoreApplication) getActivity().getApplicationContext()).getApplicationComponent()
+                .inject(this);
     }
 
     @Override
@@ -204,9 +215,7 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
 
 
         //Get and load the store profile pic
-        //ToDo inject sharedprefs
-        iqSharedPreferences = ((IQStoreApplication) getActivity().getApplicationContext()).getApplicationComponent().getIQSharedPreferences();
-        mProfilePicUri = iqSharedPreferences.getSting(ApplicationConstants.PROFILE_PIC_URL_KEY);
+        mProfilePicUri = mIQSharedPreferences.getSting(ApplicationConstants.PROFILE_PIC_URL_KEY);
 
         if (!TextUtils.isEmpty(mProfilePicUri)) {
             mStoreImageView.setEnabled(false);
@@ -281,6 +290,7 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     public void onFileUploadFinished(Uri uri) {
         mProgressBar.setVisibility(View.GONE);
         mProfilePicUri = uri.toString();
+        mIQSharedPreferences.putString(ApplicationConstants.PROFILE_PIC_URL_KEY, mProfilePicUri);
         mUploadButton.setEnabled(false);
         fab.setEnabled(true);
     }
@@ -301,8 +311,8 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
         if (getActivity() == null)
             return;
 
-        iqSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
-        iqSharedPreferences.putInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY, Integer.parseInt(mCountersEditText.getText().toString()));
+        mIQSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
+        mIQSharedPreferences.putInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY, Integer.parseInt(mCountersEditText.getText().toString()));
 
         TokensActivity.start(getActivity());
         getActivity().finish();

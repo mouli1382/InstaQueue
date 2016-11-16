@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.crash.FirebaseCrash;
@@ -45,6 +44,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String TOKENS_CHILD = "tokens/";
     private static final String STORE_CHILD = "store/";
     private static final String TOPICS_CHILD = "topics/";
+    private static final String TOKENS_HISTORY_CHILD = "token-history";
     private final static String mMsg91Url = "https://control.msg91.com/api/sendhttp.php?";
 
     private DatabaseReference mDatabaseReference;
@@ -60,33 +60,68 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         return mDatabaseReference;
     }
 
+    public Query getTokensRef(String uId) {
+        return mDatabaseReference
+                .child(TOKENS_CHILD)
+                .orderByChild("storeId")
+                .equalTo(uId);
+    }
+
     //ToDo limit by date and status.
     public Observable<List<Token>> getAllTokens(final String uId) {
         return rx.Observable.create(new Observable.OnSubscribe<List<Token>>() {
             @Override
             public void call(final Subscriber<? super List<Token>> subscriber) {
-                Query query = mDatabaseReference
+                final Query query = mDatabaseReference
                         .child(TOKENS_CHILD)
                         .orderByChild("storeId")
                         .equalTo(uId);
-                query.addValueEventListener(new ValueEventListener() {
+//                query.addChildEventListener(new ChildEventListener() {
+//                    @Override
+//                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                        Log.e(TAG, "onChildAdded");
+//                    }
+//
+//                    @Override
+//                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//                        Log.e(TAG, "onChildChanged");
+//                    }
+//
+//                    @Override
+//                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+//                        Log.e(TAG, "onChildRemoved");
+//                    }
+//
+//                    @Override
+//                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//                        Log.e(TAG, "onChildMoved");
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//                        Log.e(TAG, "onCancelled");
+//                    }
+//                });
+
+                final ValueEventListener listener = query.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot != null) {
-                            HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
-                            });
-                            if (tokens != null) {
-                                subscriber.onNext(new ArrayList<>(tokens.values()));
-                                subscriber.onCompleted();
+                        Log.e(TAG, "onDataChange --> " + subscriber.toString());
+                        if (!subscriber.isUnsubscribed()) {
+                            if (dataSnapshot != null) {
+                                HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
+                                });
+                                if (tokens != null) {
+                                    subscriber.onNext(new ArrayList<>(tokens.values()));
+                                    subscriber.onCompleted();
+                                } else {
+                                    FirebaseCrash.report(new Exception("Empty Tokens"));
+                                    subscriber.onCompleted();
+                                }
                             } else {
-                                subscriber.onError(new Exception("Empty Tokens."));
                                 FirebaseCrash.report(new Exception("Empty Tokens"));
                                 subscriber.onCompleted();
                             }
-                        } else {
-                            subscriber.onError(new Exception("Empty Tokens."));
-                            FirebaseCrash.report(new Exception("Empty Tokens"));
-                            subscriber.onCompleted();
                         }
                     }
 
@@ -95,9 +130,16 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         Log.e(TAG, "[fetch All Tokens] onCancelled:" + databaseError);
                         subscriber.onError(new Exception("Empty Tokens."));
                         FirebaseCrash.report(new Exception("Empty Tokens"));
-                        subscriber.onCompleted();
                     }
                 });
+
+//                // When the subscription is cancelled, remove the listener
+//                subscriber.add(Subscriptions.create(new Action0() {
+//                    @Override
+//                    public void call() {
+//                        query.removeEventListener(listener);
+//                    }
+//                }));
             }
         });
     }
@@ -106,7 +148,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         DatabaseReference tokenRef = mDatabaseReference
                 .child(TOKENS_CHILD)
                 .child(tokenId);
-        tokenRef.addValueEventListener(valueEventListener);
+        tokenRef.addListenerForSingleValueEvent(valueEventListener);
     }
 
     public Observable<Token> getTokenById(final String tokenId) {
@@ -157,7 +199,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
 
                             storeRef.addListenerForSingleValueEvent(new ValueEventListener() {
-
                                 @Override
                                 public void onDataChange(DataSnapshot storeDataSnapshot) {
                                     if (storeDataSnapshot.exists()) {
@@ -192,12 +233,39 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         }
                     } else {
                         subscriber.onError(databaseError.toException());
-
                     }
                 } else {
                     subscriber.onError(databaseError.toException());
                 }
 
+            }
+        });
+    }
+
+    public void getStoreById(String storeId, ValueEventListener valueEventListener) {
+        DatabaseReference storeRef = mDatabaseReference
+                .child(STORE_CHILD)
+                .child(storeId);
+        storeRef.addListenerForSingleValueEvent(valueEventListener);
+    }
+
+    public void getStoreById(String uid, final Subscriber<? super Store> subscriber) {
+        getStoreById(uid, new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot != null) {
+                    Store store = dataSnapshot.getValue(Store.class);
+                    subscriber.onNext(store);
+                } else {
+                    subscriber.onNext(null);
+                }
+                subscriber.onCompleted();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "[fetch Store] onCancelled:" + databaseError);
+                subscriber.onError(databaseError.toException());
             }
         });
     }
@@ -354,15 +422,29 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     public void updateToken(Token token) {
-        //Check for network connectivity
-        if (token.getBuzzCount() == 1) {
-            //Inform user if he is not present in the user table
-            checkSMSSending(token, true);
+        if (token.isCompleted()) {
+            //Move it to token-history table.
+            mDatabaseReference
+                    .child(TOKENS_HISTORY_CHILD)
+                    .push()
+                    .setValue(token.toMap());
+
+            //Remove it from the token table
+            mDatabaseReference
+                    .child(TOKENS_CHILD)
+                    .child(token.getuId())
+                    .removeValue();
+        } else {
+            //Check for network connectivity
+            if (token.getBuzzCount() == 1) {
+                //Inform user if he is not present in the user table
+                checkSMSSending(token, true);
+            }
+            mDatabaseReference
+                    .child(TOKENS_CHILD)
+                    .child(token.getuId())
+                    .setValue(token);
         }
-        mDatabaseReference
-                .child(TOKENS_CHILD)
-                .child(token.getuId())
-                .setValue(token);
     }
 
     private void decrementCredits(Token token, @NonNull Transaction.Handler handler) {

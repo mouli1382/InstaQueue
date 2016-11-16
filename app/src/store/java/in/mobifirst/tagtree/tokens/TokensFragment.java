@@ -22,14 +22,21 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.Query;
+
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+
+import javax.inject.Inject;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
+import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
+import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.tokens.viewholder.FirebaseViewHolder;
 
 public class TokensFragment extends Fragment implements TokensContract.View {
 
@@ -49,6 +56,14 @@ public class TokensFragment extends Fragment implements TokensContract.View {
 
     private TextView mFilteringLabelView;
 
+    @Inject
+    FirebaseDatabaseManager mFirebaseDatabaseManager;
+
+    @Inject
+    FirebaseAuthenticationManager mFirebaseAuthenticationManager;
+
+    private FirebaseRecyclerAdapter<Token, FirebaseViewHolder> mFirebaseAdapter;
+
     public TokensFragment() {
         // Requires empty public constructor
     }
@@ -60,9 +75,10 @@ public class TokensFragment extends Fragment implements TokensContract.View {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ((IQStoreApplication) getActivity().getApplicationContext()).getApplicationComponent()
+                .inject(this);
         mTokensAdapter = new TokensAdapter(new ArrayList<Token>(0), mItemListener);
     }
-
 
     @Override
     public void onResume() {
@@ -140,6 +156,34 @@ public class TokensFragment extends Fragment implements TokensContract.View {
                 mPresenter.loadTokens(false);
             }
         });
+
+//        Query query = mFirebaseDatabaseManager
+//                .getTokensRef(mFirebaseAuthenticationManager.getAuthInstance().getCurrentUser().getUid());
+//        mFirebaseAdapter = new FirebaseRecyclerAdapter<Token,
+//                FirebaseViewHolder>(
+//                Token.class,
+//                R.layout.item_token,
+//                FirebaseViewHolder.class,
+//                query) {
+//
+//            @Override
+//            protected void populateViewHolder(FirebaseViewHolder viewHolder, Token model, int position) {
+//                //Do nothing. We will do the heavy lifting in load tokens.
+//            }
+//        };
+//
+//        mFirebaseAdapter
+//                .registerAdapterDataObserver(
+//                        new RecyclerView.AdapterDataObserver() {
+//
+//                            @Override
+//                            public void onChanged() {
+//                                mPresenter.loadTokens(false);
+//                            }
+//                        }
+//
+//                );
+
 
         return root;
     }

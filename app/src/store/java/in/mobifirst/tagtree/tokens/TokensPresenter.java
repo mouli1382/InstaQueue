@@ -2,12 +2,14 @@ package in.mobifirst.tagtree.tokens;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.inject.Inject;
 
@@ -27,6 +29,7 @@ import rx.subscriptions.CompositeSubscription;
 
 
 final class TokensPresenter implements TokensContract.Presenter {
+    private static final String TAG = "TokensPresenter";
 
     private final TokensRepository mTokensRepository;
 
@@ -40,6 +43,7 @@ final class TokensPresenter implements TokensContract.Presenter {
 
     @Inject
     TokensPresenter(TokensRepository tokensRepository, TokensContract.View tokensView) {
+        Log.e(TAG, "constructor");
         mTokensRepository = tokensRepository;
         mTokensView = tokensView;
         mSubscriptions = new CompositeSubscription();
@@ -52,6 +56,7 @@ final class TokensPresenter implements TokensContract.Presenter {
 
     @Override
     public void subscribe() {
+        Log.e(TAG, "subscribe");
         initiateLoading();
     }
 
@@ -65,6 +70,7 @@ final class TokensPresenter implements TokensContract.Presenter {
 
     @Override
     public void unsubscribe() {
+        Log.e(TAG, "unsubscribe");
         mSubscriptions.clear();
     }
 
@@ -79,14 +85,14 @@ final class TokensPresenter implements TokensContract.Presenter {
 
     @Override
     public void loadTokens(boolean forceUpdate) {
-        // Simplification for sample: a network reload will be forced on first load.
+        Log.e(TAG, "loadTokens");
         loadTokens(forceUpdate || mFirstLoad, true);
         mFirstLoad = false;
     }
 
     @Override
     public void loadTokensMap(boolean forceUpdate) {
-        // Simplification for sample: a network reload will be forced on first load.
+        Log.e(TAG, "loadTokensMap");
         loadTokensMap(forceUpdate || mFirstLoad, true);
         mFirstLoad = false;
     }
@@ -103,6 +109,7 @@ final class TokensPresenter implements TokensContract.Presenter {
             mTokensRepository.refreshTokens();
         }
 
+        mSubscriptions.clear();
         Subscription subscription = mTokensRepository
                 .getTokens()
                 .flatMap(new Func1<List<Token>, Observable<Token>>() {
@@ -147,6 +154,7 @@ final class TokensPresenter implements TokensContract.Presenter {
                         processTokens(tokens);
                     }
                 });
+        Log.e(TAG, subscription.toString());
         mSubscriptions.add(subscription);
     }
 
@@ -158,6 +166,7 @@ final class TokensPresenter implements TokensContract.Presenter {
             mTokensRepository.refreshTokens();
         }
 
+        mSubscriptions.clear();
         Subscription subscription = mTokensRepository
                 .getTokens()
                 .flatMap(new Func1<List<Token>, Observable<Token>>() {
@@ -204,11 +213,13 @@ final class TokensPresenter implements TokensContract.Presenter {
                 .map(new Func1<Map<Integer, Collection<Token>>, List<Snap>>() {
                     @Override
                     public List<Snap> call(Map<Integer, Collection<Token>> integerCollectionMap) {
-                        ArrayList<Snap> snaps = new ArrayList<>(integerCollectionMap.size());
-                        Iterator<Integer> keyIterator = integerCollectionMap.keySet().iterator();
+                        TreeMap<Integer, Collection<Token>> sortedMap = new TreeMap<>();
+                        sortedMap.putAll(integerCollectionMap);
+                        ArrayList<Snap> snaps = new ArrayList<>(sortedMap.size());
+                        Iterator<Integer> keyIterator = sortedMap.keySet().iterator();
                         while (keyIterator.hasNext()) {
                             int key = keyIterator.next();
-                            Snap snap = new Snap(key, new ArrayList<>(integerCollectionMap.get(key)));
+                            Snap snap = new Snap(key, new ArrayList<>(sortedMap.get(key)));
                             snaps.add(snap);
                         }
                         return snaps;
@@ -224,6 +235,7 @@ final class TokensPresenter implements TokensContract.Presenter {
 
                     @Override
                     public void onError(Throwable e) {
+                        mTokensView.setLoadingIndicator(false);
                         mTokensView.showLoadingTokensError();
                     }
 
@@ -232,10 +244,12 @@ final class TokensPresenter implements TokensContract.Presenter {
                         processSnaps(snaps);
                     }
                 });
+        Log.e(TAG, subscription.toString());
         mSubscriptions.add(subscription);
     }
 
     private void processSnaps(List<Snap> snaps) {
+        Log.e(TAG, "processSnaps");
         if (snaps == null || snaps.size() == 0) {
             // Show a message indicating there are no Tokens for that filter type.
             processEmptyTokens();
@@ -249,7 +263,8 @@ final class TokensPresenter implements TokensContract.Presenter {
 
 
     private void processTokens(List<Token> tokens) {
-        if (tokens.isEmpty()) {
+        Log.e(TAG, "processTokens");
+        if (tokens == null || tokens.isEmpty()) {
             // Show a message indicating there are no Tokens for that filter type.
             processEmptyTokens();
         } else {
