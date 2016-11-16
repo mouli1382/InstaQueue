@@ -137,7 +137,7 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
                 return false;
             }
         });
-        mStoreAreaEditText = (TextInputEditText) root.findViewById(R.id.storeArea);
+        mStoreAreaEditText = (TextInputEditText) root.findViewById(R.id.areaName);
         mStoreAreaEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {

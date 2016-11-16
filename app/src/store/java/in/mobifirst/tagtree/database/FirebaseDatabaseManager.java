@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.crash.FirebaseCrash;
@@ -29,6 +30,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import in.mobifirst.tagtree.BuildConfig;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
@@ -171,8 +173,9 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                 areaName);
 
                                         mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
+                                        sendSMS(newToken,false);
                                     }
-                                    else
+
                                     {
                                         Log.e(TAG, "Snapshot is null");
                                     }
@@ -222,17 +225,28 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     private final static String mMsg91Url = "https://control.msg91.com/api/sendhttp.php?";
 
-    private void sendSMS(Token token) {
+    private void sendSMS(Token token, boolean status) {
         //Android SMS API integration code
 
         //Your authentication key
-        String authkey = "128441AGQNt0b0eb2q580367e2";
+        String authkey = BuildConfig.SMS91_SECRET;
         //Multiple mobiles numbers separated by comma
         String mobiles = token.getPhoneNumber();
         //Sender ID,While using route4 sender id should be 6 characters long.
-        String senderId = "InstaQ";
+        String senderId = "TagTre";
+        String message="";
         //Your message to send, Add URL encoding here.
-        String message = "Your token number = " + token.getTokenNumber();
+        if  (status == false) {
+            message = "You have received a token from " + token.getSenderName() + " "
+                    + token.getAreaName() + " branch"                   + ". Token number = " + token.getTokenNumber() + ", Counter Number = " + token.getCounter()
+                    + ". Please download https://play.google.com/apps/testing/in.mobifirst.tagtree.client for real time updates on Android.";
+        }
+        else
+        {
+            message = "Please report at the counter for " + token.getSenderName() + " " + token.getAreaName() + " branch."
+                    + "Token number = " + token.getTokenNumber() + ", Counter Number = " + token.getCounter()
+                    + ". Get more real time updates through app @ https://play.google.com/apps/testing/in.mobifirst.tagtree.client.";
+        }
         //define route
         String route = "4"; //4 For transaction, check with msg91
 
@@ -281,7 +295,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             }
         }
         //Uncomment this  to execute the send sms
-        //new SendSMSTask().execute(mainUrl);
+        new SendSMSTask().execute(mainUrl);
     }
 
     private void updateTopicsForPushNotification(Token token) {

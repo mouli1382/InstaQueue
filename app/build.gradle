@@ -61,6 +61,7 @@ android {
             versionName "1.0"
             buildConfigField("String", "TWITTER_KEY", "\"1C1mNkwwXKrpoS1MnBeGBekzA\"")
             buildConfigField("String", "TWITTER_SECRET", "\"0mzEaRQxZOh14SskANmdZgfuW3ae0IUwu9FetUUiQoN7o2VcLR\"")
+            buildConfigField("String", "SMS91_SECRET", "\"128441AGQNt0b0eb2q580367e2\"")
         }
 
         client {
