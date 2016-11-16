@@ -31,6 +31,5 @@ public class LandingActivity extends BaseDrawerActivity {
             ActivityUtilities.addFragmentToActivity(
                     getSupportFragmentManager(), landingFragment, R.id.content_base_drawer);
         }
-
     }
 }
