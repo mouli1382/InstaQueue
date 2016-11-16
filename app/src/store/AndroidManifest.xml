@@ -34,6 +34,7 @@
         <activity
             android:name="com.razorpay.CheckoutActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
+        <activity android:name=".ftu.SettingsFetcherActivity"></activity>
         <activity android:name=".activity.RazorPayActivity"></activity>
         <!-- Add your API key here -->
         <meta-data
@@ -42,8 +43,7 @@
 
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="da7a69f0dee3ffe21c69c8e4aff9bdff1db53059"
-            />
+            android:value="da7a69f0dee3ffe21c69c8e4aff9bdff1db53059" />
 
     </application>
 

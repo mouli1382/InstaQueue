@@ -30,6 +30,7 @@ import in.mobifirst.tagtree.activity.BaseActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.ftu.SettingsActivity;
+import in.mobifirst.tagtree.ftu.SettingsFetcherActivity;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 
@@ -133,7 +134,7 @@ public class GoogleSignInActivity extends BaseActivity
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             finish();
-                            SettingsActivity.start(GoogleSignInActivity.this);
+                            SettingsFetcherActivity.start(GoogleSignInActivity.this);
                         }
                     }
                 });

@@ -22,11 +22,15 @@ public interface SettingsContract {
         void showTokensList();
 
         boolean isActive();
+
+        void populateStore(Store store);
     }
 
     interface Presenter extends BasePresenter {
         void uploadFile(byte[] bitmapData);
 
         void addStoreDetails(Store store);
+
+        void getStoreDetails(String uId);
     }
 }

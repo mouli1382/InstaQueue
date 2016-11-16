@@ -7,14 +7,22 @@ public class ApplicationConstants {
     public static final String PERMISSION_RECEIVE_SMS = Manifest.permission.RECEIVE_SMS;
     public static final String PERMISSION_READ_PHONE_STATE = Manifest.permission.READ_PHONE_STATE;
     public static final String PHONE_NUMBER_KEY = "phone_number_key";
-    public static final String PROFILE_PIC_URL_KEY = "profile_url_key";
-    public static final String DISPLAY_NAME_KEY = "display_name_key";
-    public static final String AREA_NAME_KEY = "area_name_key";
-    public static final String EMAIL_KEY = "email_key";
+
+    //Store details
+    public static final String DISPLAY_NAME_KEY = "display_name";
+    public static final String AREA_NAME_KEY = "area_name";
+    public static final String WEBSITE_KEY = "website";
+    public static String NUMBER_OF_COUNTERS_KEY = "number_of_counters";
+    public static final String PROFILE_PIC_URL_KEY = "profile_url";
+    public static final String CREDITS_KEY = "credits";
+
+    public static final String EMAIL_KEY = "email";
     public static final String STORE_DETAILS_UPLOADED = "store_details_uploaded";
 
     public static final int REQUEST_CODE_RECEIVE_SMS = 1;
     public static final int REQUEST_CODE_READ_PHONE_STATE = 2;
+
     public static String FTU_COMPLETED_KEY = "ftu_completed";
-    public static String NUMBER_OF_COUNTERS_KEY = "number_of_counters";
+
+
 }

@@ -3,10 +3,12 @@ package in.mobifirst.tagtree.model;
 import android.text.TextUtils;
 
 import com.google.firebase.database.Exclude;
-import com.google.firebase.database.ServerValue;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 
 public class Store {
 
@@ -91,6 +93,7 @@ public class Store {
     public void setNumberOfCounters(int numberOfCounters) {
         this.numberOfCounters = numberOfCounters;
     }
+
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
@@ -102,5 +105,15 @@ public class Store {
         result.put("numberOfCounters", numberOfCounters);
         result.put("credits", credits);
         return result;
+    }
+
+    @Exclude
+    public void persistStore(IQSharedPreferences sharedPreferences) {
+        sharedPreferences.putString(ApplicationConstants.DISPLAY_NAME_KEY, name);
+        sharedPreferences.putString(ApplicationConstants.AREA_NAME_KEY, area);
+        sharedPreferences.putString(ApplicationConstants.WEBSITE_KEY, website);
+        sharedPreferences.putString(ApplicationConstants.PROFILE_PIC_URL_KEY, logoUrl);
+        sharedPreferences.putInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY, numberOfCounters);
+        sharedPreferences.putLong(ApplicationConstants.CREDITS_KEY, credits);
     }
 }

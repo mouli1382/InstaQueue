@@ -313,6 +313,11 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
         return isAdded();
     }
 
+    @Override
+    public void populateStore(Store store) {
+
+    }
+
 
     private boolean validateInput() {
         if ((mStoreNameTextInputLayout.getError() != null

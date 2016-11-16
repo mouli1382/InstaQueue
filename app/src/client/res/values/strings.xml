@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TagTree</string>
+    <string name="app_name">TagTree-Client</string>
 
     <string name="loading_tokens_error">Error while loading tokens</string>
     <string name="empty_token_message">TO DOs cannot be empty</string>

@@ -7,10 +7,8 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.SignInButton;
@@ -21,7 +19,7 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
-import in.mobifirst.tagtree.ftu.SettingsActivity;
+import in.mobifirst.tagtree.ftu.SettingsFetcherActivity;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.tokens.TokensActivity;
 import in.mobifirst.tagtree.util.ApplicationConstants;
@@ -99,7 +97,7 @@ public class WelcomeActivity extends BaseActivity {
             if (mIQSharedPreferences.getBoolean(ApplicationConstants.FTU_COMPLETED_KEY)) {
                 intent = new Intent(this, TokensActivity.class);
             } else {
-                intent = new Intent(this, SettingsActivity.class);
+                intent = new Intent(this, SettingsFetcherActivity.class);
             }
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);

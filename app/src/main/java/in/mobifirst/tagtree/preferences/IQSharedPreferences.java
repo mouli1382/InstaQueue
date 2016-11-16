@@ -44,6 +44,15 @@ public class IQSharedPreferences {
     }
 
     public int getInt(String key) {
-        return mSharedPreferences.getInt(key, 1);
+        return mSharedPreferences.getInt(key, 0);
+    }
+
+    public boolean putLong(String key, long value) {
+        mEditor.putLong(key, value);
+        return mEditor.commit();
+    }
+
+    public long getLong(String key) {
+        return mSharedPreferences.getLong(key, 0);
     }
 }

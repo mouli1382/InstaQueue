@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TagTree</string>
+    <string name="app_name">TagTree-Store</string>
     <string name="app_type">(Store)</string>
     <string name="buzz">BUZZ</string>
 
@@ -79,5 +79,6 @@
     <string name="empty_store_counters">Empty Counters</string>
     <string name="invalid_store_counters">Enter between 1 - 100</string>
     <string name="issue_token">Issue Token</string>
+    <string name="failed_fetch_store">Fetching Store details failed. Try again!</string>
 
 </resources>
