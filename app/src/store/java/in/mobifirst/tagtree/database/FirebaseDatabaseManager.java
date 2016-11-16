@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.BuildConfig;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.model.User;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import rx.Observable;
@@ -173,9 +174,37 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                 areaName);
 
                                         mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
-                                        sendSMS(newToken,false);
-                                    }
 
+                                        Query query = mDatabaseReference.getRef()
+                                                .child("users")
+                                                .orderByChild("phoneNumber")
+                                                .equalTo(token.getPhoneNumber());
+                                        query.addListenerForSingleValueEvent(new ValueEventListener() {
+
+
+                                            @Override
+                                            public void onDataChange(DataSnapshot usersnapshot) {
+                                                if (usersnapshot == null)
+                                                {
+                                                    //user is not present
+                                                    sendSMS(newToken,false);
+                                                }
+                                                else {
+                                                    //User user = usersnapshot.getValue(User.class);
+                                                    //User is already present
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError userdatabaseerror) {
+                                                Log.e(TAG, "[fetch User] onCancelled:" + userdatabaseerror);
+
+                                            }
+
+                                        } );
+
+                                    }
+                                    else
                                     {
                                         Log.e(TAG, "Snapshot is null");
                                     }
