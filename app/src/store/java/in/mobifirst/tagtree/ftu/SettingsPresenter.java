@@ -45,7 +45,7 @@ public class SettingsPresenter implements SettingsContract.Presenter {
 
     @Override
     public void subscribe() {
-        showStoreDetails();
+        getStoreDetails();
     }
 
     @Override
@@ -107,32 +107,25 @@ public class SettingsPresenter implements SettingsContract.Presenter {
     }
 
     @Override
-    public void getStoreDetails(String uId) {
-        if (uId != null) {
-            mFirebaseDatabaseManager.getStoreById(mFirebaseAuthenticationManager
-                            .getAuthInstance().getCurrentUser().getUid(),
-                    new Subscriber<Store>() {
-                        @Override
-                        public void onCompleted() {
-                            mSettingsView.showTokensList();
+    public void getStoreDetails() {
+        mFirebaseDatabaseManager.getStoreById(mFirebaseAuthenticationManager
+                        .getAuthInstance().getCurrentUser().getUid(),
+                new Subscriber<Store>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (mSettingsView.isActive()) {
+                            mSettingsView.showAddStoreFailedError();
                         }
+                    }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            if (mSettingsView.isActive()) {
-                                mSettingsView.showAddStoreFailedError();
-                            }
-                        }
-
-                        @Override
-                        public void onNext(Store result) {
-                        }
-                    });
-        }
-    }
-
-
-    private void showStoreDetails() {
-
+                    @Override
+                    public void onNext(Store result) {
+                        mSettingsView.populateStore(result);
+                    }
+                });
     }
 }

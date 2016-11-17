@@ -11,12 +11,16 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.util.ActivityUtilities;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 
 public class SettingsActivity extends BaseActivity {
 
     @Inject
     SettingsPresenter mSettingsPresenter;
+
+    IQSharedPreferences mIQSharedPreferences;
 
     public static void start(Context caller) {
         Intent intent = new Intent(caller, SettingsActivity.class);
@@ -33,23 +37,22 @@ public class SettingsActivity extends BaseActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
-//        actionBar.setDisplayHomeAsUpEnabled(true);
-//        actionBar.setDisplayShowHomeEnabled(true);
+
+        //ToDo inject it - avoid cyclic dependency.
+        mIQSharedPreferences = ((IQStoreApplication) getApplicationContext()).getApplicationComponent().getIQSharedPreferences();
+        if (mIQSharedPreferences.getBoolean(ApplicationConstants.FTU_COMPLETED_KEY)) {
+            actionBar.setTitle(R.string.my_account);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        } else {
+            actionBar.hide();
+        }
 
         SettingsFragment settingsFragment =
                 (SettingsFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
 
         if (settingsFragment == null) {
             settingsFragment = SettingsFragment.newInstance();
-
-//            if (getIntent().hasExtra(SettingsFragment.ARGUMENT_EDIT_TASK_ID)) {
-//                tokenId = getIntent().getStringExtra(
-//                        SettingsFragment.ARGUMENT_EDIT_TASK_ID);
-//                actionBar.setTitle(R.string.edit_token);
-//            } else {
-//            actionBar.setTitle(R.string.config_store);
-//            }
 
             ActivityUtilities.addFragmentToActivity(getSupportFragmentManager(),
                     settingsFragment, R.id.contentFrame);

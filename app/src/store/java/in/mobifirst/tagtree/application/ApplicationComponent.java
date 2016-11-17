@@ -13,6 +13,7 @@ import in.mobifirst.tagtree.data.token.TokensRepository;
 import in.mobifirst.tagtree.data.token.TokensRepositoryModule;
 import in.mobifirst.tagtree.database.DatabaseModule;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
+import in.mobifirst.tagtree.ftu.SettingsActivity;
 import in.mobifirst.tagtree.ftu.SettingsFetcherActivity;
 import in.mobifirst.tagtree.ftu.SettingsFragment;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;

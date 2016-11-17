@@ -325,7 +325,14 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
 
     @Override
     public void populateStore(Store store) {
+        if (isAdded()) {
+            mStoreNameEditText.setText(store.getName());
+            mStoreAreaEditText.setText(store.getArea());
+            mWebsiteEditText.setText(store.getWebsite());
+            mCountersEditText.setText(store.getNumberOfCounters()+"");
 
+            //ToDo get the store pic from Firebase storage
+        }
     }
 
 

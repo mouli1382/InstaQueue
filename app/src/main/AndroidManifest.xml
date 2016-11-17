@@ -13,8 +13,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".activity.BaseActivity" />
         <activity
-            android:name=".activity.BaseDrawerActivity"
-            android:theme="@style/AppTheme.Background" />
+            android:name=".activity.BaseDrawerActivity" />
         <activity android:name=".authentication.google.GoogleSignInActivity" />
         <activity
             android:name=".activity.WelcomeActivity"

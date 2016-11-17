@@ -485,8 +485,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .orderByChild("phoneNumber")
                 .equalTo(token.getPhoneNumber());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
-
-
             @Override
             public void onDataChange(DataSnapshot usersnapshot) {
                 if (usersnapshot == null || !usersnapshot.exists()) {

@@ -31,6 +31,6 @@ public interface SettingsContract {
 
         void addStoreDetails(Store store);
 
-        void getStoreDetails(String uId);
+        void getStoreDetails();
     }
 }

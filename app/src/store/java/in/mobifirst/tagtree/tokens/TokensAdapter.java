@@ -120,26 +120,7 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
         String date = DateFormat.format("dd-MM-yyyy", cal).toString();
 
         holder.mTokenDate.setText(date);
-        /*holder.mChronoMeter.setFormat("H:MM:SS");
-        holder.mChronoMeter.setBase(token.getTimestamp());
-        holder.mChronoMeter.start();*/
     }
-
-//    private String getDateAndAuthor(String date, String author) {
-//        Date parsed = null;
-//        try {
-//            parsed = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(date);
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//        StringBuilder sb = new StringBuilder(author + "\n");
-//        if (parsed != null)
-//            sb.append(android.text.format.DateFormat.format("MMMM dd, yyyy", parsed.getTime()));
-//        else
-//            sb.append(date);
-//
-//        return sb.toString();
-//    }
 
     @Override
     public int getItemCount() {
