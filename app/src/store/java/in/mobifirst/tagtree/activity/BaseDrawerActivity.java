@@ -9,16 +9,28 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import javax.inject.Inject;
 
 import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 
 public class BaseDrawerActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private ActionBarDrawerToggle mDrawerToggle;
+    @Inject
+    IQSharedPreferences mIQSharedPrefs;
     protected View mainContentView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ((IQStoreApplication)getApplication())
+                .getApplicationComponent()
+                .inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base_drawer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -49,7 +61,8 @@ public class BaseDrawerActivity extends BaseActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.base_drawer, menu);
+        getMenuInflater().inflate(R.menu.base_drawer, menu);
+
         return true;
     }
 
@@ -58,6 +71,17 @@ public class BaseDrawerActivity extends BaseActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+
+        String strMailId = mIQSharedPrefs.getSting(ApplicationConstants.EMAIL_KEY);
+        String strStorename = mIQSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY);
+        ImageView storeProfilePic = (ImageView) findViewById(R.id.navProfilePic);
+        TextView storeMailId = (TextView) findViewById(R.id.storemailId);
+        TextView storeName = (TextView) findViewById(R.id.storeName);
+        if (storeMailId != null && storeName!= null)
+            storeMailId.setText(strMailId);
+        if (strStorename != null && storeName != null)
+            storeName.setText(strStorename);
+
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement

@@ -3,6 +3,7 @@ package in.mobifirst.tagtree.application;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import in.mobifirst.tagtree.activity.BaseDrawerActivity;
 import in.mobifirst.tagtree.activity.RazorPayActivity;
 import in.mobifirst.tagtree.activity.WelcomeActivity;
 import in.mobifirst.tagtree.authentication.AuthenticationModule;
@@ -43,6 +44,8 @@ public interface ApplicationComponent {
     void inject(TokensFragment tokensFragment);
 
     void inject(SnapFragment snapFragment);
+
+    void inject(BaseDrawerActivity baseDrawerActivity);
 
     TokensRepository getTokensRepository();
 
