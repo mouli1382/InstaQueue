@@ -20,6 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -54,6 +55,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String TOPICS_CHILD = "topics/";
     private static final String TOKENS_HISTORY_CHILD = "token-history";
     private final static String mMsg91Url = "https://control.msg91.com/api/sendhttp.php?";
+    private final static String mMsgBulkSMSUrl = "http://login.bulksmsgateway.in/sendmessage.php?";
 
     private DatabaseReference mDatabaseReference;
     private IQSharedPreferences mSharedPrefs;
@@ -489,7 +491,8 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             public void onDataChange(DataSnapshot usersnapshot) {
                 if (usersnapshot == null || !usersnapshot.exists()) {
                     //user is not present
-                    sendSMS(token, status);
+                    //sendSMS(token, status);
+                    sendBulkSMS(token, status);
                 } else {
                     //User user = usersnapshot.getValue(User.class);
                     //User is already present
@@ -519,13 +522,13 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         String message = "";
         //Your message to send, Add URL encoding here.
         if (status == false) {
-            message = "You have received a token from " + token.getSenderName() + " "
-                    + token.getAreaName() + " branch" + ". Token number = " + (token.getTokenNumber()) + ", Counter Number = " + token.getCounter()
-                    + ". Please download https://play.google.com/apps/testing/in.mobifirst.tagtree.client for real time updates on Android.";
+            message = "You've received a token from " + token.getSenderName().trim() + " "
+                    + token.getAreaName().trim() + ". Token= " + (token.getTokenNumber()) + ", Counter= " + token.getCounter()
+                    + ". Download the app https://goo.gl/agLQ3C for real time updates";
         } else {
-            message = "Please report at the counter in " + token.getSenderName() + " " + token.getAreaName() + " branch."
-                    + "Token number = " + token.getTokenNumber() + ", Counter Number = " + token.getCounter()
-                    + ". Get more real time updates through app @ https://play.google.com/apps/testing/in.mobifirst.tagtree.client";
+            message = "It's your turn at " + token.getSenderName() + " " + token.getAreaName() + "."
+                    + " Token = " + token.getTokenNumber() + ", Counter = " + token.getCounter()
+                    + ". Download the app https://goo.gl/agLQ3C for real time updates.";
         }
         //define route
         String route = "4"; //4 For transaction, check with msg91
@@ -574,6 +577,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 return 0L;
             }
         }
+
         //Uncomment this  to execute the send sms
         //new SendSMSTask().execute(mainUrl);
         incrementSMS(token, new Transaction.Handler() {
@@ -677,7 +681,101 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             }
         });
 
-
     }
+
+    private void sendBulkSMS(Token token, boolean status){
+
+
+        //Android SMS API integration code
+
+        //Your authentication key
+        //Multiple mobiles numbers separated by comma
+        String mobiles = token.getPhoneNumber();
+        //Sender ID,While using route4 sender id should be 6 characters long.
+        String senderId = "TagTre";
+        String message = "";
+        //Your message to send, Add URL encoding here.
+        if (status == false) {
+            message = "You've received a token from " + token.getSenderName().trim() + " "
+                    + token.getAreaName().trim() + ". Token= " + (token.getTokenNumber()) + ", Counter= " + token.getCounter()
+                    + ". Download the app https://goo.gl/agLQ3C for real time updates";
+        } else {
+            message = "It's your turn at " + token.getSenderName() + " " + token.getAreaName() + "."
+                    + " Token = " + token.getTokenNumber() + ", Counter = " + token.getCounter()
+                    + ". Download the app https://goo.gl/agLQ3C for real time updates.";
+        }
+        //define route
+        String route = "4"; //4 For transaction, check with msg91
+
+        URLConnection myURLConnection = null;
+        URL myURL = null;
+        BufferedReader reader = null;
+
+        //encoding message
+        String encoded_message = URLEncoder.encode(message);
+
+        //Send SMS API
+        String mainUrl = mMsgBulkSMSUrl;
+
+        //Prepare parameter string
+        StringBuilder sbPostData = new StringBuilder(mainUrl);
+        sbPostData.append("user=" + "tagtree");
+        sbPostData.append("&password=" + "Tagtree@123");
+        sbPostData.append("&message=" + encoded_message);
+        sbPostData.append("&sender=" + "TagTre");
+        sbPostData.append("&type=" + "3");
+        sbPostData.append("&mobile=" + token.getPhoneNumber());
+
+
+        //final string
+        mainUrl = sbPostData.toString();
+        class SendSMSTask extends AsyncTask<String, Integer, Long> {
+            protected Long doInBackground(String... urls) {
+                try {
+                    //prepare connection
+                    URL myURL = new URL(urls[0]);
+                    URLConnection myURLConnection = myURL.openConnection();
+                    myURLConnection.connect();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(myURLConnection.getInputStream()));
+
+                    //reading response
+                    String response;
+                    while ((response = reader.readLine()) != null)
+                        //print response
+                        Log.d("RESPONSE", "" + response);
+
+                    //finally close connection
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    FirebaseCrash.report(new Exception("Error in Sending SMS: " + e.getMessage()));
+                }
+                return 0L;
+            }
+        }
+
+        //Uncomment this  to execute the send sms
+        new SendSMSTask().execute(mainUrl);
+        incrementSMS(token, new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Long currentValue = mutableData.getValue(Long.class);
+                if (currentValue == null) {
+                    mutableData.setValue(1);
+                } else {
+                    mutableData.setValue(currentValue + 1);
+                }
+
+
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+
+            }
+        });
+    }
+
 }
 
