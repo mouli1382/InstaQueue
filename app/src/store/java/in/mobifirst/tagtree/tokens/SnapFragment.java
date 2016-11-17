@@ -167,32 +167,32 @@ public class SnapFragment extends Fragment implements TokensContract.View {
             }
         });
 
-        Query query = mFirebaseDatabaseManager
-                .getTokensRef(mFirebaseAuthenticationManager.getAuthInstance().getCurrentUser().getUid());
-        mFirebaseAdapter = new FirebaseRecyclerAdapter<Token,
-                FirebaseViewHolder>(
-                Token.class,
-                R.layout.item_token,
-                FirebaseViewHolder.class,
-                query) {
-
-            @Override
-            protected void populateViewHolder(FirebaseViewHolder viewHolder, Token model, int position) {
-                //Do nothing. We will do the heavy lifting in load tokens.
-            }
-        };
-
-        mFirebaseAdapter
-                .registerAdapterDataObserver(
-                        new RecyclerView.AdapterDataObserver() {
-
-                            @Override
-                            public void onChanged() {
-                                mPresenter.loadTokensMap(false);
-                            }
-                        }
-
-                );
+//        Query query = mFirebaseDatabaseManager
+//                .getTokensRef(mFirebaseAuthenticationManager.getAuthInstance().getCurrentUser().getUid());
+//        mFirebaseAdapter = new FirebaseRecyclerAdapter<Token,
+//                FirebaseViewHolder>(
+//                Token.class,
+//                R.layout.item_token,
+//                FirebaseViewHolder.class,
+//                query) {
+//
+//            @Override
+//            protected void populateViewHolder(FirebaseViewHolder viewHolder, Token model, int position) {
+//                //Do nothing. We will do the heavy lifting in load tokens.
+//            }
+//        };
+//
+//        mFirebaseAdapter
+//                .registerAdapterDataObserver(
+//                        new RecyclerView.AdapterDataObserver() {
+//
+//                            @Override
+//                            public void onChanged() {
+//                                mPresenter.loadTokensMap(false);
+//                            }
+//                        }
+//
+//                );
 
 
         return root;

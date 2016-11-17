@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.tokens.Snap;
 import rx.Observable;
 import rx.Subscriber;
 
@@ -24,6 +25,11 @@ public class TokensRepository implements TokensDataSource {
     @Override
     public Observable<List<Token>> getTokens() {
         return mTokensDataSource.getTokens();
+    }
+
+    @Override
+    public Observable<List<Snap>> getSnaps() {
+        return mTokensDataSource.getSnaps();
     }
 
     @Override

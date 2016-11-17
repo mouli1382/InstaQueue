@@ -6,9 +6,10 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
-import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
+import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.tokens.Snap;
 import rx.Observable;
 import rx.Subscriber;
 
@@ -20,6 +21,11 @@ public class TokensDataSourceImpl implements TokensDataSource {
     public TokensDataSourceImpl(FirebaseDatabaseManager firebaseDatabaseManager, FirebaseAuthenticationManager firebaseAuthenticationManager) {
         mFirebaseDatabaseManager = firebaseDatabaseManager;
         mFirebaseAuth = firebaseAuthenticationManager.getAuthInstance();
+    }
+
+    @Override
+    public Observable<List<Snap>> getSnaps() {
+        return mFirebaseDatabaseManager.getAllSnaps(mFirebaseAuth.getCurrentUser().getUid());
     }
 
     @Override
