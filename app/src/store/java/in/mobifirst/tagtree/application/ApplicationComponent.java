@@ -6,6 +6,7 @@ import dagger.Component;
 import in.mobifirst.tagtree.activity.BaseDrawerActivity;
 import in.mobifirst.tagtree.activity.RazorPayActivity;
 import in.mobifirst.tagtree.activity.WelcomeActivity;
+import in.mobifirst.tagtree.addedittoken.AddEditTokenFragment;
 import in.mobifirst.tagtree.authentication.AuthenticationModule;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
@@ -43,6 +44,8 @@ public interface ApplicationComponent {
     void inject(SettingsFragment settingsFragment);
 
     void inject(TokensFragment tokensFragment);
+
+    void inject(AddEditTokenFragment addEditTokenFragment);
 
     void inject(SnapFragment snapFragment);
 

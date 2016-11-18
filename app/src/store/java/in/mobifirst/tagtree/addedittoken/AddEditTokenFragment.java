@@ -14,7 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import java.util.ArrayList;
+import javax.inject.Inject;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQStoreApplication;
@@ -27,12 +27,21 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
 
     private AddEditTokenContract.Presenter mPresenter;
 
+    @Inject
+    IQSharedPreferences iqSharedPreferences;
+
     private TextInputEditText mPhoneNumberEditText;
-    private IQSharedPreferences iqSharedPreferences;
     private Spinner mCounterSpinner;
 
     public static AddEditTokenFragment newInstance() {
         return new AddEditTokenFragment();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ((IQStoreApplication) getActivity().getApplicationContext()).getApplicationComponent()
+                .inject(this);
     }
 
     @Override
@@ -62,7 +71,8 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.addNewToken(mPhoneNumberEditText.getText().toString(), mCounterSpinner.getSelectedItemPosition() + 1);
+                //ToDo hardcoding to IND country code as of now.
+                mPresenter.addNewToken("+91" + mPhoneNumberEditText.getText().toString(), mCounterSpinner.getSelectedItemPosition() + 1);
             }
         });
     }
@@ -74,16 +84,14 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
         View root = inflater.inflate(R.layout.fragment_addtoken, container, false);
         mPhoneNumberEditText = (TextInputEditText) root.findViewById(R.id.add_phone_number);
 
-        //ToDo inject sharedprefs
-        iqSharedPreferences = ((IQStoreApplication) getActivity().getApplicationContext()).getApplicationComponent().getIQSharedPreferences();
         int numberOfCounters = iqSharedPreferences.getInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY);
 
         mCounterSpinner = (Spinner) root.findViewById(R.id.counter_spinner);
-        if(numberOfCounters > 1) {
+        if (numberOfCounters > 1) {
             // Create an ArrayAdapter using the string array and a default spinner layout
             String[] items = new String[numberOfCounters];
-            for(int i = 0; i < numberOfCounters; i++) {
-                items[i] = "Counter-"+(i+1);
+            for (int i = 0; i < numberOfCounters; i++) {
+                items[i] = "Counter-" + (i + 1);
             }
             final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
             // Specify the layout to use when the list of choices appears

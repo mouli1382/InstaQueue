@@ -20,7 +20,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -37,7 +36,6 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.BuildConfig;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.model.Token;
-import in.mobifirst.tagtree.model.User;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.tokens.Snap;
 import in.mobifirst.tagtree.util.ApplicationConstants;
@@ -273,6 +271,18 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                     return Observable.from(tokens);
                                                 }
                                             })
+                                            .toSortedList(new Func2<Token, Token, Integer>() {
+                                                @Override
+                                                public Integer call(Token token, Token token2) {
+                                                    return new Long(token.getTokenNumber()).compareTo(token2.getTokenNumber());
+                                                }
+                                            })
+                                            .flatMap(new Func1<List<Token>, Observable<Token>>() {
+                                                @Override
+                                                public Observable<Token> call(List<Token> tokens) {
+                                                    return Observable.from(tokens);
+                                                }
+                                            })
                                             .filter(new Func1<Token, Boolean>() {
                                                 @Override
                                                 public Boolean call(Token token) {
@@ -491,8 +501,8 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             public void onDataChange(DataSnapshot usersnapshot) {
                 if (usersnapshot == null || !usersnapshot.exists()) {
                     //user is not present
-                    //sendSMS(token, status);
-                    sendBulkSMS(token, status);
+                    sendSMS(token, status);
+//                    sendBulkSMS(token, status);
                 } else {
                     //User user = usersnapshot.getValue(User.class);
                     //User is already present
@@ -579,7 +589,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         }
 
         //Uncomment this  to execute the send sms
-        //new SendSMSTask().execute(mainUrl);
+        new SendSMSTask().execute(mainUrl);
         incrementSMS(token, new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
@@ -683,7 +693,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     }
 
-    private void sendBulkSMS(Token token, boolean status){
+    private void sendBulkSMS(Token token, boolean status) {
 
 
         //Android SMS API integration code

@@ -1,28 +1,17 @@
 package in.mobifirst.tagtree.tokens;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.util.TimeUtils;
 
 
 public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder> {
@@ -48,32 +37,6 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
         mTokens = tokens;
     }
 
-
-    /*private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
-
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-           bmImage.setImageBitmap(result);
-        }
-    }*/
-
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -93,7 +56,7 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
                 mTokenItemListener.onActivateTokenClick(token);
             }
         });
-        holder.mTokenCompleteButton.setOnClickListener( new View.OnClickListener() {
+        holder.mTokenCompleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Call tokenComplete
@@ -101,30 +64,14 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
             }
         });
 
-        /*try {
-            if (token.getSenderPic() == null)
-                return;
-                //holder.mSenderPic.setImageURI(Uri.parse(token.getSenderPic()));
-            URL url = new URL(token.getSenderPic());
-            new DownloadImageTask(holder.mSenderPic)
-                    .execute(token.getSenderPic());
-
-        } catch(IOException e) {
-            System.out.println(e);
-        }*/
-
         holder.mSenderName.setText(token.getSenderName());
-
-        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-        cal.setTimeInMillis(token.getTimestamp());
-        String date = DateFormat.format("dd-MM-yyyy", cal).toString();
-
-        holder.mTokenDate.setText(date);
+        holder.mTokenDate.setText(TimeUtils.getDate(token.getTimestamp()));
+        holder.mTokenTime.setText(TimeUtils.getTime(token.getTimestamp()));
     }
 
     @Override
     public int getItemCount() {
-        if (mTokens ==  null)
+        if (mTokens == null)
             return 0;
         return mTokens.size();
     }
@@ -132,7 +79,8 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
     public static class ViewHolder extends RecyclerView.ViewHolder {
         protected TextView mTokenNumber;
         protected TextView mSenderName;
-        protected EditText mTokenDate;
+        protected TextView mTokenDate;
+        protected TextView mTokenTime;
         protected ImageButton mTokenBuzzButton;
         protected ImageButton mTokenCompleteButton;
 
@@ -140,7 +88,8 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
             super(view);
             mTokenNumber = (TextView) view.findViewById(R.id.tokenNumber);
             mSenderName = (TextView) view.findViewById(R.id.tokenCustomerName);
-            mTokenDate = (EditText) view.findViewById(R.id.tokenDate);
+            mTokenDate = (TextView) view.findViewById(R.id.tokenDate);
+            mTokenTime = (TextView) view.findViewById(R.id.tokenTime);
             mTokenBuzzButton = (ImageButton) view.findViewById(R.id.imageBuzzButton);
             mTokenCompleteButton = (ImageButton) view.findViewById(R.id.imageCompleteButton);
         }

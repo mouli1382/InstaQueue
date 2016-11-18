@@ -5,131 +5,102 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    card_view:cardCornerRadius="@dimen/cardview_default_radius"
-    card_view:cardElevation="@dimen/cardview_default_elevation"
-    android:layout_margin="5dp">
+    android:layout_margin="5dp"
+    card_view:cardCornerRadius="5dp"
+    card_view:cardElevation="5dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="191dp"
-        android:elevation="15dp"
-        android:background="@color/colorAccent">
+        android:layout_height="wrap_content">
 
-         <EditText
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/relativeLL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tokenDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:gravity="bottom"
                 android:inputType="date"
-            android:ems="10"
-            android:id="@+id/tokenDate"
-            android:enabled="false"
-                tools:text="01/01/2016"
-            android:textColor="@android:color/background_dark"
-            android:clickable="false"
-            android:gravity="bottom"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_margin="0dp"
-            android:layout_marginBottom="0dp"
-            android:layout_marginEnd="0dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginRight="0dp"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="0dp"
-                android:layout_height="wrap_content" />
+                android:padding="5dp"
+                tools:text="01/01/2016" />
 
-
-
-
-
+            <TextView
+                android:id="@+id/tokenTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:padding="5dp"
+                tools:text="23:59:59" />
+        </RelativeLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_alignParentLeft="true"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:weightSum="2"
-            android:layout_height="50sp">
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/tokenNumber"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal"
+            android:weightSum="2">
 
             <ImageButton
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-                card_view:srcCompat="@android:drawable/sym_action_call"
                 android:id="@+id/imageBuzzButton"
-                android:background="@color/cardview_dark_background"
-                android:layout_weight="1"
-                style="@style/AppTheme"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_margin="5dp"
-                android:layout_marginBottom="5dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp" />
-
-
+                android:layout_weight="1"
+                android:padding="3dp"
+                android:background="@color/tw__transparent"
+                android:src="@drawable/ic_alarm_white_24dp" />
 
             <ImageButton
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-                card_view:srcCompat="@drawable/dgts__ic_success"
                 android:id="@+id/imageCompleteButton"
-                android:background="@color/cardview_dark_background"
-                style="@style/AppTheme"
-                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_margin="5dp"
-                android:layout_marginBottom="5dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp" />
-
+                android:layout_weight="1"
+                android:padding="3dp"
+                android:background="@color/tw__transparent"
+                android:src="@drawable/ic_check_circle_white_24dp" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/tokenCustomerName"
-            android:layout_width="169dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            android:textColor="@color/common_google_signin_btn_text_dark_focused"
-            android:textSize="18sp"
-            android:typeface="monospace"
-            tools:text="Name"
-            android:textColorLink="@color/cardview_dark_background"
-            android:textStyle="normal|bold"
             android:layout_alignBaseline="@+id/tokenNumber"
             android:layout_alignBottom="@+id/tokenNumber"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_margin="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
+            android:textSize="18sp"
+            android:typeface="monospace"
+            tools:text="Name" />
 
         <TextView
-           android:text="5000"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:id="@+id/tokenNumber"
-           android:textStyle="normal|bold"
-           android:textColor="@color/common_google_signin_btn_text_dark_focused"
-           android:textSize="75sp"
-
-            android:layout_alignParentRight="true"
+            android:id="@+id/tokenNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/relativeLL"
             android:layout_margin="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp" />
-
-
+            android:text="5000"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
+            android:textSize="75sp"
+            android:textStyle="normal|bold" />
     </RelativeLayout>
+
 </android.support.v7.widget.CardView>
 
 
