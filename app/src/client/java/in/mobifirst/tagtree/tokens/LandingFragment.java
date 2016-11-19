@@ -1,8 +1,7 @@
 package in.mobifirst.tagtree.tokens;
 
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
+import android.animation.ValueAnimator;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -11,6 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,6 +31,9 @@ import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.tokens.viewholder.FirebaseViewHolder;
+import in.mobifirst.tagtree.util.ApplicationConstants;
+import in.mobifirst.tagtree.util.NotificationUtil;
+import in.mobifirst.tagtree.util.SoundUtil;
 import in.mobifirst.tagtree.util.TimeUtils;
 
 public class LandingFragment extends BaseFragment {
@@ -44,13 +48,16 @@ public class LandingFragment extends BaseFragment {
     private ImageView mNoTokenIcon;
     private TextView mNoTokenMainView;
     private ProgressBar mProgressBar;
+    private String mTokenId;
 
     public LandingFragment() {
         // Requires empty public constructor
     }
 
-    public static LandingFragment newInstance() {
-        return new LandingFragment();
+    public static LandingFragment newInstance(Bundle args) {
+        LandingFragment landingFragment = new LandingFragment();
+        landingFragment.setArguments(args);
+        return landingFragment;
     }
 
     @Override
@@ -78,6 +85,8 @@ public class LandingFragment extends BaseFragment {
 
         setLoadingIndicator(true);
 
+        final Bundle bundle = getArguments();
+
         Query query = mFirebaseDatabaseManager.getTokenRef();
         mFirebaseAdapter = new FirebaseRecyclerAdapter<Token,
                 FirebaseViewHolder>(
@@ -101,6 +110,14 @@ public class LandingFragment extends BaseFragment {
                 holder.mTime.setText(TimeUtils.getTime(token.getTimestamp()));
                 holder.mCounterNumber.setText("" + token.getCounter());
                 holder.mArea.setText(token.getAreaName());
+
+                if (bundle != null) {
+                    mTokenId = bundle.getString(ApplicationConstants.TOKEN_ID_KEY);
+                }
+                if (mTokenId != null && token.getuId().equals(mTokenId)) {
+                    holder.mTokenNumber.setTextColor(getResources().getColor(R.color.colorAccent));
+                    animateTokenNumber(holder.mTokenNumber);
+                }
             }
         };
 
@@ -112,21 +129,20 @@ public class LandingFragment extends BaseFragment {
                         new RecyclerView.AdapterDataObserver() {
                             @Override
                             public void onItemRangeChanged(int positionStart, int itemCount, Object payload) {
-                                Token oldToken = mFirebaseAdapter.getItem(positionStart);
-                                if (oldToken.needsBuzz()) {
-                                    playSound();
+                                Token changedToken = mFirebaseAdapter.getItem(positionStart);
+                                if (changedToken.needsBuzz()) {
+                                    mTokenId = changedToken.getuId();
+                                    handleTokenStatus(changedToken);
                                 }
                                 super.onItemRangeChanged(positionStart, itemCount, payload);
                             }
 
                             @Override
-                            public void onChanged() {
-                                super.onChanged();
+                            public void onItemRangeRemoved(int positionStart, int itemCount) {
                                 if (mFirebaseAdapter.getItemCount() == 0) {
                                     showNoTokens();
-                                } else {
-                                    showTokens();
                                 }
+                                super.onItemRangeRemoved(positionStart, itemCount);
                             }
                         }
 
@@ -155,8 +171,25 @@ public class LandingFragment extends BaseFragment {
         return root;
     }
 
-    private void setLoadingIndicator(boolean active) {
+    private void animateTokenNumber(View view) {
+        //Animate the token number.
+        AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
+        alphaAnimation.setDuration(300);
+        alphaAnimation.setRepeatCount(3);
+        alphaAnimation.setRepeatMode(Animation.REVERSE);
+        view.setAnimation(alphaAnimation);
 
+        alphaAnimation.start();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mFirebaseAdapter != null)
+            mFirebaseAdapter.cleanup();
+    }
+
+    private void setLoadingIndicator(boolean active) {
         if (getView() == null) {
             return;
         }
@@ -191,13 +224,17 @@ public class LandingFragment extends BaseFragment {
         Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
     }
 
-    private void playSound() {
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        Ringtone ringtone = RingtoneManager.getRingtone(getActivity(), defaultSoundUri);
-        ringtone.play();
-
-        //Requires vibrate permission.
-        //        Vibrator vibrator = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
-        //        vibrator.vibrate(200);
+    private void handleTokenStatus(Token token) {
+        if (getActivity() != null) {
+            if (isResumed()) {
+                //Play sound and vibrate
+                SoundUtil.playSound(getActivity());
+            } else {
+                Bundle b = new Bundle();
+                b.putString(ApplicationConstants.TOKEN_ID_KEY, token.getuId());
+                NotificationUtil.sendNotification(getActivity(), "Update for Token number: " + token.getTokenNumber(),
+                        "Your turn has arrived. Kindly proceed to the counter number: " + token.getCounter(), b);
+            }
+        }
     }
 }

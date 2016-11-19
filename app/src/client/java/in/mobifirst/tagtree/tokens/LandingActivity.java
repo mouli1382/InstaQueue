@@ -9,6 +9,7 @@ import com.crashlytics.android.Crashlytics;
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseDrawerActivity;
 import in.mobifirst.tagtree.util.ActivityUtilities;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 import io.fabric.sdk.android.Fabric;
 
 public class LandingActivity extends BaseDrawerActivity {
@@ -27,7 +28,7 @@ public class LandingActivity extends BaseDrawerActivity {
         LandingFragment landingFragment =
                 (LandingFragment) getSupportFragmentManager().findFragmentById(R.id.content_base_drawer);
         if (landingFragment == null) {
-            landingFragment = LandingFragment.newInstance();
+            landingFragment = LandingFragment.newInstance(getIntent().getBundleExtra(ApplicationConstants.BUNDLE_KEY));
             ActivityUtilities.addFragmentToActivity(
                     getSupportFragmentManager(), landingFragment, R.id.content_base_drawer);
         }
