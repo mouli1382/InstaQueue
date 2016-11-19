@@ -3,7 +3,6 @@ package in.mobifirst.tagtree.util;
 import android.Manifest;
 
 public class ApplicationConstants {
-
     public static final String PERMISSION_RECEIVE_SMS = Manifest.permission.RECEIVE_SMS;
     public static final String PERMISSION_READ_PHONE_STATE = Manifest.permission.READ_PHONE_STATE;
 

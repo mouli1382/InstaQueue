@@ -1,10 +1,10 @@
 package in.mobifirst.tagtree.tokens;
 
-import android.animation.ValueAnimator;
-import android.graphics.Color;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -30,8 +30,10 @@ import in.mobifirst.tagtree.application.IQClientApplication;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.tokens.viewholder.FirebaseViewHolder;
 import in.mobifirst.tagtree.util.ApplicationConstants;
+import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 import in.mobifirst.tagtree.util.NotificationUtil;
 import in.mobifirst.tagtree.util.SoundUtil;
 import in.mobifirst.tagtree.util.TimeUtils;
@@ -40,6 +42,9 @@ public class LandingFragment extends BaseFragment {
 
     @Inject
     protected FirebaseDatabaseManager mFirebaseDatabaseManager;
+
+    @Inject
+    protected NetworkConnectionUtils mNetworkConnectionUtils;
 
     private FirebaseRecyclerAdapter<Token, FirebaseViewHolder>
             mFirebaseAdapter;
@@ -60,11 +65,40 @@ public class LandingFragment extends BaseFragment {
         return landingFragment;
     }
 
+    private BroadcastReceiver mNetworkBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean isConnected = intent.getBooleanExtra(TTLocalBroadcastManager.NETWORK_STATUS_KEY, false);
+
+            if (!isConnected && getView() != null) {
+                setLoadingIndicator(false);
+                showNetworkError(getView());
+            }
+        }
+    };
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((IQClientApplication) getActivity().getApplicationContext()).getApplicationComponent()
                 .inject(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //ToDo for now just check for the connectivity and show it in a snackbar.
+        // Need to give user capability to refresh when SwipeToRefresh along with Rx and MVP is brought in.
+        if (!mNetworkConnectionUtils.isConnected()) {
+            showNetworkError(getView());
+        }
+        TTLocalBroadcastManager.registerReceiver(getActivity(), mNetworkBroadcastReceiver, TTLocalBroadcastManager.NETWORK_INTENT_ACTION);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        TTLocalBroadcastManager.unRegisterReceiver(getActivity(), mNetworkBroadcastReceiver);
     }
 
     @Nullable
@@ -73,7 +107,7 @@ public class LandingFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_token, container, false);
 
-        RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.tokens_list);
+        final RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.tokens_list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
 
         mProgressBar = (ProgressBar) root.findViewById(R.id.progressBar);
@@ -111,11 +145,14 @@ public class LandingFragment extends BaseFragment {
                 holder.mCounterNumber.setText("" + token.getCounter());
                 holder.mArea.setText(token.getAreaName());
 
+                if (token.isActive()) {
+                    holder.mTokenNumber.setTextColor(getResources().getColor(R.color.colorAccent));
+                }
+
                 if (bundle != null) {
                     mTokenId = bundle.getString(ApplicationConstants.TOKEN_ID_KEY);
                 }
                 if (mTokenId != null && token.getuId().equals(mTokenId)) {
-                    holder.mTokenNumber.setTextColor(getResources().getColor(R.color.colorAccent));
                     animateTokenNumber(holder.mTokenNumber);
                 }
             }
@@ -133,6 +170,7 @@ public class LandingFragment extends BaseFragment {
                                 if (changedToken.needsBuzz()) {
                                     mTokenId = changedToken.getuId();
                                     handleTokenStatus(changedToken);
+                                    recyclerView.scrollToPosition(positionStart);
                                 }
                                 super.onItemRangeChanged(positionStart, itemCount, payload);
                             }
@@ -217,11 +255,7 @@ public class LandingFragment extends BaseFragment {
     }
 
     private void showLoadingTokensError() {
-        showMessage(getString(R.string.loading_tokens_error));
-    }
-
-    private void showMessage(String message) {
-        Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
+        showMessage(getView(), getString(R.string.loading_tokens_error));
     }
 
     private void handleTokenStatus(Token token) {

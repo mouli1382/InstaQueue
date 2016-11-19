@@ -7,6 +7,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
+import in.mobifirst.tagtree.R;
+
 public class BaseFragment extends Fragment {
 
     public BaseFragment() {
@@ -30,5 +32,9 @@ public class BaseFragment extends Fragment {
                 .make(view, message, Snackbar.LENGTH_LONG);
 
         snackbar.show();
+    }
+
+    public void showNetworkError(View view) {
+        showMessage(view, R.string.no_network);
     }
 }

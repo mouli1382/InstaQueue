@@ -5,18 +5,25 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.BaseActivity" />
         <activity
-            android:name=".activity.BaseDrawerActivity" />
-        <activity android:name=".authentication.google.GoogleSignInActivity" />
+            android:name=".activity.BaseActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.BaseDrawerActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".authentication.google.GoogleSignInActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.WelcomeActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,6 +31,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".receiver.NetworkStateReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
 
         <meta-data
             android:name="io.fabric.ApiKey"

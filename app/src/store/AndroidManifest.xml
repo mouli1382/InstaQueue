@@ -13,11 +13,13 @@
         android:supportsRtl="true">
         <activity
             android:name=".tokens.TokensActivity"
-            android:theme="@style/AppTheme.Background" />
+            android:theme="@style/AppTheme.Background"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".addedittoken.AddEditTokenActivity"
             android:parentActivityName=".tokens.TokensActivity"
-            android:theme="@style/AppTheme.Background">
+            android:theme="@style/AppTheme.Background"
+            android:screenOrientation="portrait" >
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
@@ -26,16 +28,20 @@
         </activity>
         <activity
             android:name=".ftu.SettingsActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.CreditsActivity"
             android:label="@string/title_activity_credits"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.razorpay.CheckoutActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
-        <activity android:name=".ftu.SettingsFetcherActivity" />
-        <activity android:name=".activity.RazorPayActivity" />
+        <activity android:name=".ftu.SettingsFetcherActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".activity.RazorPayActivity"
+            android:screenOrientation="portrait" />
         <!-- Add your API key here -->
         <meta-data
             android:name="com.razorpay.ApiKey"
@@ -43,11 +49,6 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="da7a69f0dee3ffe21c69c8e4aff9bdff1db53059" />
-
-        <activity
-            android:name=".activity.NavigationDrawerActivity"
-            android:label="@string/title_activity_navigation_drawer"
-            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
