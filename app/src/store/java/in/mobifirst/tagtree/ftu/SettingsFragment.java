@@ -306,13 +306,13 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     }
 
     @Override
-    public void showTokensList() {
+    public void showTokensList(Store store) {
         //todo: Find a better way to avoid crash
         if (getActivity() == null)
             return;
 
         mIQSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
-        mIQSharedPreferences.putInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY, Integer.parseInt(mCountersEditText.getText().toString()));
+        store.persistStore(mIQSharedPreferences);
 
         TokensActivity.start(getActivity());
         getActivity().finish();
@@ -329,7 +329,7 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
             mStoreNameEditText.setText(store.getName());
             mStoreAreaEditText.setText(store.getArea());
             mWebsiteEditText.setText(store.getWebsite());
-            mCountersEditText.setText(store.getNumberOfCounters()+"");
+            mCountersEditText.setText(store.getNumberOfCounters() + "");
 
             //ToDo get the store pic from Firebase storage
         }

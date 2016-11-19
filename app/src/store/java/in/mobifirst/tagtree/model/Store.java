@@ -118,9 +118,6 @@ public class Store {
         result.put("website", website);
         result.put("logoUrl", logoUrl);
         result.put("numberOfCounters", numberOfCounters);
-        result.put("credits", credits);
-        result.put("smsCounter", smsCounter);
-        result.put("tokenCounter", tokenCounter);
         return result;
     }
 
@@ -131,6 +128,6 @@ public class Store {
         sharedPreferences.putString(ApplicationConstants.WEBSITE_KEY, website);
         sharedPreferences.putString(ApplicationConstants.PROFILE_PIC_URL_KEY, logoUrl);
         sharedPreferences.putInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY, numberOfCounters);
-        sharedPreferences.putLong(ApplicationConstants.CREDITS_KEY, credits);
+//        sharedPreferences.putLong(ApplicationConstants.CREDITS_KEY, credits);
     }
 }

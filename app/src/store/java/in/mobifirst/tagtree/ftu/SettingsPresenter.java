@@ -81,7 +81,7 @@ public class SettingsPresenter implements SettingsContract.Presenter {
     }
 
     @Override
-    public void addStoreDetails(Store store) {
+    public void addStoreDetails(final Store store) {
         if (store.isEmpty()) {
             mSettingsView.showEmptyStoreError();
         } else {
@@ -89,7 +89,7 @@ public class SettingsPresenter implements SettingsContract.Presenter {
                     .getAuthInstance().getCurrentUser().getUid(), store, new Subscriber<String>() {
                 @Override
                 public void onCompleted() {
-                    mSettingsView.showTokensList();
+                    mSettingsView.showTokensList(store);
                 }
 
                 @Override

@@ -19,7 +19,7 @@ public interface SettingsContract {
 
         void showAddStoreFailedError();
 
-        void showTokensList();
+        void showTokensList(Store store);
 
         boolean isActive();
 
