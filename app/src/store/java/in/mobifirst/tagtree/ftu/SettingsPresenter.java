@@ -124,7 +124,9 @@ public class SettingsPresenter implements SettingsContract.Presenter {
 
                     @Override
                     public void onNext(Store result) {
-                        mSettingsView.populateStore(result);
+                        if(result != null) {
+                            mSettingsView.populateStore(result);
+                        }
                     }
                 });
     }

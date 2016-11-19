@@ -468,16 +468,52 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         });
     }
 
-    public void addStore(String uid, final Store store, final Subscriber<? super String> subscriber) {
+    public void addStore(final String uid, final Store store, final Subscriber<? super String> subscriber) {
         mDatabaseReference
-                .child(STORE_CHILD)
+                .child("store")
                 .child(uid)
-                .setValue(store.toMap())
+                .child("name").setValue(store.getName())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        subscriber.onNext(null);
-                        subscriber.onCompleted();
+                        mDatabaseReference
+                                .child("store")
+                                .child(uid)
+                                .child("area").setValue(store.getArea())
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        mDatabaseReference
+                                                .child("store")
+                                                .child(uid)
+                                                .child("website").setValue(store.getWebsite())
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        mDatabaseReference
+                                                                .child("store")
+                                                                .child(uid)
+                                                                .child("logoUrl").setValue(store.getLogoUrl())
+                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void aVoid) {
+                                                                        mDatabaseReference
+                                                                                .child("store")
+                                                                                .child(uid)
+                                                                                .child("numberOfCounters").setValue(store.getNumberOfCounters())
+                                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                    @Override
+                                                                                    public void onSuccess(Void aVoid) {
+                                                                                        subscriber.onNext(null);
+                                                                                        subscriber.onCompleted();
+                                                                                    }
+                                                                                });
+                                                                    }
+                                                                });
+                                                    }
+                                                });
+                                    }
+                                });
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

@@ -114,7 +114,7 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
                     Store store = new Store(mStoreNameEditText.getText().toString(),
                             mStoreAreaEditText.getText().toString(),
                             mWebsiteEditText.getText().toString(),
-                            mProfilePicUri, Integer.parseInt(mCountersEditText.getText().toString()), 1000, 0, 0);
+                            mProfilePicUri, Integer.parseInt(mCountersEditText.getText().toString()));
                     mPresenter.addStoreDetails(store);
                 }
             }
@@ -330,8 +330,6 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
             mStoreAreaEditText.setText(store.getArea());
             mWebsiteEditText.setText(store.getWebsite());
             mCountersEditText.setText(store.getNumberOfCounters() + "");
-
-            //ToDo get the store pic from Firebase storage
         }
     }
 

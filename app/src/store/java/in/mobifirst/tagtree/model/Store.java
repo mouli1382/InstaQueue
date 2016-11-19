@@ -23,15 +23,12 @@ public class Store {
     private long globaltokenCounter;
     private long smsCounter;
 
-    public Store(String name, String area, String website, String logoUrl, int numberOfCounters, long credits, long tokenCounter, long smsCount) {
+    public Store(String name, String area, String website, String logoUrl, int numberOfCounters) {
         this.name = name;
         this.area = area;
         this.website = website;
         this.logoUrl = logoUrl;
         this.numberOfCounters = numberOfCounters;
-        this.credits = credits;
-        this.tokenCounter = tokenCounter;
-        this.smsCounter = smsCount;
     }
 
     public Store() {
@@ -66,18 +63,10 @@ public class Store {
         return tokenCounter;
     }
 
-    public void setTokenCounter(long tokenCounter) { this.tokenCounter = tokenCounter;}
-
     public long getSmsCounter() { return smsCounter; }
-
-    public void setSmsCounter(long smsCounter) { this.smsCounter = smsCounter;}
 
     public long getCredits() {
         return credits;
-    }
-
-    public void setCredits(long credits) {
-        this.credits = credits;
     }
 
     public String getWebsite() {
