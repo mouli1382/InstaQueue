@@ -224,7 +224,7 @@ public class LandingFragment extends BaseFragment {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         setLoadingIndicator(false);
-                        if (dataSnapshot == null) {
+                        if (dataSnapshot != null && dataSnapshot.getValue() == null) {
                             showNoTokens();
                         }
                     }
