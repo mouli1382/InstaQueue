@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQClientApplication;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.fragment.BaseFragment;
+import in.mobifirst.tagtree.model.CurrentToken;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.tokens.viewholder.FirebaseViewHolder;
@@ -37,8 +39,10 @@ import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 import in.mobifirst.tagtree.util.NotificationUtil;
 import in.mobifirst.tagtree.util.SoundUtil;
 import in.mobifirst.tagtree.util.TimeUtils;
+import rx.Subscriber;
 
 public class LandingFragment extends BaseFragment {
+    private static final String TAG = "LandingFragment";
 
     @Inject
     protected FirebaseDatabaseManager mFirebaseDatabaseManager;
@@ -103,7 +107,7 @@ public class LandingFragment extends BaseFragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_token, container, false);
 
@@ -131,7 +135,7 @@ public class LandingFragment extends BaseFragment {
 
 
             @Override
-            protected void populateViewHolder(FirebaseViewHolder holder, final Token token, int position) {
+            protected void populateViewHolder(final FirebaseViewHolder holder, final Token token, int position) {
                 showTokens();
                 holder.mTokenNumber.setText(token.getTokenNumber() + "");
                 holder.mStoreName.setText(token.getSenderName() + "");
@@ -147,7 +151,36 @@ public class LandingFragment extends BaseFragment {
 
                 if (token.isActive()) {
                     holder.mTokenNumber.setTextColor(getResources().getColor(R.color.colorAccent));
+                } else {
+                    holder.mTokenNumber.setTextColor(getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
                 }
+
+                mFirebaseDatabaseManager.getCounterCurrentActiveToken(token, new Subscriber<CurrentToken>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(CurrentToken currentToken) {
+                        Log.e(TAG, "passed token = " + token.getuId());
+                        if (currentToken != null) {
+                            Log.e(TAG, "result token = " + currentToken.getTokenId());
+                            if (token.getuId().equals(currentToken.getTokenId())) {
+                                long activeToken = currentToken.getCurrentToken();
+                                if (activeToken != -1) {
+                                    holder.mCurrentActiveToken
+                                            .setText("Currently running  " + activeToken);
+                                }
+                            }
+                        }
+                    }
+                });
 
                 if (bundle != null) {
                     mTokenId = bundle.getString(ApplicationConstants.TOKEN_ID_KEY);

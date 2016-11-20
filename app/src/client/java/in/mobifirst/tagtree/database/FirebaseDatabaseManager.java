@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import in.mobifirst.tagtree.model.CurrentToken;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.util.ApplicationConstants;
@@ -29,6 +30,9 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String TAG = "FirebaseDatabaseManager";
 
     private static final String TOKENS_CHILD = "tokens/";
+    private static final String STORE_CHILD = "store/";
+    private static final String COUNTERS_CHILD = "counters/";
+    private static final String COUNTERS_LAST_ACTIVE_TOKEN = "activatedToken/";
 
     private DatabaseReference mDatabaseReference;
 
@@ -112,6 +116,37 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 });
             }
         });
+    }
+
+    public void getCounterCurrentActiveToken(final Token token, final Subscriber<CurrentToken> subscriber) {
+        mDatabaseReference
+                .child(STORE_CHILD)
+                .child(token.getStoreId())
+                .child(COUNTERS_CHILD)
+                .child("" + token.getCounter())
+                .child(COUNTERS_LAST_ACTIVE_TOKEN)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.e(TAG, "Called token = "+ token.getuId());
+                        if (dataSnapshot != null) {
+                            Long currentToken = dataSnapshot.getValue(Long.class);
+                            CurrentToken activeToken = new CurrentToken();
+                            activeToken.setCurrentToken(currentToken != null ? currentToken : -1);
+                            activeToken.setTokenId(token.getuId());
+                            subscriber.onNext(activeToken);
+                        } else {
+                            subscriber.onNext(null);
+                        }
+                        subscriber.onCompleted();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(TAG, "[fetch Store] onCancelled:" + databaseError);
+                        subscriber.onError(databaseError.toException());
+                    }
+                });
     }
 }
 
