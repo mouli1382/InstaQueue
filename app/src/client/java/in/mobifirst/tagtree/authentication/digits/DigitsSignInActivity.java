@@ -9,9 +9,11 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+
 import com.digits.sdk.android.AuthCallback;
 import com.digits.sdk.android.AuthConfig;
 import com.digits.sdk.android.Digits;
+import com.digits.sdk.android.DigitsAuthButton;
 import com.digits.sdk.android.DigitsException;
 import com.digits.sdk.android.DigitsSession;
 import com.google.firebase.auth.FirebaseUser;
@@ -19,6 +21,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 import javax.inject.Inject;
 
+import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseActivity;
 import in.mobifirst.tagtree.application.IQClientApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
@@ -46,11 +49,12 @@ public class DigitsSignInActivity extends BaseActivity {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.digits_auth);
+        DigitsAuthButton digitsButton = (DigitsAuthButton) findViewById(R.id.auth_button);
 
         ((IQClientApplication) getApplication())
                 .getApplicationComponent()
                 .inject(this);
-
 
         if (checkPermission(this, ApplicationConstants.PERMISSION_READ_PHONE_STATE)) {
             TelephonyManager tMgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
@@ -81,10 +85,9 @@ public class DigitsSignInActivity extends BaseActivity {
             }
         };
 
-        AuthConfig.Builder authConfigBuilder = new AuthConfig.Builder()
-                .withAuthCallBack(authCallback)
-                .withPhoneNumber("+91" + (!TextUtils.isEmpty(mLineNumber) ? mLineNumber : ""));
-        Digits.authenticate(authConfigBuilder.build());
+        Digits.clearActiveSession();
+        digitsButton.setCallback(authCallback);
+
     }
 
     public static void start(Context caller) {
