@@ -21,6 +21,7 @@ public class Token {
     private String senderName;
     private String areaName;
     private int counter;
+    private long activatedTokenTime;
 
     public enum Status {
         ISSUED, READY, CANCELLED, COMPLETED
@@ -132,6 +133,14 @@ public class Token {
         this.timestamp = timestamp;
     }
 
+    public long getActivatedTokenTime() {
+        return activatedTokenTime;
+    }
+
+    public void setActivatedTokenTime(long timestamp) {
+        this.activatedTokenTime = timestamp;
+    }
+
     public int getBuzzCount() {
         return buzzCount;
     }
@@ -170,6 +179,7 @@ public class Token {
         result.put("senderPic", senderPic);
         result.put("counter", counter);
         result.put("areaName", areaName);
+        result.put("activatedTokenTime", activatedTokenTime);
         return result;
     }
 
@@ -187,6 +197,7 @@ public class Token {
         if (!getStoreId().equals(token.getStoreId())) return false;
         if (!getPhoneNumber().equals(token.getPhoneNumber())) return false;
         if (!getAreaName().equals(token.getAreaName())) return false;
+        if (getActivatedTokenTime() != (token.getActivatedTokenTime())) return false;
         return getTimestamp() != (token.getTimestamp());
 
     }
@@ -198,6 +209,7 @@ public class Token {
         result = 31 * result + getPhoneNumber().hashCode();
         result = 31 * result + (int) (getTokenNumber() ^ (getTokenNumber() >>> 32));
         result = 31 * result + (int) (getTimestamp() ^ (getTimestamp() >>> 32));
+        result = 31 * result + (int) (getActivatedTokenTime() ^ (getActivatedTokenTime() >>> 32));
         result = 31 * result + getStatus();
         result = 31 * result + getBuzzCount();
         result = 31 * result + getAreaName().hashCode();

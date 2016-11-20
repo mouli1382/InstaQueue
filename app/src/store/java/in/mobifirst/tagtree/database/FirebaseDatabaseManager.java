@@ -14,6 +14,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
@@ -23,6 +24,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,6 +41,7 @@ import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.tokens.Snap;
 import in.mobifirst.tagtree.util.ApplicationConstants;
+import in.mobifirst.tagtree.util.TimeUtils;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
@@ -50,6 +53,10 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     private static final String TOKENS_CHILD = "tokens/";
     private static final String STORE_CHILD = "store/";
+    private static final String COUNTERS_CHILD = "counters/";
+    private static final String COUNTERS_AVG_TAT_CHILD = "avgTurnAroundTime/";
+    private static final String COUNTERS_LAST_ACTIVE_TOKEN = "activatedToken/";
+    private static final String COUNTERS_USERS = "counterUserCount/";
     private static final String TOPICS_CHILD = "topics/";
     private static final String TOKENS_HISTORY_CHILD = "token-history";
     private final static String mMsg91Url = "https://control.msg91.com/api/sendhttp.php?";
@@ -57,12 +64,57 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     private DatabaseReference mDatabaseReference;
     private IQSharedPreferences mSharedPrefs;
+    private long avgwaitTime = 0;
 
     @Inject
     public FirebaseDatabaseManager(IQSharedPreferences iqSharedPreferences) {
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mSharedPrefs = iqSharedPreferences;
+
     }
+
+    public class IncremnetTransactionHander implements  Transaction.Handler{
+
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Long currentValue = mutableData.getValue(Long.class);
+                if (currentValue == null) {
+                    mutableData.setValue(1);
+                } else {
+                    mutableData.setValue(currentValue + 1);
+                }
+
+
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+
+            }
+        };
+
+    public class AvgTATIncrementHandler implements  Transaction.Handler{
+
+        @Override
+        public Transaction.Result doTransaction(MutableData mutableData) {
+            Long currentValue = mutableData.getValue(Long.class);
+            if (currentValue == null) {
+                mutableData.setValue(avgwaitTime);
+            } else {
+                mutableData.setValue(currentValue + avgwaitTime);
+            }
+
+
+            return Transaction.success(mutableData);
+        }
+
+        @Override
+        public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+
+        }
+    };
+
 
     public DatabaseReference getDatabaseReference() {
         return mDatabaseReference;
@@ -626,25 +678,8 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
         //Uncomment this  to execute the send sms
         new SendSMSTask().execute(mainUrl);
-        incrementSMS(token, new Transaction.Handler() {
-            @Override
-            public Transaction.Result doTransaction(MutableData mutableData) {
-                Long currentValue = mutableData.getValue(Long.class);
-                if (currentValue == null) {
-                    mutableData.setValue(1);
-                } else {
-                    mutableData.setValue(currentValue + 1);
-                }
-
-
-                return Transaction.success(mutableData);
-            }
-
-            @Override
-            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
-
-            }
-        });
+        incrementSMS(token, new IncremnetTransactionHander()
+        );
     }
 
     private void updateTopicsForPushNotification(Token token) {
@@ -661,23 +696,52 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             mDatabaseReference
                     .child(TOKENS_HISTORY_CHILD)
                     .push()
-                    .setValue(token.toMap());
+                    .setValue(token.toMap()); //Fix this to Map should not be used
 
             //Remove it from the token table
             mDatabaseReference
                     .child(TOKENS_CHILD)
                     .child(token.getuId())
                     .removeValue();
-        } else {
-            //Check for network connectivity
-            if (token.getBuzzCount() == 1) {
-                //Inform user if he is not present in the user table
-                checkSMSSending(token, true);
-            }
+
+            //Remove it from the token table
+
+        } else {            //Check for network connectivity
             mDatabaseReference
                     .child(TOKENS_CHILD)
                     .child(token.getuId())
                     .setValue(token);
+            mDatabaseReference
+                    .child(TOKENS_CHILD)
+                    .child(token.getuId())
+                    .child("activatedTokenTime")
+                    .setValue(ServerValue.TIMESTAMP);
+
+            ValueEventListener postListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // Get Post object and use the values to update the UI
+                    Token tokenUpdated = dataSnapshot.getValue(Token.class);
+                    if (tokenUpdated.getBuzzCount() == 1) {
+                        //Inform user if he is not present in the user table
+                        checkSMSSending(tokenUpdated, true);
+                        incrementUserCount(tokenUpdated, new IncremnetTransactionHander());
+                        incrementAvgTAT(tokenUpdated, new AvgTATIncrementHandler());
+                        setActiveTokenNumber(tokenUpdated);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Getting Post failed, log a message
+                    Log.w(TAG, "SMS won't be sent", databaseError.toException());
+                    // ...
+                }
+            };
+            mDatabaseReference
+                    .child(TOKENS_CHILD)
+                    .child(token.getuId()).addListenerForSingleValueEvent(postListener);
+
         }
     }
 
@@ -696,6 +760,43 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .child(token.getStoreId())
                 .child("smsCounter");
         creditsRef.runTransaction(handler);
+
+    }
+
+    private void setActiveTokenNumber(Token token)
+    {
+        mDatabaseReference
+                .child(STORE_CHILD)
+                .child(token.getStoreId())
+                .child(COUNTERS_CHILD)
+                .child(""+ token.getCounter())
+                .child(COUNTERS_LAST_ACTIVE_TOKEN)
+                .setValue(token.getTokenNumber());
+    }
+
+    private void incrementUserCount(Token token, @NonNull Transaction.Handler handler) {
+        mDatabaseReference
+                .child(STORE_CHILD)
+                .child(token.getStoreId())
+                .child(COUNTERS_CHILD)
+                .child(""+ token.getCounter())
+                .child(COUNTERS_USERS)
+                .runTransaction(handler);
+
+    }
+
+    private void incrementAvgTAT(Token token, @NonNull Transaction.Handler handler) {
+        avgwaitTime = token.getActivatedTokenTime() - token.getTimestamp();
+        if (avgwaitTime < 0)
+            avgwaitTime = 0;
+
+        mDatabaseReference
+                .child(STORE_CHILD)
+                .child(token.getStoreId())
+                .child(COUNTERS_CHILD)
+                .child(""+ token.getCounter())
+                .child(COUNTERS_AVG_TAT_CHILD)
+                .runTransaction(handler);
 
     }
 
@@ -802,25 +903,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
         //Uncomment this  to execute the send sms
         new SendSMSTask().execute(mainUrl);
-        incrementSMS(token, new Transaction.Handler() {
-            @Override
-            public Transaction.Result doTransaction(MutableData mutableData) {
-                Long currentValue = mutableData.getValue(Long.class);
-                if (currentValue == null) {
-                    mutableData.setValue(1);
-                } else {
-                    mutableData.setValue(currentValue + 1);
-                }
-
-
-                return Transaction.success(mutableData);
-            }
-
-            @Override
-            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
-
-            }
-        });
+        incrementSMS(token, new IncremnetTransactionHander());
     }
 
 }
