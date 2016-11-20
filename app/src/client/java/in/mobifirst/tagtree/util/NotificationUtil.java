@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
-import in.mobifirst.tagtree.tokens.LandingActivity;
+import in.mobifirst.tagtree.tokens.TokensActivity;
 
 public class NotificationUtil {
 
@@ -16,7 +16,7 @@ public class NotificationUtil {
     public static final int NOTIFICATION_ID = 1986;
 
     public static void sendNotification(Context context, String title, String message, Bundle bundle) {
-        Intent intent = new Intent(context, LandingActivity.class);
+        Intent intent = new Intent(context, TokensActivity.class);
         if (bundle != null) {
             intent.putExtra(ApplicationConstants.BUNDLE_KEY, bundle);
         }

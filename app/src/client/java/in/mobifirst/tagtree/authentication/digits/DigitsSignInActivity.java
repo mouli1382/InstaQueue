@@ -25,7 +25,7 @@ import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.model.User;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
-import in.mobifirst.tagtree.tokens.LandingActivity;
+import in.mobifirst.tagtree.tokens.TokensActivity;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 
 public class DigitsSignInActivity extends BaseActivity {
@@ -70,7 +70,7 @@ public class DigitsSignInActivity extends BaseActivity {
                     writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail(), mPhoneNumber);
 
                     //Launch the landing screen.
-                    LandingActivity.start(DigitsSignInActivity.this);
+                    TokensActivity.start(DigitsSignInActivity.this);
                 }
                 finish();
             }

@@ -20,7 +20,7 @@ import in.mobifirst.tagtree.application.IQClientApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
-import in.mobifirst.tagtree.tokens.LandingActivity;
+import in.mobifirst.tagtree.tokens.TokensActivity;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import io.fabric.sdk.android.Fabric;
 
@@ -88,7 +88,7 @@ public class WelcomeActivity extends BaseActivity {
         if (mFirebaseAuth.getAuthInstance().getCurrentUser() != null) {
             Intent intent;
             if (mIQSharedPreferences.getBoolean(ApplicationConstants.FTU_COMPLETED_KEY)) {
-                intent = new Intent(this, LandingActivity.class);
+                intent = new Intent(this, TokensActivity.class);
             } else {
                 intent = new Intent(this, RequestPermissionsActivity.class);
             }

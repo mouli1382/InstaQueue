@@ -2,6 +2,7 @@ package in.mobifirst.tagtree.database;
 
 import android.util.Log;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,6 +22,9 @@ import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.functions.Func2;
 
 public class FirebaseDatabaseManager implements DatabaseManager {
 
@@ -50,37 +54,87 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     //ToDo limit by date and status.
-    public Observable<List<Token>> getAllTokens(final String uId) {
-        return Observable.create(new Observable.OnSubscribe<List<Token>>() {
+    public Observable<List<Token>> getAllTokens() {
+        return rx.Observable.create(new Observable.OnSubscribe<List<Token>>() {
             @Override
             public void call(final Subscriber<? super List<Token>> subscriber) {
-                Query query = mDatabaseReference
-                        .child(TOKENS_CHILD)
-                        .orderByChild("phoneNumber")
-                        .equalTo(mSharedPrefs.getSting(ApplicationConstants.PHONE_NUMBER_KEY));
-                query.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot != null) {
-                            HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
-                            });
-                            if (tokens != null) {
-                                subscriber.onNext(new ArrayList<>(tokens.values()));
-                                subscriber.onCompleted();
-                            }
-                        } else {
-                            subscriber.onError(new Exception("Empty Tokens."));
-                            subscriber.onCompleted();
-                        }
-                    }
+                getTokenRef()
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                Log.e(TAG, "onDataChange --> " + subscriber.toString());
+                                if (!subscriber.isUnsubscribed()) {
+                                    if (dataSnapshot != null) {
+                                        HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
+                                        });
+                                        if (tokens != null) {
+                                            Observable.just(new ArrayList<>(tokens.values()))
+                                                    .flatMap(new Func1<List<Token>, Observable<Token>>() {
+                                                        @Override
+                                                        public Observable<Token> call(List<Token> tokens) {
+                                                            return Observable.from(tokens);
+                                                        }
+                                                    })
+                                                    .toSortedList(new Func2<Token, Token, Integer>() {
+                                                        @Override
+                                                        public Integer call(Token token, Token token2) {
+                                                            return new Long(token.getTimestamp()).compareTo(token2.getTimestamp());
+                                                        }
+                                                    })
+                                                    .flatMap(new Func1<List<Token>, Observable<Token>>() {
+                                                        @Override
+                                                        public Observable<Token> call(List<Token> tokens) {
+                                                            return Observable.from(tokens);
+                                                        }
+                                                    })
+                                                    .filter(new Func1<Token, Boolean>() {
+                                                        @Override
+                                                        public Boolean call(Token token) {
+//                        switch (mCurrentFiltering) {
+//                            case ACTIVE_TOKENS:
+//                                return token.isActive();
+//                            case COMPLETED_TOKENS:
+//                                return token.isCompleted();
+//                            case CANCELLED_TOKENS:
+//                                return token.isCancelled();
+//                            default:
+//                                return true;
+//                        }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.e(TAG, "[fetch All Tokens] onCancelled:" + databaseError);
-                        subscriber.onError(new Exception("Empty Tokens."));
-                        subscriber.onCompleted();
-                    }
-                });
+                                                            return !token.isCompleted();
+                                                        }
+                                                    })
+                                                    .toList()
+                                                    .subscribe(new Action1<List<Token>>() {
+                                                        @Override
+                                                        public void call(List<Token> tokenList) {
+                                                            subscriber.onNext(tokenList);
+                                                        }
+                                                    });
+
+//                                    subscriber.onNext(new ArrayList<>(tokens.values()));
+//                                    subscriber.onCompleted();
+                                        } else {
+                                            FirebaseCrash.report(new Exception("Empty Tokens"));
+                                            subscriber.onNext(null);
+//                                    subscriber.onCompleted();
+                                        }
+                                    } else {
+                                        FirebaseCrash.report(new Exception("Empty Tokens"));
+                                        subscriber.onNext(null);
+//                                subscriber.onCompleted();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Log.e(TAG, "[fetch All Tokens] onCancelled:" + databaseError);
+                                subscriber.onError(new Exception("Empty Tokens."));
+                                FirebaseCrash.report(new Exception("Empty Tokens"));
+                            }
+                        });
+
             }
         });
     }

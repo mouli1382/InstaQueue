@@ -1,6 +1,7 @@
 package in.mobifirst.tagtree.application;
 
 import in.mobifirst.tagtree.authentication.AuthenticationModule;
+import in.mobifirst.tagtree.token.TokensRepositoryModule;
 import in.mobifirst.tagtree.database.DatabaseModule;
 
 public class IQClientApplication extends IQApplication {
@@ -19,6 +20,7 @@ public class IQClientApplication extends IQApplication {
                     .databaseModule(new DatabaseModule())
                     .authenticationModule(new AuthenticationModule())
                     .applicationModule(new ApplicationModule(this))
+                    .tokensRepositoryModule(new TokensRepositoryModule())
                     .build();
         }
     }
