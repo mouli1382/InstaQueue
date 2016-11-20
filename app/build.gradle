@@ -1,5 +1,14 @@
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
+def versionBuild = 0 // bump for dogfood builds, public betas, etc.
+
+def gitSha = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim()
+def gitBranchName = 'git rev-parse --abbrev-ref HEAD'.execute([], project.rootDir).text.trim()
+def apkSuffix = versionMajor + '.' + versionMinor + '.' + versionPatch;
+def projectName = "TagTree"
+
 apply plugin: 'com.android.application'
-apply from: "../artifacts.gradle"
 apply plugin: 'io.fabric'
 apply plugin: 'com.neenbedankt.android-apt'
 
@@ -20,8 +29,6 @@ android {
         applicationId "in.mobifirst.tagtree"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         // Enabling multidex support.
@@ -57,8 +64,8 @@ android {
     productFlavors {
         store {
             applicationId "in.mobifirst.tagtree.store"
-            versionCode 1
-            versionName "1.0"
+            versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+            versionName "${versionMajor}.${versionMinor}.${versionPatch}-${gitBranchName}"
             buildConfigField("String", "TWITTER_KEY", "\"1C1mNkwwXKrpoS1MnBeGBekzA\"")
             buildConfigField("String", "TWITTER_SECRET", "\"0mzEaRQxZOh14SskANmdZgfuW3ae0IUwu9FetUUiQoN7o2VcLR\"")
             buildConfigField("String", "SMS91_SECRET", "\"128441AGQNt0b0eb2q580367e2\"")
@@ -66,10 +73,21 @@ android {
 
         client {
             applicationId "in.mobifirst.tagtree.client"
-            versionCode 1
-            versionName "1.0"
+            versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+            versionName "${versionMajor}.${versionMinor}.${versionPatch}-${gitBranchName}"
             buildConfigField("String", "TWITTER_KEY", "\"uJ5rp39QWzZUgbPmJFCqRvcRE\"")
             buildConfigField("String", "TWITTER_SECRET", "\"fQ7PjYnsW4ByxDdaBYGmed0DGisnYx10Bs5b7bOtIMtRwFqls3\"")
+        }
+    }
+
+    // Used to name our output apk
+    applicationVariants.all { variant ->
+        variant.mergedFlavor.versionName = "${versionMajor}.${versionMinor}.${versionPatch}-${variant.flavorName}-${variant.buildType.name}-${gitBranchName}";
+        variant.outputs.each { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                output.outputFile = file("$project.buildDir/${projectName}-${variant.name}-${apkSuffix}-${gitSha}.apk")
+            }
         }
     }
 
@@ -116,7 +134,7 @@ dependencies {
     compile "com.github.bumptech.glide:glide:$rootProject.glideVersion"
     compile "com.google.code.findbugs:jsr305:$rootProject.findbugsVersion"
 
-    compile'com.razorpay:checkout:1.0.2'
+    compile 'com.razorpay:checkout:1.0.2'
 
     testCompile 'junit:junit:4.12'
 }
