@@ -119,6 +119,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     public void getCounterCurrentActiveToken(final Token token, final Subscriber<CurrentToken> subscriber) {
+        Log.e(TAG, "Passed-In token = "+ token.getuId());
         mDatabaseReference
                 .child(STORE_CHILD)
                 .child(token.getStoreId())
@@ -134,6 +135,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                             CurrentToken activeToken = new CurrentToken();
                             activeToken.setCurrentToken(currentToken != null ? currentToken : -1);
                             activeToken.setTokenId(token.getuId());
+                            activeToken.setCounterNumber(token.getCounter());
                             subscriber.onNext(activeToken);
                         } else {
                             subscriber.onNext(null);

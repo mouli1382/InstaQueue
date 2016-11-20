@@ -4,6 +4,7 @@ public class CurrentToken {
 
     private String tokenId;
     private long currentToken;
+    private int counterNumber;
 
     public String getTokenId() {
         return tokenId;
@@ -21,4 +22,11 @@ public class CurrentToken {
         this.currentToken = currentToken;
     }
 
+    public int getCounterNumber() {
+        return counterNumber;
+    }
+
+    public void setCounterNumber(int counterNumber) {
+        this.counterNumber = counterNumber;
+    }
 }

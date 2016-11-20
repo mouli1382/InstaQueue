@@ -171,7 +171,7 @@ public class LandingFragment extends BaseFragment {
                         Log.e(TAG, "passed token = " + token.getuId());
                         if (currentToken != null) {
                             Log.e(TAG, "result token = " + currentToken.getTokenId());
-                            if (token.getuId().equals(currentToken.getTokenId())) {
+                            if (token.getuId().equals(currentToken.getTokenId()) && token.getCounter() == currentToken.getCounterNumber()) {
                                 long activeToken = currentToken.getCurrentToken();
                                 if (activeToken != -1) {
                                     holder.mCurrentActiveToken
@@ -203,7 +203,7 @@ public class LandingFragment extends BaseFragment {
                                 if (changedToken.needsBuzz()) {
                                     mTokenId = changedToken.getuId();
                                     handleTokenStatus(changedToken);
-                                    recyclerView.scrollToPosition(positionStart);
+//                                    recyclerView.scrollToPosition(positionStart);
                                 }
                                 super.onItemRangeChanged(positionStart, itemCount, payload);
                             }
