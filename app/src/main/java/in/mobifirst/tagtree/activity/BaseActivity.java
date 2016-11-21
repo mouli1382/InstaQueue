@@ -9,6 +9,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import in.mobifirst.tagtree.R;
+
 public class BaseActivity extends AppCompatActivity {
     private static final String TAG = "BaseActivity";
 
@@ -61,5 +63,9 @@ public class BaseActivity extends AppCompatActivity {
             return false;
 
         return true;
+    }
+
+    public void showNetworkError(View view) {
+        showMessage(view, R.string.no_network);
     }
 }

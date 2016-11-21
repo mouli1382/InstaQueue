@@ -60,6 +60,8 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private final static String mMsg91Url = "https://control.msg91.com/api/sendhttp.php?";
     private final static String mMsgBulkSMSUrl = "http://login.bulksmsgateway.in/sendmessage.php?";
 
+    private final static String CLIENT_APP_PLAYSTORE_URL = "https://goo.gl/mVAdpT";
+
     private DatabaseReference mDatabaseReference;
     private IQSharedPreferences mSharedPrefs;
     private long avgwaitTime = 0;
@@ -90,9 +92,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
 
         }
-    }
-
-    ;
+    };
 
     public class AvgTATIncrementHandler implements Transaction.Handler {
 
@@ -113,9 +113,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
 
         }
-    }
-
-    ;
+    };
 
 
     public DatabaseReference getDatabaseReference() {
@@ -138,32 +136,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         .child(TOKENS_CHILD)
                         .orderByChild("storeId")
                         .equalTo(uId);
-//                query.addChildEventListener(new ChildEventListener() {
-//                    @Override
-//                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                        Log.e(TAG, "onChildAdded");
-//                    }
-//
-//                    @Override
-//                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//                        Log.e(TAG, "onChildChanged");
-//                    }
-//
-//                    @Override
-//                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-//                        Log.e(TAG, "onChildRemoved");
-//                    }
-//
-//                    @Override
-//                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//                        Log.e(TAG, "onChildMoved");
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//                        Log.e(TAG, "onCancelled");
-//                    }
-//                });
 
                 final ValueEventListener listener = query.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -197,17 +169,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                             .filter(new Func1<Token, Boolean>() {
                                                 @Override
                                                 public Boolean call(Token token) {
-//                        switch (mCurrentFiltering) {
-//                            case ACTIVE_TOKENS:
-//                                return token.isActive();
-//                            case COMPLETED_TOKENS:
-//                                return token.isCompleted();
-//                            case CANCELLED_TOKENS:
-//                                return token.isCancelled();
-//                            default:
-//                                return true;
-//                        }
-
                                                     return !token.isCompleted();
                                                 }
                                             })
@@ -238,18 +199,13 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                     subscriber.onNext(snapList);
                                                 }
                                             });
-
-//                                    subscriber.onNext(new ArrayList<>(tokens.values()));
-//                                    subscriber.onCompleted();
                                 } else {
                                     FirebaseCrash.report(new Exception("Empty Tokens"));
                                     subscriber.onNext(null);
-//                                    subscriber.onCompleted();
                                 }
                             } else {
                                 FirebaseCrash.report(new Exception("Empty Tokens"));
                                 subscriber.onNext(null);
-//                                subscriber.onCompleted();
                             }
                         }
                     }
@@ -261,14 +217,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         FirebaseCrash.report(new Exception("Empty Tokens"));
                     }
                 });
-
-//                // When the subscription is cancelled, remove the listener
-//                subscriber.add(Subscriptions.create(new Action0() {
-//                    @Override
-//                    public void call() {
-//                        query.removeEventListener(listener);
-//                    }
-//                }));
             }
         });
     }
@@ -282,32 +230,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         .child(TOKENS_CHILD)
                         .orderByChild("storeId")
                         .equalTo(uId);
-//                query.addChildEventListener(new ChildEventListener() {
-//                    @Override
-//                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                        Log.e(TAG, "onChildAdded");
-//                    }
-//
-//                    @Override
-//                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//                        Log.e(TAG, "onChildChanged");
-//                    }
-//
-//                    @Override
-//                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-//                        Log.e(TAG, "onChildRemoved");
-//                    }
-//
-//                    @Override
-//                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//                        Log.e(TAG, "onChildMoved");
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//                        Log.e(TAG, "onCancelled");
-//                    }
-//                });
 
                 final ValueEventListener listener = query.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -350,18 +272,13 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                     subscriber.onNext(tokenList);
                                                 }
                                             });
-
-//                                    subscriber.onNext(new ArrayList<>(tokens.values()));
-//                                    subscriber.onCompleted();
                                 } else {
                                     FirebaseCrash.report(new Exception("Empty Tokens"));
                                     subscriber.onNext(null);
-//                                    subscriber.onCompleted();
                                 }
                             } else {
                                 FirebaseCrash.report(new Exception("Empty Tokens"));
                                 subscriber.onNext(null);
-//                                subscriber.onCompleted();
                             }
                         }
                     }
@@ -373,14 +290,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         FirebaseCrash.report(new Exception("Empty Tokens"));
                     }
                 });
-
-//                // When the subscription is cancelled, remove the listener
-//                subscriber.add(Subscriptions.create(new Action0() {
-//                    @Override
-//                    public void call() {
-//                        query.removeEventListener(listener);
-//                    }
-//                }));
             }
         });
     }
@@ -613,11 +522,11 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         if (status == false) {
             message = "You've received a token from " + token.getSenderName().trim() + " "
                     + token.getAreaName().trim() + ". Token= " + (token.getTokenNumber()) + ", Counter= " + token.getCounter()
-                    + ". Download the app https://goo.gl/agLQ3C for real time updates";
+                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL +" for real time updates";
         } else {
             message = "It's your turn at " + token.getSenderName() + " " + token.getAreaName() + "."
                     + " Token = " + token.getTokenNumber() + ", Counter = " + token.getCounter()
-                    + ". Download the app https://goo.gl/agLQ3C for real time updates.";
+                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL +" for real time updates.";
         }
         //define route
         String route = "4"; //4 For transaction, check with msg91
@@ -835,11 +744,11 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         if (status == false) {
             message = "You've received a token from " + token.getSenderName().trim() + " "
                     + token.getAreaName().trim() + ". Token= " + (token.getTokenNumber()) + ", Counter= " + token.getCounter()
-                    + ". Download the app https://goo.gl/agLQ3C for real time updates";
+                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL +" for real time updates";
         } else {
             message = "It's your turn at " + token.getSenderName() + " " + token.getAreaName() + "."
                     + " Token = " + token.getTokenNumber() + ", Counter = " + token.getCounter()
-                    + ". Download the app https://goo.gl/agLQ3C for real time updates.";
+                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL +" for real time updates.";
         }
         //define route
         String route = "4"; //4 For transaction, check with msg91

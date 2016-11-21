@@ -106,9 +106,11 @@ public class TokensFragment extends BaseFragment implements TokensContract.View 
         //ToDo for now just check for the connectivity and show it in a snackbar.
         // Need to give user capability to refresh when SwipeToRefresh along with Rx and MVP is brought in.
         if (!mNetworkConnectionUtils.isConnected()) {
+            setLoadingIndicator(false);
             showNetworkError(getView());
+        } else {
+            mPresenter.subscribe();
         }
-        mPresenter.subscribe();
         TTLocalBroadcastManager.registerReceiver(getActivity(), mNetworkBroadcastReceiver, TTLocalBroadcastManager.NETWORK_INTENT_ACTION);
     }
 
@@ -196,7 +198,7 @@ public class TokensFragment extends BaseFragment implements TokensContract.View 
             }
         });
 
-        setRetainInstance(true);
+//        setRetainInstance(true);
 
         // Set up progress indicator
         final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
@@ -314,13 +316,36 @@ public class TokensFragment extends BaseFragment implements TokensContract.View 
         final SwipeRefreshLayout srl =
                 (SwipeRefreshLayout) getView().findViewById(R.id.refresh_layout);
 
-        // Make sure setRefreshing() is called after the layout is done with everything else.
-        srl.post(new Runnable() {
-            @Override
-            public void run() {
-                srl.setRefreshing(active);
+        if (!mNetworkConnectionUtils.isConnected()) {
+            // Make sure setRefreshing() is called after the layout is done with everything else.
+            srl.post(new Runnable() {
+                @Override
+                public void run() {
+                    srl.setRefreshing(false);
+                }
+            });
+            return;
+        }
+
+        if (active) {
+            if (!srl.isRefreshing()) {
+                // Make sure setRefreshing() is called after the layout is done with everything else.
+                srl.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        srl.setRefreshing(true);
+                    }
+                });
             }
-        });
+        } else {
+            // Make sure setRefreshing() is called after the layout is done with everything else.
+            srl.post(new Runnable() {
+                @Override
+                public void run() {
+                    srl.setRefreshing(false);
+                }
+            });
+        }
     }
 
     @Override

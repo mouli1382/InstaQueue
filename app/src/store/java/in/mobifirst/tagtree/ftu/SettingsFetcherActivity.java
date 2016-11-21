@@ -1,9 +1,9 @@
 package in.mobifirst.tagtree.ftu;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -16,8 +16,10 @@ import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.tokens.TokensActivity;
 import in.mobifirst.tagtree.util.ApplicationConstants;
+import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 import rx.Subscriber;
 
 public class SettingsFetcherActivity extends BaseActivity {
@@ -30,6 +32,9 @@ public class SettingsFetcherActivity extends BaseActivity {
 
     @Inject
     FirebaseDatabaseManager mFirebaseDatabaseManager;
+
+    @Inject
+    protected NetworkConnectionUtils mNetworkConnectionUtils;
 
     private ProgressBar mProgressBar;
 
@@ -50,7 +55,38 @@ public class SettingsFetcherActivity extends BaseActivity {
         ((IQStoreApplication) getApplication()).getApplicationComponent()
                 .inject(this);
 
-        fetchStore();
+        if (mNetworkConnectionUtils.isConnected()) {
+            fetchStore();
+        } else {
+            showNetworkError(mProgressBar);
+        }
+    }
+
+    private BroadcastReceiver mNetworkBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean isConnected = intent.getBooleanExtra(TTLocalBroadcastManager.NETWORK_STATUS_KEY, false);
+            if (!isConnected) {
+                showNetworkError(mProgressBar);
+            } else {
+                fetchStore();
+            }
+        }
+    };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!mNetworkConnectionUtils.isConnected()) {
+            showNetworkError(mProgressBar);
+        }
+        TTLocalBroadcastManager.registerReceiver(SettingsFetcherActivity.this, mNetworkBroadcastReceiver, TTLocalBroadcastManager.NETWORK_INTENT_ACTION);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        TTLocalBroadcastManager.unRegisterReceiver(SettingsFetcherActivity.this, mNetworkBroadcastReceiver);
     }
 
     private void fetchStore() {
@@ -67,13 +103,13 @@ public class SettingsFetcherActivity extends BaseActivity {
                         if (mProgressBar != null) {
                             mProgressBar.setVisibility(View.GONE);
 
-                            Snackbar.make(mProgressBar, R.string.failed_fetch_store,
-                                    Snackbar.LENGTH_INDEFINITE)
-                                    .setAction(android.R.string.ok, new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                        }
-                                    }).show();
+//                            Snackbar.make(mProgressBar, R.string.failed_fetch_store,
+//                                    Snackbar.LENGTH_INDEFINITE)
+//                                    .setAction(android.R.string.ok, new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View view) {
+//                                        }
+//                                    }).show();
                         }
                     }
 

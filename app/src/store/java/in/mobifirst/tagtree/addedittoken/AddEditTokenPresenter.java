@@ -46,9 +46,9 @@ public class AddEditTokenPresenter implements AddEditTokenContract.Presenter {
 
     @Override
     public void unsubscribe() {
-        if (mSubscriptions != null) {
-            mSubscriptions.clear();
-        }
+//        if (mSubscriptions != null) {
+//            mSubscriptions.clear();
+//        }
     }
 
     @Override

@@ -1,5 +1,7 @@
 package in.mobifirst.tagtree.ftu;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -38,8 +40,10 @@ import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.tokens.TokensActivity;
 import in.mobifirst.tagtree.util.ApplicationConstants;
+import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -70,21 +74,43 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     @Inject
     IQSharedPreferences mIQSharedPreferences;
 
+    @Inject
+    protected NetworkConnectionUtils mNetworkConnectionUtils;
+
 
     public static SettingsFragment newInstance() {
         return new SettingsFragment();
     }
 
+    private BroadcastReceiver mNetworkBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean isConnected = intent.getBooleanExtra(TTLocalBroadcastManager.NETWORK_STATUS_KEY, false);
+
+            if (!isConnected && getView() != null) {
+                showNetworkError(getView());
+            } else {
+                mPresenter.subscribe();
+            }
+        }
+    };
+
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.subscribe();
+        if (!mNetworkConnectionUtils.isConnected()) {
+            showNetworkError(getView());
+        } else {
+            mPresenter.subscribe();
+        }
+        TTLocalBroadcastManager.registerReceiver(getActivity(), mNetworkBroadcastReceiver, TTLocalBroadcastManager.NETWORK_INTENT_ACTION);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mPresenter.unsubscribe();
+        TTLocalBroadcastManager.unRegisterReceiver(getActivity(), mNetworkBroadcastReceiver);
     }
 
     @Override
@@ -110,12 +136,14 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (validateInput()) {
-                    Store store = new Store(mStoreNameEditText.getText().toString(),
-                            mStoreAreaEditText.getText().toString(),
-                            mWebsiteEditText.getText().toString(),
-                            mProfilePicUri, Integer.parseInt(mCountersEditText.getText().toString()));
-                    mPresenter.addStoreDetails(store);
+                if (mNetworkConnectionUtils.isConnected()) {
+                    if (validateInput()) {
+                        Store store = new Store(mStoreNameEditText.getText().toString(),
+                                mStoreAreaEditText.getText().toString(),
+                                mWebsiteEditText.getText().toString(),
+                                mProfilePicUri, Integer.parseInt(mCountersEditText.getText().toString()));
+                        mPresenter.addStoreDetails(store);
+                    }
                 }
             }
         });
@@ -242,10 +270,8 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                // Show only images, no videos or anything else
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                // Always show the chooser (if there are multiple options available)
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
             }
         });
@@ -260,13 +286,10 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
 
             Uri uri = data.getData();
-
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
 
                 mStoreImageView.setImageBitmap(bitmap);
-
-                // Get the data from an ImageView as bytes
                 mStoreImageView.setDrawingCacheEnabled(true);
                 mStoreImageView.buildDrawingCache();
                 mStoreImageView.getDrawingCache();
@@ -325,7 +348,7 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
 
     @Override
     public void populateStore(Store store) {
-        if (isAdded()) {
+        if (isAdded() && store != null) {
             mStoreNameEditText.setText(store.getName());
             mStoreAreaEditText.setText(store.getArea());
             mWebsiteEditText.setText(store.getWebsite());
@@ -335,21 +358,45 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
 
 
     private boolean validateInput() {
-        if ((mStoreNameTextInputLayout.getError() != null
-                && mStoreNameTextInputLayout.getError().length() != 0))
-            return false;
+        boolean result = false;
+        CharSequence storeName = mStoreNameEditText.getText();
+        if (TextUtils.isEmpty(storeName)) {
+            mStoreNameTextInputLayout.setError(getString(R.string.empty_store_name));
+            return result;
+        }
 
-        if ((mStoreAreaTextInputLayout.getError() != null
-                && mStoreAreaTextInputLayout.getError().length() != 0))
-            return false;
+        CharSequence storeArea = mStoreAreaEditText.getText();
+        if (TextUtils.isEmpty(storeArea)) {
+            mStoreAreaTextInputLayout.setError(getString(R.string.empty_store_area));
+            return result;
+        }
 
-        if ((mStoreWebsiteTextInputLayout.getError() != null
-                && mStoreWebsiteTextInputLayout.getError().length() != 0))
-            return false;
+        CharSequence website = mWebsiteEditText.getText();
+        if (TextUtils.isEmpty(website)) {
+            mStoreWebsiteTextInputLayout.setError(getString(R.string.empty_store_website));
+            return result;
+        } else if (!Patterns.WEB_URL.matcher(website).matches()) {
+            mStoreWebsiteTextInputLayout.setError(getString(R.string.invalid_store_website));
+            return result;
+        }
 
-        if ((mStoreCountersTextInputLayout.getError() != null
-                && mStoreCountersTextInputLayout.getError().length() != 0))
-            return false;
+        CharSequence counters = mCountersEditText.getText();
+        if (TextUtils.isEmpty(counters)) {
+            mStoreCountersTextInputLayout.setError(getString(R.string.empty_store_counters));
+            return result;
+        } else {
+            int counterValue = Integer.parseInt(counters.toString());
+            if (counterValue < 1 || counterValue > 100) {
+                mStoreCountersTextInputLayout.setError(getString(R.string.invalid_store_counters));
+                return result;
+            }
+        }
+
+
+        mStoreNameTextInputLayout.setError("");
+        mStoreAreaTextInputLayout.setError("");
+        mStoreWebsiteTextInputLayout.setError("");
+        mStoreCountersTextInputLayout.setError("");
 
         return true;
     }

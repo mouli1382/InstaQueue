@@ -140,6 +140,7 @@ final class TokensPresenter implements TokensContract.Presenter {
 
                     @Override
                     public void onError(Throwable e) {
+                        mTokensView.setLoadingIndicator(false);
                         mTokensView.showLoadingTokensError();
                     }
 

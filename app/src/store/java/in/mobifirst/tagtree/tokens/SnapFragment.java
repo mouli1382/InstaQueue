@@ -97,9 +97,11 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         //ToDo for now just check for the connectivity and show it in a snackbar.
         // Need to give user capability to refresh when SwipeToRefresh along with Rx and MVP is brought in.
         if (!mNetworkConnectionUtils.isConnected()) {
+            setLoadingIndicator(false);
             showNetworkError(getView());
+        } else {
+            mPresenter.subscribe();
         }
-        mPresenter.subscribe();
         TTLocalBroadcastManager.registerReceiver(getActivity(), mNetworkBroadcastReceiver, TTLocalBroadcastManager.NETWORK_INTENT_ACTION);
     }
 
@@ -278,13 +280,39 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         final SwipeRefreshLayout srl =
                 (SwipeRefreshLayout) getView().findViewById(R.id.refresh_layout);
 
-        // Make sure setRefreshing() is called after the layout is done with everything else.
-        srl.post(new Runnable() {
-            @Override
-            public void run() {
-                srl.setRefreshing(active);
+        if (!mNetworkConnectionUtils.isConnected()) {
+            // Make sure setRefreshing() is called after the layout is done with everything else.
+            srl.post(new Runnable() {
+                @Override
+                public void run() {
+                    srl.setRefreshing(false);
+                }
+            });
+            return;
+        }
+
+
+        if (active) {
+            if (!srl.isRefreshing()) {
+                // Make sure setRefreshing() is called after the layout is done with everything else.
+                srl.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mNetworkConnectionUtils.isConnected()) {
+                            srl.setRefreshing(true);
+                        }
+                    }
+                });
             }
-        });
+        } else {
+            // Make sure setRefreshing() is called after the layout is done with everything else.
+            srl.post(new Runnable() {
+                @Override
+                public void run() {
+                    srl.setRefreshing(false);
+                }
+            });
+        }
     }
 
     @Override
@@ -293,6 +321,7 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
 
     @Override
     public void showSnaps(List<Snap> snaps) {
+        setLoadingIndicator(false);
         mSnapAdapter.replaceData(snaps);
         mTokensView.setVisibility(View.VISIBLE);
         mNoTokensView.setVisibility(View.GONE);
@@ -312,7 +341,7 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         showNoTokensViews(
                 getResources().getString(R.string.no_tokens_all),
                 R.drawable.ic_assignment_turned_in_24dp,
-                false
+                true
         );
     }
 
@@ -340,6 +369,7 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
     }
 
     private void showNoTokensViews(String mainText, int iconRes, boolean showAddView) {
+        setLoadingIndicator(false);
         mTokensView.setVisibility(View.GONE);
         mNoTokensView.setVisibility(View.VISIBLE);
 

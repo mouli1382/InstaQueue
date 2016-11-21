@@ -1,18 +1,27 @@
 package in.mobifirst.tagtree.addedittoken;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
+import android.text.TextUtils;
+import android.util.Patterns;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import javax.inject.Inject;
 
@@ -20,7 +29,9 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.util.ApplicationConstants;
+import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 
 
 public class AddEditTokenFragment extends BaseFragment implements AddEditTokenContract.View {
@@ -30,8 +41,13 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
     @Inject
     IQSharedPreferences iqSharedPreferences;
 
+    @Inject
+    protected NetworkConnectionUtils mNetworkConnectionUtils;
+
+    private TextInputLayout mPhoneNumberInputLayout;
     private TextInputEditText mPhoneNumberEditText;
     private Spinner mCounterSpinner;
+    private int mNumberOfCounters;
 
     public static AddEditTokenFragment newInstance() {
         return new AddEditTokenFragment();
@@ -44,16 +60,32 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
                 .inject(this);
     }
 
+    private BroadcastReceiver mNetworkBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean isConnected = intent.getBooleanExtra(TTLocalBroadcastManager.NETWORK_STATUS_KEY, false);
+
+            if (!isConnected && getView() != null) {
+                showNetworkError(getView());
+            }
+        }
+    };
+
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.subscribe();
+        if (!mNetworkConnectionUtils.isConnected()) {
+            showNetworkError(getView());
+        }
+        TTLocalBroadcastManager.registerReceiver(getActivity(), mNetworkBroadcastReceiver, TTLocalBroadcastManager.NETWORK_INTENT_ACTION);
+//        mPresenter.subscribe();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mPresenter.unsubscribe();
+        TTLocalBroadcastManager.unRegisterReceiver(getActivity(), mNetworkBroadcastReceiver);
+//        mPresenter.unsubscribe();
     }
 
     @Override
@@ -71,8 +103,13 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //ToDo hardcoding to IND country code as of now.
-                mPresenter.addNewToken("+91" + mPhoneNumberEditText.getText().toString(), mCounterSpinner.getSelectedItemPosition() + 1);
+                if (mNetworkConnectionUtils.isConnected()) {
+                    if (validateInput()) {
+                        //ToDo hardcoding to IND country code as of now.
+                        mPresenter.addNewToken("+91" + mPhoneNumberEditText.getText().toString(),
+                                mNumberOfCounters > 1 ? (mCounterSpinner.getSelectedItemPosition() + 1): 1);
+                    }
+                }
             }
         });
     }
@@ -83,14 +120,32 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_addtoken, container, false);
         mPhoneNumberEditText = (TextInputEditText) root.findViewById(R.id.add_phone_number);
+        mPhoneNumberInputLayout = (TextInputLayout) root.findViewById(R.id.phoneNumberInputLayout);
 
-        int numberOfCounters = iqSharedPreferences.getInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY);
+        mPhoneNumberEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
+                    CharSequence phone = mPhoneNumberEditText.getText();
+                    if (TextUtils.isEmpty(phone)) {
+                        mPhoneNumberInputLayout.setError(getString(R.string.invalid_phone_number));
+                    } else if (!Patterns.PHONE.matcher(phone).matches()) {
+                        mPhoneNumberInputLayout.setError(getString(R.string.invalid_phone_number));
+                    } else {
+                        mPhoneNumberInputLayout.setError("");
+                    }
+                }
+                return true;
+            }
+        });
+
+        mNumberOfCounters = iqSharedPreferences.getInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY);
 
         mCounterSpinner = (Spinner) root.findViewById(R.id.counter_spinner);
-        if (numberOfCounters > 1) {
+        if (mNumberOfCounters > 1) {
             // Create an ArrayAdapter using the string array and a default spinner layout
-            String[] items = new String[numberOfCounters];
-            for (int i = 0; i < numberOfCounters; i++) {
+            String[] items = new String[mNumberOfCounters];
+            for (int i = 0; i < mNumberOfCounters; i++) {
                 items[i] = "Counter-" + (i + 1);
             }
             final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
@@ -115,6 +170,18 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
 
         setRetainInstance(true);
         return root;
+    }
+
+    private boolean validateInput() {
+        CharSequence phone = mPhoneNumberEditText.getText();
+        if (TextUtils.isEmpty(phone) || phone.toString().length() != 10) {
+            mPhoneNumberInputLayout.setError(getString(R.string.invalid_phone_number));
+            return false;
+        } else {
+            mPhoneNumberInputLayout.setError("");
+        }
+
+        return true;
     }
 
     @Override
