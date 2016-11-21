@@ -1,6 +1,7 @@
 package in.mobifirst.tagtree.tokens;
 
 
+import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
@@ -18,8 +19,10 @@ import in.mobifirst.tagtree.model.Token;
 public class SnapAdapter extends RecyclerView.Adapter<SnapAdapter.ViewHolder> {
 
     private List<Snap> mSnaps;
+    private Context mContext;
 
-    public SnapAdapter() {
+    public SnapAdapter(Context context) {
+        mContext = context;
         mSnaps = new ArrayList<>();
     }
 
@@ -55,7 +58,7 @@ public class SnapAdapter extends RecyclerView.Adapter<SnapAdapter.ViewHolder> {
         holder.recyclerView.setOnFlingListener(null);
         new LinearSnapHelper().attachToRecyclerView(holder.recyclerView);
 
-        holder.recyclerView.setAdapter(new TokensIssueAdapter(tokens));
+        holder.recyclerView.setAdapter(new TokensIssueAdapter(mContext, tokens));
     }
 
     @Override

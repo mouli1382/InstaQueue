@@ -1,5 +1,6 @@
 package in.mobifirst.tagtree.tokens;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +19,10 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
 
     private List<Token> mTokens;
     private TokensFragment.TokenItemListener mTokenItemListener;
+    private Context mContext;
 
-    public TokensAdapter(List<Token> items, TokensFragment.TokenItemListener tokenItemListener) {
+    public TokensAdapter(Context context, List<Token> items, TokensFragment.TokenItemListener tokenItemListener) {
+        mContext = context;
         setList(items);
         mTokenItemListener = tokenItemListener;
     }
@@ -48,6 +51,13 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final Token token = mTokens.get(position);
+
+//        if (token.isActive()) {
+//            holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
+//        } else {
+//            holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
+//        }
+
         holder.mTokenNumber.setText(token.getTokenNumber() + "");
         holder.mTokenBuzzButton.setOnClickListener(new View.OnClickListener() {
             @Override

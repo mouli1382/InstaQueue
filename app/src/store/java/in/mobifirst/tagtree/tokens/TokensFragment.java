@@ -1,12 +1,13 @@
 package in.mobifirst.tagtree.tokens;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,14 +34,20 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.util.ApplicationConstants;
+import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 
-public class TokensFragment extends Fragment implements TokensContract.View {
+public class TokensFragment extends BaseFragment implements TokensContract.View {
 
     @Inject
     IQSharedPreferences mIQSharedPreferences;
+
+    @Inject
+    protected NetworkConnectionUtils mNetworkConnectionUtils;
 
     private TokensContract.Presenter mPresenter;
 
@@ -68,24 +75,48 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         return new TokensFragment();
     }
 
+
+    private BroadcastReceiver mNetworkBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean isConnected = intent.getBooleanExtra(TTLocalBroadcastManager.NETWORK_STATUS_KEY, false);
+
+            if (!isConnected && getView() != null) {
+                setLoadingIndicator(false);
+                showNetworkError(getView());
+            } else {
+                if (getView() != null) {
+                    mPresenter.loadTokens(false);
+                }
+            }
+        }
+    };
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((IQStoreApplication) getActivity().getApplicationContext()).getApplicationComponent()
                 .inject(this);
-        mTokensAdapter = new TokensAdapter(new ArrayList<Token>(0), mItemListener);
+        mTokensAdapter = new TokensAdapter(getActivity(), new ArrayList<Token>(0), mItemListener);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        //ToDo for now just check for the connectivity and show it in a snackbar.
+        // Need to give user capability to refresh when SwipeToRefresh along with Rx and MVP is brought in.
+        if (!mNetworkConnectionUtils.isConnected()) {
+            showNetworkError(getView());
+        }
         mPresenter.subscribe();
+        TTLocalBroadcastManager.registerReceiver(getActivity(), mNetworkBroadcastReceiver, TTLocalBroadcastManager.NETWORK_INTENT_ACTION);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mPresenter.unsubscribe();
+        TTLocalBroadcastManager.unRegisterReceiver(getActivity(), mNetworkBroadcastReceiver);
     }
 
     @Override
@@ -181,7 +212,11 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mPresenter.loadTokens(false);
+                if (mNetworkConnectionUtils.isConnected()) {
+                    mPresenter.loadTokens(false);
+                } else {
+                    setLoadingIndicator(false);
+                }
             }
         });
 

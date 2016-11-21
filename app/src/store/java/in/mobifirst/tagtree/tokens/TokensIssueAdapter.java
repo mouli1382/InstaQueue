@@ -1,5 +1,6 @@
 package in.mobifirst.tagtree.tokens;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,13 +18,15 @@ public class TokensIssueAdapter extends RecyclerView.Adapter<TokensIssueAdapter.
 
     private List<Token> mTokens;
     private TokensFragment.TokenItemListener mTokenItemListener;
+    private Context mContext;
 
     public TokensIssueAdapter(List<Token> items, TokensFragment.TokenItemListener tokenItemListener) {
         setList(items);
         mTokenItemListener = tokenItemListener;
     }
 
-    public TokensIssueAdapter(List<Token> items) {
+    public TokensIssueAdapter(Context context, List<Token> items) {
+        mContext = context;
         setList(items);
     }
 
@@ -47,6 +50,12 @@ public class TokensIssueAdapter extends RecyclerView.Adapter<TokensIssueAdapter.
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Token token = mTokens.get(position);
+
+//        if (token.isActive()) {
+//            holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
+//        } else {
+//            holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
+//        }
         holder.mTokenNumber.setText(token.getTokenNumber() + "");
         holder.mTime.setText(TimeUtils.getTime(token.getTimestamp()));
         holder.mDate.setText(TimeUtils.getDate(token.getTimestamp()));

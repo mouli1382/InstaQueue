@@ -11,12 +11,12 @@ import com.google.firebase.storage.UploadTask;
 
 import javax.inject.Inject;
 
+import in.mobifirst.tagtree.BuildConfig;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import rx.Subscriber;
 
 public class FirebaseStorageManager {
     private static final String TAG = "FirebaseStorageManager";
-    private static final String STORAGE_REF = "gs://tagtree-4ef29.appspot.com";
     private static final String FILE_NAME = "storeProfilePic.jpg";
 
     private FirebaseStorage mFirebaseStorage;
@@ -27,7 +27,7 @@ public class FirebaseStorageManager {
     public FirebaseStorageManager(IQSharedPreferences iqSharedPreferences) {
         mIQSharedPreferences = iqSharedPreferences;
         mFirebaseStorage = FirebaseStorage.getInstance();
-        mStorageReference = mFirebaseStorage.getReferenceFromUrl(STORAGE_REF);
+        mStorageReference = mFirebaseStorage.getReferenceFromUrl(BuildConfig.STORAGE_REF);
     }
 
     public void uploadFile(final String uid, byte[] bitmapData, final Subscriber<? super Uri> subscriber) {

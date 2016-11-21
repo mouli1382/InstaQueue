@@ -56,9 +56,12 @@ android {
             useProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+            buildConfigField("String", "STORAGE_REF", "\"gs://tagtree-4ef29.appspot.com\"")
         }
         debug {
+            applicationIdSuffix ".dev"
             signingConfig signingConfigs.debug
+            buildConfigField("String", "STORAGE_REF", "\"gs://tagtree-dev.appspot.com\"")
         }
     }
     productFlavors {

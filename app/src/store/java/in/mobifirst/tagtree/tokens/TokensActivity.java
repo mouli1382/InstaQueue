@@ -7,6 +7,7 @@ import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 
 import javax.inject.Inject;
 
@@ -44,6 +45,8 @@ public class TokensActivity extends BaseDrawerActivity {
             public void onCheckedChanged(CompoundButton compoundButton, boolean issueFlow) {
                 if (compoundButton.getId() == R.id.switchCompat) {
                     if (!issueFlow) {
+                        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
+                        frameLayout.removeAllViewsInLayout();
                         SnapFragment snapFragment = SnapFragment.newInstance();
                         ActivityUtilities.replaceFragmentToActivity(
                                 getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
@@ -55,6 +58,8 @@ public class TokensActivity extends BaseDrawerActivity {
                                 .inject(TokensActivity.this);
 
                     } else {
+                        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
+                        frameLayout.removeAllViewsInLayout();
                         TokensFragment tokensFragment = TokensFragment.newInstance();
                         ActivityUtilities.replaceFragmentToActivity(
                                 getSupportFragmentManager(), tokensFragment, R.id.content_base_drawer);
@@ -68,7 +73,9 @@ public class TokensActivity extends BaseDrawerActivity {
                 }
             }
         });
-        if(!flow.isChecked()) {
+        if (!flow.isChecked()) {
+            FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
+            frameLayout.removeAllViewsInLayout();
             SnapFragment snapFragment = SnapFragment.newInstance();
             ActivityUtilities.replaceFragmentToActivity(
                     getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
@@ -115,7 +122,7 @@ public class TokensActivity extends BaseDrawerActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if(mTokensPresenter != null)
+        if (mTokensPresenter != null)
             outState.putSerializable(CURRENT_FILTERING_KEY, mTokensPresenter.getFiltering());
 
         super.onSaveInstanceState(outState);

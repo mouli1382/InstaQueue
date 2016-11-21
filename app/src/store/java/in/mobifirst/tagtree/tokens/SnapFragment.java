@@ -1,12 +1,13 @@
 package in.mobifirst.tagtree.tokens;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,14 +26,22 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
+import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 
-public class SnapFragment extends Fragment implements TokensContract.View {
+public class SnapFragment extends BaseFragment implements TokensContract.View {
 
     private static final String TAG = "SnapFragment";
+
+    @Inject
+    protected NetworkConnectionUtils mNetworkConnectionUtils;
 
     private TokensContract.Presenter mPresenter;
 
@@ -58,25 +67,47 @@ public class SnapFragment extends Fragment implements TokensContract.View {
         return new SnapFragment();
     }
 
+    private BroadcastReceiver mNetworkBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean isConnected = intent.getBooleanExtra(TTLocalBroadcastManager.NETWORK_STATUS_KEY, false);
+
+            if (!isConnected && getView() != null) {
+                setLoadingIndicator(false);
+                showNetworkError(getView());
+            } else {
+                if (getView() != null) {
+                    mPresenter.loadTokensMap(false);
+                }
+            }
+        }
+    };
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((IQStoreApplication) getActivity().getApplicationContext()).getApplicationComponent()
                 .inject(this);
-        mSnapAdapter = new SnapAdapter();
+        mSnapAdapter = new SnapAdapter(getActivity());
     }
-
 
     @Override
     public void onResume() {
         super.onResume();
+        //ToDo for now just check for the connectivity and show it in a snackbar.
+        // Need to give user capability to refresh when SwipeToRefresh along with Rx and MVP is brought in.
+        if (!mNetworkConnectionUtils.isConnected()) {
+            showNetworkError(getView());
+        }
         mPresenter.subscribe();
+        TTLocalBroadcastManager.registerReceiver(getActivity(), mNetworkBroadcastReceiver, TTLocalBroadcastManager.NETWORK_INTENT_ACTION);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mPresenter.unsubscribe();
+        TTLocalBroadcastManager.unRegisterReceiver(getActivity(), mNetworkBroadcastReceiver);
     }
 
     @Override
@@ -152,7 +183,11 @@ public class SnapFragment extends Fragment implements TokensContract.View {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mPresenter.loadTokensMap(false);
+                if (mNetworkConnectionUtils.isConnected()) {
+                    mPresenter.loadTokensMap(false);
+                } else {
+                    setLoadingIndicator(false);
+                }
             }
         });
 

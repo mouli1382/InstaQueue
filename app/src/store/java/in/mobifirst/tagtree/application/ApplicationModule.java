@@ -5,6 +5,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 
 @Module
 public class ApplicationModule {
@@ -25,5 +26,11 @@ public class ApplicationModule {
     @Singleton
     public IQSharedPreferences provideIQSharedPreferences() {
         return new IQSharedPreferences(application);
+    }
+
+    @Provides
+    @Singleton
+    NetworkConnectionUtils provideNetworkConnectionUtils() {
+        return new NetworkConnectionUtils(application);
     }
 }
