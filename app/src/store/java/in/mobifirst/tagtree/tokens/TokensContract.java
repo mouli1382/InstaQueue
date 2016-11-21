@@ -80,5 +80,9 @@ public interface TokensContract {
         void setFiltering(TokensFilterType requestType);
 
         TokensFilterType getFiltering();
+
+        void setCounter(int counter);
+
+        int getCounter();
     }
 }

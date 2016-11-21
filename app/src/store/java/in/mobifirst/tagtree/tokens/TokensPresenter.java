@@ -29,6 +29,8 @@ final class TokensPresenter implements TokensContract.Presenter {
 
     private TokensFilterType mCurrentFiltering = TokensFilterType.ALL_TOKENS;
 
+    private int mCurrentCounter = 1;
+
     private boolean mFirstLoad = true;
 
     private CompositeSubscription mSubscriptions;
@@ -103,7 +105,7 @@ final class TokensPresenter implements TokensContract.Presenter {
 
         mSubscriptions.clear();
         Subscription subscription = mTokensRepository
-                .getTokens()
+                .getTokens(mCurrentCounter)
 //                .flatMap(new Func1<List<Token>, Observable<Token>>() {
 //                    @Override
 //                    public Observable<Token> call(List<Token> tokens) {
@@ -349,6 +351,16 @@ final class TokensPresenter implements TokensContract.Presenter {
     @Override
     public TokensFilterType getFiltering() {
         return mCurrentFiltering;
+    }
+
+    @Override
+    public void setCounter(int counter) {
+        mCurrentCounter = counter;
+    }
+
+    @Override
+    public int getCounter() {
+        return mCurrentCounter;
     }
 
 }

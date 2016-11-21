@@ -24,7 +24,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -41,7 +40,6 @@ import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.tokens.Snap;
 import in.mobifirst.tagtree.util.ApplicationConstants;
-import in.mobifirst.tagtree.util.TimeUtils;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
@@ -73,28 +71,30 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     }
 
-    public class IncremnetTransactionHander implements  Transaction.Handler{
+    public class IncremnetTransactionHander implements Transaction.Handler {
 
-            @Override
-            public Transaction.Result doTransaction(MutableData mutableData) {
-                Long currentValue = mutableData.getValue(Long.class);
-                if (currentValue == null) {
-                    mutableData.setValue(1);
-                } else {
-                    mutableData.setValue(currentValue + 1);
-                }
-
-
-                return Transaction.success(mutableData);
+        @Override
+        public Transaction.Result doTransaction(MutableData mutableData) {
+            Long currentValue = mutableData.getValue(Long.class);
+            if (currentValue == null) {
+                mutableData.setValue(1);
+            } else {
+                mutableData.setValue(currentValue + 1);
             }
 
-            @Override
-            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
 
-            }
-        };
+            return Transaction.success(mutableData);
+        }
 
-    public class AvgTATIncrementHandler implements  Transaction.Handler{
+        @Override
+        public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+
+        }
+    }
+
+    ;
+
+    public class AvgTATIncrementHandler implements Transaction.Handler {
 
         @Override
         public Transaction.Result doTransaction(MutableData mutableData) {
@@ -113,7 +113,9 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
 
         }
-    };
+    }
+
+    ;
 
 
     public DatabaseReference getDatabaseReference() {
@@ -272,7 +274,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     //ToDo limit by date and status.
-    public Observable<List<Token>> getAllTokens(final String uId) {
+    public Observable<List<Token>> getAllTokens(final String uId, final int currentCounter) {
         return rx.Observable.create(new Observable.OnSubscribe<List<Token>>() {
             @Override
             public void call(final Subscriber<? super List<Token>> subscriber) {
@@ -338,18 +340,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                             .filter(new Func1<Token, Boolean>() {
                                                 @Override
                                                 public Boolean call(Token token) {
-//                        switch (mCurrentFiltering) {
-//                            case ACTIVE_TOKENS:
-//                                return token.isActive();
-//                            case COMPLETED_TOKENS:
-//                                return token.isCompleted();
-//                            case CANCELLED_TOKENS:
-//                                return token.isCancelled();
-//                            default:
-//                                return true;
-//                        }
-
-                                                    return !token.isCompleted();
+                                                    return token.getCounter() == currentCounter && !token.isCompleted();
                                                 }
                                             })
                                             .toList()
@@ -763,13 +754,12 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     }
 
-    private void setActiveTokenNumber(Token token)
-    {
+    private void setActiveTokenNumber(Token token) {
         mDatabaseReference
                 .child(STORE_CHILD)
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
-                .child(""+ token.getCounter())
+                .child("" + token.getCounter())
                 .child(COUNTERS_LAST_ACTIVE_TOKEN)
                 .setValue(token.getTokenNumber());
     }
@@ -779,7 +769,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .child(STORE_CHILD)
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
-                .child(""+ token.getCounter())
+                .child("" + token.getCounter())
                 .child(COUNTERS_USERS)
                 .runTransaction(handler);
 
@@ -794,7 +784,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .child(STORE_CHILD)
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
-                .child(""+ token.getCounter())
+                .child("" + token.getCounter())
                 .child(COUNTERS_AVG_TAT_CHILD)
                 .runTransaction(handler);
 

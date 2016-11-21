@@ -18,12 +18,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
-
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +33,14 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
-import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
-import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.model.Token;
-import in.mobifirst.tagtree.tokens.viewholder.FirebaseViewHolder;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 
 public class TokensFragment extends Fragment implements TokensContract.View {
+
+    @Inject
+    IQSharedPreferences mIQSharedPreferences;
 
     private TokensContract.Presenter mPresenter;
 
@@ -56,13 +58,7 @@ public class TokensFragment extends Fragment implements TokensContract.View {
 
     private TextView mFilteringLabelView;
 
-    @Inject
-    FirebaseDatabaseManager mFirebaseDatabaseManager;
-
-    @Inject
-    FirebaseAuthenticationManager mFirebaseAuthenticationManager;
-
-    private FirebaseRecyclerAdapter<Token, FirebaseViewHolder> mFirebaseAdapter;
+    private Spinner mCounterSpinner;
 
     public TokensFragment() {
         // Requires empty public constructor
@@ -110,6 +106,36 @@ public class TokensFragment extends Fragment implements TokensContract.View {
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab);
         fab.setVisibility(View.GONE);
+
+        int numberOfCounters = mIQSharedPreferences.getInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY);
+
+        mCounterSpinner = (Spinner) getActivity().findViewById(R.id.counter_spinner);
+        if (numberOfCounters > 1) {
+            // Create an ArrayAdapter using the string array and a default spinner layout
+            String[] items = new String[numberOfCounters];
+            for (int i = 0; i < numberOfCounters; i++) {
+                items[i] = "" + (i + 1);
+            }
+            final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
+            // Specify the layout to use when the list of choices appears
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            // Apply the adapter to the spinner
+            mCounterSpinner.setAdapter(adapter);
+            mCounterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    filterTokensByCounter(i);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                }
+            });
+            mCounterSpinner.setVisibility(View.VISIBLE);
+        } else {
+            mCounterSpinner.setVisibility(View.GONE);
+        }
     }
 
     @Nullable
@@ -139,6 +165,8 @@ public class TokensFragment extends Fragment implements TokensContract.View {
             }
         });
 
+        setRetainInstance(true);
+
         // Set up progress indicator
         final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
                 (ScrollChildSwipeRefreshLayout) root.findViewById(R.id.refresh_layout);
@@ -157,35 +185,14 @@ public class TokensFragment extends Fragment implements TokensContract.View {
             }
         });
 
-//        Query query = mFirebaseDatabaseManager
-//                .getTokensRef(mFirebaseAuthenticationManager.getAuthInstance().getCurrentUser().getUid());
-//        mFirebaseAdapter = new FirebaseRecyclerAdapter<Token,
-//                FirebaseViewHolder>(
-//                Token.class,
-//                R.layout.item_token,
-//                FirebaseViewHolder.class,
-//                query) {
-//
-//            @Override
-//            protected void populateViewHolder(FirebaseViewHolder viewHolder, Token model, int position) {
-//                //Do nothing. We will do the heavy lifting in load tokens.
-//            }
-//        };
-//
-//        mFirebaseAdapter
-//                .registerAdapterDataObserver(
-//                        new RecyclerView.AdapterDataObserver() {
-//
-//                            @Override
-//                            public void onChanged() {
-//                                mPresenter.loadTokens(false);
-//                            }
-//                        }
-//
-//                );
-
-
         return root;
+    }
+
+    private void filterTokensByCounter(int counterNUmber) {
+        //spinner items are 0th index based.
+        // +1 to map to the correct counter
+        mPresenter.setCounter(counterNUmber + 1);
+        mPresenter.loadTokens(false);
     }
 
     @Override

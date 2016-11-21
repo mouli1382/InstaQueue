@@ -20,9 +20,8 @@
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
             <RelativeLayout
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_margin="5dp">
 
                 <TextView
@@ -48,6 +47,13 @@
                     android:layout_toRightOf="@+id/switchCompat"
                     android:gravity="center_horizontal"
                     android:text="SERVICE" />
+
+                <Spinner
+                    android:id="@+id/counter_spinner"
+                    android:layout_alignParentRight="true"
+                    android:gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
             </RelativeLayout>
         </android.support.v7.widget.Toolbar>

@@ -11,7 +11,7 @@ import rx.Subscriber;
 
 public interface TokensDataSource {
 
-    Observable<List<Token>> getTokens();
+    Observable<List<Token>> getTokens(int mCurrentCounter);
 
     Observable<List<Snap>> getSnaps();
 

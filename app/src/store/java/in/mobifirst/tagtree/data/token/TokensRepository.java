@@ -23,8 +23,8 @@ public class TokensRepository implements TokensDataSource {
     }
 
     @Override
-    public Observable<List<Token>> getTokens() {
-        return mTokensDataSource.getTokens();
+    public Observable<List<Token>> getTokens(int mCurrentCounter) {
+        return mTokensDataSource.getTokens(mCurrentCounter);
     }
 
     @Override
