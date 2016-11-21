@@ -28,32 +28,33 @@
                     android:id="@+id/switchLeft"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:gravity="center_horizontal"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="5dp"
                     android:text="ISSUE" />
 
                 <android.support.v7.widget.SwitchCompat
                     android:id="@+id/switchCompat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/switchLeft"
-                    android:gravity="center_horizontal" />
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/switchLeft" />
 
                 <TextView
                     android:id="@+id/switchRight"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="5dp"
                     android:layout_toRightOf="@+id/switchCompat"
-                    android:gravity="center_horizontal"
                     android:text="SERVICE" />
 
                 <Spinner
                     android:id="@+id/counter_spinner"
-                    android:layout_alignParentRight="true"
-                    android:gravity="center_horizontal"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true" />
 
             </RelativeLayout>
         </android.support.v7.widget.Toolbar>

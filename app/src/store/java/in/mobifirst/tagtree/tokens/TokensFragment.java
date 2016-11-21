@@ -114,7 +114,7 @@ public class TokensFragment extends Fragment implements TokensContract.View {
             // Create an ArrayAdapter using the string array and a default spinner layout
             String[] items = new String[numberOfCounters];
             for (int i = 0; i < numberOfCounters; i++) {
-                items[i] = "" + (i + 1);
+                items[i] = "Counter-" + (i + 1);
             }
             final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
             // Specify the layout to use when the list of choices appears
