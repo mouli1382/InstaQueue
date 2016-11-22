@@ -55,11 +55,12 @@
                 android:id="@+id/imageBuzzButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorAccent"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:padding="3dp"
-                android:background="@color/tw__transparent"
-                android:src="@drawable/ic_alarm_white_24dp" />
+                android:src="@drawable/token_button_activate_selector" />
 
             <ImageButton
                 android:id="@+id/imageCompleteButton"
@@ -68,8 +69,9 @@
                 android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:padding="3dp"
-                android:background="@color/tw__transparent"
-                android:src="@drawable/ic_check_circle_white_24dp" />
+                android:backgroundTint="@color/colorAccent"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/token_button_complete_selector" />
         </LinearLayout>
 
         <TextView
