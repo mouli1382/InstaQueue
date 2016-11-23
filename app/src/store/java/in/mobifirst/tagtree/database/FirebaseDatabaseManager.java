@@ -64,7 +64,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     private DatabaseReference mDatabaseReference;
     private IQSharedPreferences mSharedPrefs;
-    private long avgwaitTime = 0;
+    private long waitTimePerToken = 0;
 
     @Inject
     public FirebaseDatabaseManager(IQSharedPreferences iqSharedPreferences) {
@@ -96,15 +96,15 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     ;
 
-    public class AvgTATIncrementHandler implements Transaction.Handler {
+    public class TATIncrementHandler implements Transaction.Handler {
 
         @Override
         public Transaction.Result doTransaction(MutableData mutableData) {
             Long currentValue = mutableData.getValue(Long.class);
             if (currentValue == null) {
-                mutableData.setValue(avgwaitTime);
+                mutableData.setValue(waitTimePerToken);
             } else {
-                mutableData.setValue(currentValue + avgwaitTime);
+                mutableData.setValue(currentValue + waitTimePerToken);
             }
 
 
@@ -327,6 +327,18 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         });
     }
 
+    private void addTokenUnderStoreCounter(Token token) {
+        //Save the token Id under the token number which makes client job easy in sorting and calculating TAT.
+        mDatabaseReference
+                .child(STORE_CHILD)
+                .child(token.getStoreId())
+                .child(COUNTERS_CHILD)
+                .child("" + token.getCounter())
+                .child(TOKENS_CHILD)
+                .child(token.getuId())
+                .setValue(token.getTokenNumber());
+    }
+
     public void addNewToken(final Token token, final Subscriber<? super String> subscriber) {
         incrementTokenCounter(token, new Transaction.Handler() {
             @Override
@@ -370,6 +382,14 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                 areaName);
 
                                         mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
+                                        addTokenUnderStoreCounter(newToken);
+
+                                        //ToDo replicate the entire tokens under store. Too much but easy.
+//                                        Map<String, Object> childUpdates = new HashMap<>();
+//                                        childUpdates.put(TOKENS_CHILD + key, tokenValues);
+//                                        childUpdates.put(STORE_CHILD + newToken.getStoreId() + "/" + newToken.getCounter() + "/" + TOKENS_CHILD + key, tokenValues);
+//
+//                                        mDatabaseReference.updateChildren(childUpdates);
                                         checkSMSSending(newToken, false);
                                     } else {
                                         Log.e(TAG, "Snapshot is null");
@@ -604,14 +624,21 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                     .push()
                     .setValue(token.toMap()); //Fix this to Map should not be used
 
-            //Remove it from the token table
+            //Remove it from the store counter
             mDatabaseReference
+                    .child(STORE_CHILD)
+                    .child(token.getStoreId())
+                    .child(COUNTERS_CHILD)
+                    .child("" + token.getCounter())
                     .child(TOKENS_CHILD)
                     .child(token.getuId())
                     .removeValue();
 
             //Remove it from the token table
-
+            mDatabaseReference
+                    .child(TOKENS_CHILD)
+                    .child(token.getuId())
+                    .removeValue();
         } else {            //Check for network connectivity
             mDatabaseReference
                     .child(TOKENS_CHILD)
@@ -632,7 +659,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         //Inform user if he is not present in the user table
                         checkSMSSending(tokenUpdated, true);
                         incrementUserCount(tokenUpdated, new IncremnetTransactionHander());
-                        incrementAvgTAT(tokenUpdated, new AvgTATIncrementHandler());
+                        incrementAvgTAT(tokenUpdated, new TATIncrementHandler());
                         setActiveTokenNumber(tokenUpdated);
                     }
                 }
@@ -691,9 +718,9 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     private void incrementAvgTAT(Token token, @NonNull Transaction.Handler handler) {
-        avgwaitTime = token.getActivatedTokenTime() - token.getTimestamp();
-        if (avgwaitTime < 0)
-            avgwaitTime = 0;
+        waitTimePerToken = token.getActivatedTokenTime() - token.getTimestamp();
+        if (waitTimePerToken < 0)
+            waitTimePerToken = 0;
 
         mDatabaseReference
                 .child(STORE_CHILD)

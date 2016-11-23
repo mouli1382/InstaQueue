@@ -30,7 +30,7 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQClientApplication;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.fragment.BaseFragment;
-import in.mobifirst.tagtree.model.CurrentToken;
+import in.mobifirst.tagtree.model.StoreCounter;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.tokens.viewholder.FirebaseViewHolder;
@@ -155,48 +155,57 @@ public class LandingFragment extends BaseFragment {
                     holder.mTokenNumber.setTextColor(getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
                 }
 
-                mFirebaseDatabaseManager.getCounterCurrentActiveToken(token, new Subscriber<CurrentToken>() {
-                    @Override
-                    public void onCompleted() {
+                mFirebaseDatabaseManager.getCounterStatus(token, new Subscriber<StoreCounter>() {
+                            @Override
+                            public void onCompleted() {
 
-                    }
+                            }
 
-                    @Override
-                    public void onError(Throwable e) {
+                            @Override
+                            public void onError(Throwable e) {
 
-                    }
+                            }
 
-                    @Override
-                    public void onNext(CurrentToken currentToken) {
-                        Log.e(TAG, "passed token = " + token.getuId());
-                        if (currentToken != null) {
-                            Log.e(TAG, "result token = " + currentToken.getTokenId());
-                            if (token.getuId().equals(currentToken.getTokenId()) && token.getCounter() == currentToken.getCounterNumber()) {
-                                long activeToken = currentToken.getCurrentToken();
-                                if (activeToken != -1) {
+                            @Override
+                            public void onNext(StoreCounter storeCounter) {
+                                Log.e(TAG, "passed token = " + token.getuId());
+                                if (storeCounter != null) {
                                     holder.mCurrentActiveToken
-                                            .setText("Currently running  " + activeToken);
+                                            .setText("Currently running  " + storeCounter.getActivatedToken() + " ETA " + storeCounter.ETA(token.getTokenNumber()));
                                 }
                             }
                         }
-                    }
-                });
 
-                if (bundle != null) {
+                );
+
+                if (bundle != null)
+
+                {
                     mTokenId = bundle.getString(ApplicationConstants.TOKEN_ID_KEY);
                 }
-                if (mTokenId != null && token.getuId().equals(mTokenId)) {
+
+                if (mTokenId != null && token.getuId().
+
+                        equals(mTokenId)
+
+                        )
+
+                {
                     animateTokenNumber(holder.mTokenNumber);
                 }
             }
-        };
+        }
+
+        ;
 
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(mFirebaseAdapter);
 
         mFirebaseAdapter
                 .registerAdapterDataObserver(
-                        new RecyclerView.AdapterDataObserver() {
+                        new RecyclerView.AdapterDataObserver()
+
+                        {
                             @Override
                             public void onItemRangeChanged(int positionStart, int itemCount, Object payload) {
                                 Token changedToken = mFirebaseAdapter.getItem(positionStart);
@@ -220,23 +229,26 @@ public class LandingFragment extends BaseFragment {
                 );
 
         query.addListenerForSingleValueEvent(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        setLoadingIndicator(false);
-                        if (dataSnapshot != null && dataSnapshot.getValue() == null) {
-                            showNoTokens();
-                        }
-                    }
+                new
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        setLoadingIndicator(false);
-                        if (databaseError != null) {
-                            showLoadingTokensError();
+                        ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                setLoadingIndicator(false);
+                                if (dataSnapshot != null && dataSnapshot.getValue() == null) {
+                                    showNoTokens();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                setLoadingIndicator(false);
+                                if (databaseError != null) {
+                                    showLoadingTokensError();
+                                }
+                            }
                         }
-                    }
-                }
+
         );
 
         return root;

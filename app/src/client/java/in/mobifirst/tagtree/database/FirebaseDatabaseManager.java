@@ -16,7 +16,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import in.mobifirst.tagtree.model.CurrentToken;
+import in.mobifirst.tagtree.model.StoreCounter;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.util.ApplicationConstants;
@@ -118,25 +118,21 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         });
     }
 
-    public void getCounterCurrentActiveToken(final Token token, final Subscriber<CurrentToken> subscriber) {
-        Log.e(TAG, "Passed-In token = "+ token.getuId());
+    public void getCounterStatus(final Token token, final Subscriber<StoreCounter> subscriber) {
+        Log.e(TAG, "Passed-In token = " + token.getuId());
         mDatabaseReference
                 .child(STORE_CHILD)
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
                 .child("" + token.getCounter())
-                .child(COUNTERS_LAST_ACTIVE_TOKEN)
+//                .child(COUNTERS_LAST_ACTIVE_TOKEN)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        Log.e(TAG, "Called token = "+ token.getuId());
-                        if (dataSnapshot != null) {
-                            Long currentToken = dataSnapshot.getValue(Long.class);
-                            CurrentToken activeToken = new CurrentToken();
-                            activeToken.setCurrentToken(currentToken != null ? currentToken : -1);
-                            activeToken.setTokenId(token.getuId());
-                            activeToken.setCounterNumber(token.getCounter());
-                            subscriber.onNext(activeToken);
+                        Log.e(TAG, "Called token = " + token.getuId());
+                        if (dataSnapshot != null && dataSnapshot.exists()) {
+                            StoreCounter storeCounter = dataSnapshot.getValue(StoreCounter.class);
+                            subscriber.onNext(storeCounter);
                         } else {
                             subscriber.onNext(null);
                         }

@@ -20,4 +20,13 @@ public class TimeUtils {
         return sfd.format(new Date(timestamp));
     }
 
+    public static String getDuration(long timestamp) {
+        String format = String.format("%%0%dd", 2);
+        timestamp = timestamp / 1000;
+        String seconds = String.format(format, timestamp % 60);
+        String minutes = String.format(format, (timestamp % 3600) / 60);
+        String hours = String.format(format, timestamp / 3600);
+        String time = hours + ":" + minutes + ":" + seconds;
+        return time;
+    }
 }
