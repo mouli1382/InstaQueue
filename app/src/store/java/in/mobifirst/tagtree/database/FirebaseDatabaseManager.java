@@ -92,7 +92,9 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
 
         }
-    };
+    }
+
+    ;
 
     public class AvgTATIncrementHandler implements Transaction.Handler {
 
@@ -113,7 +115,9 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
 
         }
-    };
+    }
+
+    ;
 
 
     public DatabaseReference getDatabaseReference() {
@@ -489,7 +493,9 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             public void onDataChange(DataSnapshot usersnapshot) {
                 if (usersnapshot == null || !usersnapshot.exists()) {
                     //user is not present
-                    sendSMS(token, status);
+                    if (!BuildConfig.DEBUG) {
+                        sendSMS(token, status);
+                    }
 //                    sendBulkSMS(token, status);
                 } else {
                     //User user = usersnapshot.getValue(User.class);
@@ -522,11 +528,11 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         if (status == false) {
             message = "You've received a token from " + token.getSenderName().trim() + " "
                     + token.getAreaName().trim() + ". Token= " + (token.getTokenNumber()) + ", Counter= " + token.getCounter()
-                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL +" for real time updates";
+                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates";
         } else {
             message = "It's your turn at " + token.getSenderName() + " " + token.getAreaName() + "."
                     + " Token = " + token.getTokenNumber() + ", Counter = " + token.getCounter()
-                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL +" for real time updates.";
+                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates.";
         }
         //define route
         String route = "4"; //4 For transaction, check with msg91
@@ -744,11 +750,11 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         if (status == false) {
             message = "You've received a token from " + token.getSenderName().trim() + " "
                     + token.getAreaName().trim() + ". Token= " + (token.getTokenNumber()) + ", Counter= " + token.getCounter()
-                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL +" for real time updates";
+                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates";
         } else {
             message = "It's your turn at " + token.getSenderName() + " " + token.getAreaName() + "."
                     + " Token = " + token.getTokenNumber() + ", Counter = " + token.getCounter()
-                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL +" for real time updates.";
+                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates.";
         }
         //define route
         String route = "4"; //4 For transaction, check with msg91

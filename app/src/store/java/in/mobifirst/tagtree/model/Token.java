@@ -154,7 +154,7 @@ public class Token {
     }
 
     public boolean isActive() {
-        return status == Status.ISSUED.ordinal();
+        return status == Status.READY.ordinal();
     }
 
     public boolean isCancelled() {

@@ -52,11 +52,11 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final Token token = mTokens.get(position);
 
-//        if (token.isActive()) {
-//            holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
-//        } else {
-//            holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
-//        }
+        if (token.isActive()) {
+            holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
+        } else {
+            holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
+        }
 
         holder.mTokenNumber.setText(token.getTokenNumber() + "");
         holder.mTokenBuzzButton.setOnClickListener(new View.OnClickListener() {
