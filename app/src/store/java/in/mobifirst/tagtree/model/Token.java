@@ -22,6 +22,7 @@ public class Token {
     private String areaName;
     private int counter;
     private long activatedTokenTime;
+    private String userName;
 
     public enum Status {
         ISSUED, READY, CANCELLED, COMPLETED
@@ -81,7 +82,7 @@ public class Token {
         return areaName;
     }
 
-    public void setAreaName (String areaName) {
+    public void setAreaName(String areaName) {
         this.areaName = areaName;
     }
 
@@ -149,18 +150,25 @@ public class Token {
         this.buzzCount = buzzCount;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    @Exclude
     public boolean isCompleted() {
         return status == Status.COMPLETED.ordinal();
     }
 
+    @Exclude
     public boolean isActive() {
         return status == Status.READY.ordinal();
     }
 
-    public boolean isCancelled() {
-        return status == Status.CANCELLED.ordinal();
-    }
-
+    @Exclude
     public boolean isEmpty() {
         return TextUtils.isEmpty(phoneNumber);
     }
@@ -171,6 +179,7 @@ public class Token {
         result.put("uId", uId);
         result.put("storeId", storeId);
         result.put("phoneNumber", phoneNumber);
+        result.put("userName", userName);
         result.put("tokenNumber", tokenNumber);
         result.put("timestamp", ServerValue.TIMESTAMP);
         result.put("status", status);

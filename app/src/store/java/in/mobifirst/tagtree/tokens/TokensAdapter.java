@@ -2,6 +2,7 @@ package in.mobifirst.tagtree.tokens;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,7 +75,11 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
             }
         });
 
-        holder.mSenderName.setText(token.getPhoneNumber());
+        if (!TextUtils.isEmpty(token.getUserName())) {
+            holder.mSenderName.setText(token.getUserName());
+        } else {
+            holder.mSenderName.setText(token.getPhoneNumber());
+        }
         holder.mTokenDate.setText(TimeUtils.getDate(token.getTimestamp()));
         holder.mTokenTime.setText(TimeUtils.getTime(token.getTimestamp()));
     }

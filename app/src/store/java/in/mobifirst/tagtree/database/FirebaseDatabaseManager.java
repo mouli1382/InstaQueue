@@ -2,6 +2,7 @@ package in.mobifirst.tagtree.database;
 
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -37,6 +38,7 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.BuildConfig;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.model.User;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.tokens.Snap;
 import in.mobifirst.tagtree.util.ApplicationConstants;
@@ -518,8 +520,15 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                     }
 //                    sendBulkSMS(token, status);
                 } else {
-                    //User user = usersnapshot.getValue(User.class);
-                    //User is already present
+                    //User present. Update token table for the counter view.
+                    HashMap<String, User> userMap = usersnapshot.getValue(new GenericTypeIndicator<HashMap<String, User>>() {
+                    });
+                    if (userMap != null && userMap.size() > 0) {
+                        User user = new ArrayList<>(userMap.values()).get(0);
+                        if (user != null && !TextUtils.isEmpty(user.getName())) {
+                            mDatabaseReference.child(TOKENS_CHILD).child(token.getuId()).child("userName").setValue(user.getName());
+                        }
+                    }
                 }
             }
 
