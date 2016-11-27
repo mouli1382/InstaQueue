@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
+import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.tokens.LandingActivity;
 
 public class NotificationUtil {
@@ -26,7 +27,7 @@ public class NotificationUtil {
 
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context)
-                        .setSmallIcon(android.R.drawable.ic_notification_overlay)
+                        .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle(title)
                         .setContentText(message)
                         .setAutoCancel(true)
@@ -39,5 +40,11 @@ public class NotificationUtil {
         notification.defaults = Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND;
 
         notificationManager.notify(NOTIFICATION_ID, notification);
+    }
+
+    public static void clearNotification(Context context) {
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
     }
 }

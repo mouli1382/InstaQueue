@@ -30,7 +30,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="5dp"
-                    android:text="ISSUE" />
+                    android:text="@string/issue" />
 
                 <android.support.v7.widget.SwitchCompat
                     android:id="@+id/switchCompat"
@@ -46,7 +46,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="5dp"
                     android:layout_toRightOf="@+id/switchCompat"
-                    android:text="SERVICE" />
+                    android:text="@string/serve" />
 
                 <Spinner
                     android:id="@+id/counter_spinner"

@@ -74,7 +74,7 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
             }
         });
 
-        holder.mSenderName.setText(token.getSenderName());
+        holder.mSenderName.setText(token.getPhoneNumber());
         holder.mTokenDate.setText(TimeUtils.getDate(token.getTimestamp()));
         holder.mTokenTime.setText(TimeUtils.getTime(token.getTimestamp()));
     }

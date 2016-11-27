@@ -10,6 +10,7 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseDrawerActivity;
 import in.mobifirst.tagtree.util.ActivityUtilities;
 import in.mobifirst.tagtree.util.ApplicationConstants;
+import in.mobifirst.tagtree.util.NotificationUtil;
 import io.fabric.sdk.android.Fabric;
 
 public class LandingActivity extends BaseDrawerActivity {
@@ -32,5 +33,12 @@ public class LandingActivity extends BaseDrawerActivity {
             ActivityUtilities.addFragmentToActivity(
                     getSupportFragmentManager(), landingFragment, R.id.content_base_drawer);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //Cancel any notification from this app as we are coming to foreground.
+        NotificationUtil.clearNotification(LandingActivity.this);
     }
 }
