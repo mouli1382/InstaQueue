@@ -1,5 +1,7 @@
 package in.mobifirst.tagtree.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
 import com.google.firebase.database.Exclude;
@@ -8,7 +10,7 @@ import com.google.firebase.database.ServerValue;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Token {
+public class Token implements Parcelable {
 
     private String uId;
     private String storeId;
@@ -224,4 +226,54 @@ public class Token {
         result = 31 * result + getAreaName().hashCode();
         return result;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(uId);
+        parcel.writeString(storeId);
+        parcel.writeString(phoneNumber);
+        parcel.writeLong(tokenNumber);
+        parcel.writeLong(timestamp);
+        parcel.writeInt(status);
+        parcel.writeInt(buzzCount);
+        parcel.writeString(senderPic);
+        parcel.writeString(senderName);
+        parcel.writeString(areaName);
+        parcel.writeInt(counter);
+        parcel.writeLong(activatedTokenTime);
+        parcel.writeString(userName);
+    }
+
+    protected Token(Parcel in) {
+        uId = in.readString();
+        storeId = in.readString();
+        phoneNumber = in.readString();
+        tokenNumber = in.readLong();
+        timestamp = in.readLong();
+        status = in.readInt();
+        buzzCount = in.readInt();
+        senderPic = in.readString();
+        senderName = in.readString();
+        areaName = in.readString();
+        counter = in.readInt();
+        activatedTokenTime = in.readLong();
+        userName = in.readString();
+    }
+
+    public static final Creator<Token> CREATOR = new Creator<Token>() {
+        @Override
+        public Token createFromParcel(Parcel in) {
+            return new Token(in);
+        }
+
+        @Override
+        public Token[] newArray(int size) {
+            return new Token[size];
+        }
+    };
 }

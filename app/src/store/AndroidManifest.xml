@@ -13,12 +13,10 @@
         android:supportsRtl="true">
         <activity
             android:name=".tokens.TokensActivity"
-            android:theme="@style/AppTheme.Background"
             android:screenOrientation="portrait" />
         <activity
             android:name=".addedittoken.AddEditTokenActivity"
             android:parentActivityName=".tokens.TokensActivity"
-            android:theme="@style/AppTheme.Background"
             android:screenOrientation="portrait" >
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
@@ -50,7 +48,7 @@
             android:name="io.fabric.ApiKey"
             android:value="da7a69f0dee3ffe21c69c8e4aff9bdff1db53059" />
 
-        <service android:name=".tokens.TokenDisplayService"/>
+        <service android:name=".display.TokenDisplayService"/>
     </application>
 
 </manifest>

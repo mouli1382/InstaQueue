@@ -8,6 +8,7 @@ import android.support.v4.content.LocalBroadcastManager;
 
 public class TTLocalBroadcastManager {
     public static final String NETWORK_INTENT_ACTION = "TAGTREE_NETWORK_EVENT";
+    public static final String TOKEN_CHANGE_INTENT_ACTION = "TAGTREE_TOKEN_CHANGE_EVENT";
     public static final String NETWORK_STATUS_KEY = "network_status_key";
 
     public static void registerReceiver(Context context, BroadcastReceiver receiver, String intentAction) {

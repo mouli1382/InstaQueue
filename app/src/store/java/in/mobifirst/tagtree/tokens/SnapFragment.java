@@ -4,11 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -24,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -31,6 +34,7 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.display.TokenDisplayService;
 import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
@@ -149,8 +153,6 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_issuetokens, container, false);
-        root.setDrawingCacheEnabled(true);
-        root.buildDrawingCache(true);
 
         RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -328,9 +330,11 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         mTokensView.setVisibility(View.VISIBLE);
         mNoTokensView.setVisibility(View.GONE);
 
-        Intent intent = new Intent(getActivity(), TokenDisplayService.class);
-        intent.putExtra(TokenDisplayService.SNAP_BITMAP_VIEW, getView().getDrawingCache());
-        getActivity().startService(intent);
+        //Send broadcast to TokenDisplayService here.
+        Intent intent = new Intent(TTLocalBroadcastManager.TOKEN_CHANGE_INTENT_ACTION);
+        intent.putParcelableArrayListExtra(TokenDisplayService.SNAP_LIST_INTENT_KEY,
+                (ArrayList<? extends Parcelable>) snaps);
+        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
     }
 
     @Override

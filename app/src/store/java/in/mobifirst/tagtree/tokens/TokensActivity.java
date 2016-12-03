@@ -3,11 +3,9 @@ package in.mobifirst.tagtree.tokens;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 
@@ -17,6 +15,7 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseDrawerActivity;
 import in.mobifirst.tagtree.activity.CreditsActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.display.TokenDisplayService;
 import in.mobifirst.tagtree.util.ActivityUtilities;
 
 public class TokensActivity extends BaseDrawerActivity {
@@ -94,6 +93,8 @@ public class TokensActivity extends BaseDrawerActivity {
                     (TokensFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
             mTokensPresenter.setFiltering(currentFiltering);
         }
+
+        startService(new Intent(this, TokenDisplayService.class));
     }
 
     @Override
@@ -127,5 +128,11 @@ public class TokensActivity extends BaseDrawerActivity {
             outState.putSerializable(CURRENT_FILTERING_KEY, mTokensPresenter.getFiltering());
 
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(new Intent(this, TokenDisplayService.class));
+        super.onDestroy();
     }
 }
