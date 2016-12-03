@@ -149,6 +149,8 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_issuetokens, container, false);
+        root.setDrawingCacheEnabled(true);
+        root.buildDrawingCache(true);
 
         RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -325,6 +327,10 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         mSnapAdapter.replaceData(snaps);
         mTokensView.setVisibility(View.VISIBLE);
         mNoTokensView.setVisibility(View.GONE);
+
+        Intent intent = new Intent(getActivity(), TokenDisplayService.class);
+        intent.putExtra(TokenDisplayService.SNAP_BITMAP_VIEW, getView().getDrawingCache());
+        getActivity().startService(intent);
     }
 
     @Override

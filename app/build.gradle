@@ -14,7 +14,13 @@ apply plugin: 'com.neenbedankt.android-apt'
 
 repositories {
     mavenCentral()
-    maven { url 'https://maven.fabric.io/public' }
+    maven {
+        url 'https://maven.fabric.io/public'
+    }
+
+    maven {
+        url "https://s3.amazonaws.com/repo.commonsware.com"
+    }
 }
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -140,6 +146,8 @@ dependencies {
     compile 'com.razorpay:checkout:1.0.2'
 
     testCompile 'junit:junit:4.12'
+
+    compile 'com.commonsware.cwac:presentation:0.4.6'
 }
 
 apply plugin: 'com.google.gms.google-services'

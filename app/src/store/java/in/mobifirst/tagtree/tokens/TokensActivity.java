@@ -3,9 +3,11 @@ package in.mobifirst.tagtree.tokens;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 
@@ -56,7 +58,6 @@ public class TokensActivity extends BaseDrawerActivity {
                                 .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
                                 .tokensPresenterModule(new TokensPresenterModule(snapFragment)).build()
                                 .inject(TokensActivity.this);
-
                     } else {
                         FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
                         frameLayout.removeAllViewsInLayout();
