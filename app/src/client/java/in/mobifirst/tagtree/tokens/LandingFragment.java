@@ -171,7 +171,7 @@ public class LandingFragment extends BaseFragment {
                                 Log.e(TAG, "passed token = " + token.getuId());
                                 if (storeCounter != null) {
                                     holder.mCurrentActiveToken
-                                            .setText("Currently running  " + storeCounter.getActivatedToken() + " ETA " + storeCounter.ETA(token.getTokenNumber()));
+                                            .setText(token.isActive() ? "It's your turn" : ("Currently running  " + storeCounter.getActivatedToken() + " ETA " + storeCounter.ETA(token.getTokenNumber())));
                                 }
                             }
                         }
