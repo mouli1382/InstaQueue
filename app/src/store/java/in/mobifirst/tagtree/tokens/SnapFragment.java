@@ -353,6 +353,12 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
                 R.drawable.ic_assignment_turned_in_24dp,
                 true
         );
+
+        //Send broadcast to TokenDisplayService here that there are no tokens.
+        Intent intent = new Intent(TTLocalBroadcastManager.TOKEN_CHANGE_INTENT_ACTION);
+        intent.putParcelableArrayListExtra(TokenDisplayService.SNAP_LIST_INTENT_KEY,
+                new ArrayList<Snap>());
+        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
     }
 
     @Override

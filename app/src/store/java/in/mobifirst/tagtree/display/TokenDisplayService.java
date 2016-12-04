@@ -9,7 +9,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
 
 import com.commonsware.cwac.preso.PresentationService;
 
@@ -26,15 +25,15 @@ public class TokenDisplayService extends PresentationService implements
     private Handler handler = null;
     private RecyclerView mRecyclerView;
     private SnapAdapter mSnapAdapter;
-    private FrameLayout mLayout;
     private boolean flipMe = false;
     private LinearLayoutManager mLinearLayoutManager;
+    private View mRootView;
 
     private BroadcastReceiver mSnapBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             ArrayList<Snap> snapList = intent.getParcelableArrayListExtra(SNAP_LIST_INTENT_KEY);
-            if (snapList != null && snapList.size() > 0) {
+            if (snapList != null) {
                 mSnapAdapter.replaceData(snapList);
             }
         }
@@ -55,15 +54,14 @@ public class TokenDisplayService extends PresentationService implements
 
     @Override
     protected View buildPresoView(Context context, LayoutInflater inflater) {
-        mLayout = new FrameLayout(context);
-        mRecyclerView = (RecyclerView) inflater.inflate(R.layout.content_extended_display, null);
+        mRootView = inflater.inflate(R.layout.extended_display, null);
+        mRecyclerView = (RecyclerView) mRootView.findViewById(R.id.display_recyclerview);
         mLinearLayoutManager = new LinearLayoutManager(context);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mLayout.addView(mRecyclerView);
 
         run();
 
-        return (mLayout);
+        return (mRootView);
     }
 
     @Override
