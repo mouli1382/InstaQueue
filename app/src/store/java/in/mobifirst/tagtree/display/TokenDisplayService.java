@@ -27,6 +27,8 @@ public class TokenDisplayService extends PresentationService implements
     private RecyclerView mRecyclerView;
     private SnapAdapter mSnapAdapter;
     private FrameLayout mLayout;
+    private boolean flipMe = false;
+    private LinearLayoutManager mLinearLayoutManager;
 
     private BroadcastReceiver mSnapBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -55,8 +57,8 @@ public class TokenDisplayService extends PresentationService implements
     protected View buildPresoView(Context context, LayoutInflater inflater) {
         mLayout = new FrameLayout(context);
         mRecyclerView = (RecyclerView) inflater.inflate(R.layout.content_extended_display, null);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
+        mLinearLayoutManager = new LinearLayoutManager(context);
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mLayout.addView(mRecyclerView);
 
         run();
@@ -67,8 +69,23 @@ public class TokenDisplayService extends PresentationService implements
     @Override
     public void run() {
         mRecyclerView.setAdapter(mSnapAdapter);
-        //Use this to scroll the list for showing the entire screen.
-        handler.postDelayed(this, 1000);
+        int itemCount = mSnapAdapter.getItemCount();
+        if (itemCount > 0) {
+            if (flipMe) {
+                //Scroll to end
+                mRecyclerView.scrollToPosition(itemCount - 1);
+//                int lastVisiblePosition =
+//                        mLinearLayoutManager.findLastVisibleItemPosition();
+//                if (lastVisiblePosition != -1 && (lastVisiblePosition < itemCount - 1)) {
+//                    mRecyclerView.scrollToPosition(itemCount - 1);
+//                }
+            } else {
+                //Scroll to start
+                mRecyclerView.scrollToPosition(0);
+            }
+        }
+        flipMe = !flipMe;
+        handler.postDelayed(this, 5000);
     }
 
     @Override
