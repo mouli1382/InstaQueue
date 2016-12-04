@@ -57,8 +57,6 @@ public class TokenDisplayService extends PresentationService implements
         mRecyclerView = (RecyclerView) inflater.inflate(R.layout.content_extended_display, null);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerView.setAdapter(mSnapAdapter);
-        mLayout.removeAllViews();
         mLayout.addView(mRecyclerView);
 
         run();
@@ -68,6 +66,7 @@ public class TokenDisplayService extends PresentationService implements
 
     @Override
     public void run() {
+        mRecyclerView.setAdapter(mSnapAdapter);
         //Use this to scroll the list for showing the entire screen.
         handler.postDelayed(this, 1000);
     }
