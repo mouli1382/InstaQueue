@@ -14,6 +14,7 @@ public class ApplicationConstants {
     public static final String WEBSITE_KEY = "website";
     public static String NUMBER_OF_COUNTERS_KEY = "number_of_counters";
     public static final String PROFILE_PIC_URL_KEY = "profile_url";
+    public static final String WEBSITE_LOGO_URL_KEY = "website_logo_url";
     public static final String CREDITS_KEY = "credits";
 
     public static final String EMAIL_KEY = "email";

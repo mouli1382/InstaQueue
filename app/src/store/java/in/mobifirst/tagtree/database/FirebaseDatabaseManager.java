@@ -378,7 +378,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                         final Token newToken = new Token(key, token.getStoreId(),
                                                 token.getPhoneNumber(),
                                                 currentToken,
-                                                mSharedPrefs.getSting((ApplicationConstants.PROFILE_PIC_URL_KEY)),
+                                                mSharedPrefs.getSting((ApplicationConstants.WEBSITE_LOGO_URL_KEY)),
                                                 mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY),
                                                 token.getCounter(),
                                                 areaName);
