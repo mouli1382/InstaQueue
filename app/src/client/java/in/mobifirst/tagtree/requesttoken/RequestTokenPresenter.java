@@ -30,6 +30,7 @@ public class RequestTokenPresenter implements RequestTokenContract.Presenter {
     @Inject
     RequestTokenPresenter(RequestTokenContract.View addTokenView) {
         mRequestTokenView = addTokenView;
+        mSubscriptions = new CompositeSubscription();
     }
 
     @Inject

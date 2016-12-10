@@ -450,40 +450,49 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         mDatabaseReference
                 .child("store")
                 .child(uid)
-                .child("name").setValue(store.getName())
+                .child("storeId").setValue(uid)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         mDatabaseReference
                                 .child("store")
                                 .child(uid)
-                                .child("area").setValue(store.getArea())
+                                .child("name").setValue(store.getName())
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
                                         mDatabaseReference
                                                 .child("store")
                                                 .child(uid)
-                                                .child("website").setValue(store.getWebsite())
+                                                .child("area").setValue(store.getArea())
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
                                                         mDatabaseReference
                                                                 .child("store")
                                                                 .child(uid)
-                                                                .child("logoUrl").setValue(store.getLogoUrl())
+                                                                .child("website").setValue(store.getWebsite())
                                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                     @Override
                                                                     public void onSuccess(Void aVoid) {
                                                                         mDatabaseReference
                                                                                 .child("store")
                                                                                 .child(uid)
-                                                                                .child("numberOfCounters").setValue(store.getNumberOfCounters())
+                                                                                .child("logoUrl").setValue(store.getLogoUrl())
                                                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                                     @Override
                                                                                     public void onSuccess(Void aVoid) {
-                                                                                        subscriber.onNext(null);
-                                                                                        subscriber.onCompleted();
+                                                                                        mDatabaseReference
+                                                                                                .child("store")
+                                                                                                .child(uid)
+                                                                                                .child("numberOfCounters").setValue(store.getNumberOfCounters())
+                                                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                                    @Override
+                                                                                                    public void onSuccess(Void aVoid) {
+                                                                                                        subscriber.onNext(null);
+                                                                                                        subscriber.onCompleted();
+                                                                                                    }
+                                                                                                });
                                                                                     }
                                                                                 });
                                                                     }

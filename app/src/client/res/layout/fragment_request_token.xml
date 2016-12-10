@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<in.mobifirst.tagtree.tokens.ScrollChildSwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<in.mobifirst.tagtree.requesttoken.ScrollChildSwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/refresh_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -34,4 +34,4 @@
             android:layout_height="wrap_content" />
 
     </LinearLayout>
-</in.mobifirst.tagtree.tokens.ScrollChildSwipeRefreshLayout>
+</in.mobifirst.tagtree.requesttoken.ScrollChildSwipeRefreshLayout>

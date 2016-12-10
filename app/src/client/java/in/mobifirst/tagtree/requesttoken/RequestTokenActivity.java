@@ -1,5 +1,7 @@
 package in.mobifirst.tagtree.requesttoken;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -44,7 +46,7 @@ public class RequestTokenActivity extends BaseActivity {
 
         DaggerRequestTokenComponent.builder()
                 .applicationComponent(((IQClientApplication) getApplication()).getApplicationComponent())
-                .addEditTokenPresenterModule(new RequestTokenPresenterModule(requestTokenFragment))
+                .requestTokenPresenterModule(new RequestTokenPresenterModule(requestTokenFragment))
                 .build()
                 .inject(this);
     }
@@ -53,5 +55,10 @@ public class RequestTokenActivity extends BaseActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    public static void start(Context context) {
+        Intent intent = new Intent(context, RequestTokenActivity.class);
+        context.startActivity(intent/*, RequestTokenActivity.REQUEST_ADD_TOKEN*/);
     }
 }

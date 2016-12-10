@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
-import in.mobifirst.tagtree.util.ApplicationConstants;
 
 public class Store {
 

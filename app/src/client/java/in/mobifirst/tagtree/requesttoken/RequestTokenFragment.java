@@ -210,7 +210,7 @@ public class RequestTokenFragment extends BaseFragment implements RequestTokenCo
         //todo: Find a better way to avoid crash
         if (getActivity() == null)
             return;
-        getActivity().setResult(Activity.RESULT_OK);
+//        getActivity().setResult(Activity.RESULT_OK);
         getActivity().finish();
     }
 
