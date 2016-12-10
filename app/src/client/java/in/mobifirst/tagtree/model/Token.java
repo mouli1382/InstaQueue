@@ -2,6 +2,12 @@ package in.mobifirst.tagtree.model;
 
 import android.text.TextUtils;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.ServerValue;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class Token {
 
     private String uId;
@@ -13,18 +19,32 @@ public class Token {
     private int buzzCount;
     private String senderPic;
     private String senderName;
-    private int counter;
     private String areaName;
-
+    private int counter;
+    private long activatedTokenTime;
+    private String userName;
 
     public enum Status {
-        ISSUED, READY, COMPLETED
+        ISSUED, READY, CANCELLED, COMPLETED
     }
 
     ;
 
     public Token() {
         // Default constructor required for calls to DataSnapshot.getValue(Token.class)
+    }
+
+    public Token(String uId, String storeId, String phoneNumber, long tokenNumber, String senderPic, String senderName, int counter, String areaName) {
+        this.uId = uId;
+        this.storeId = storeId;
+        this.phoneNumber = phoneNumber;
+        this.tokenNumber = tokenNumber;
+        this.status = Status.ISSUED.ordinal();
+        this.buzzCount = 0;
+        this.senderPic = senderPic;
+        this.senderName = senderName;
+        this.areaName = areaName;
+        this.counter = counter;
     }
 
     public boolean needsBuzz() {
@@ -56,6 +76,14 @@ public class Token {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getAreaName() {
+        return areaName;
+    }
+
+    public void setAreaName(String areaName) {
+        this.areaName = areaName;
     }
 
     public String getSenderName() {
@@ -106,6 +134,14 @@ public class Token {
         this.timestamp = timestamp;
     }
 
+    public long getActivatedTokenTime() {
+        return activatedTokenTime;
+    }
+
+    public void setActivatedTokenTime(long timestamp) {
+        this.activatedTokenTime = timestamp;
+    }
+
     public int getBuzzCount() {
         return buzzCount;
     }
@@ -114,24 +150,46 @@ public class Token {
         this.buzzCount = buzzCount;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    @Exclude
     public boolean isCompleted() {
         return status == Status.COMPLETED.ordinal();
     }
 
+    @Exclude
     public boolean isActive() {
         return status == Status.READY.ordinal();
     }
 
+    @Exclude
     public boolean isEmpty() {
         return TextUtils.isEmpty(phoneNumber);
     }
 
-    public String getAreaName() {
-        return areaName;
-    }
-
-    public void setAreaName(String areaName) {
-        this.areaName = areaName;
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("uId", uId);
+        result.put("storeId", storeId);
+        result.put("phoneNumber", phoneNumber);
+        result.put("userName", userName);
+        result.put("tokenNumber", tokenNumber);
+        result.put("timestamp", ServerValue.TIMESTAMP);
+        result.put("status", status);
+        result.put("buzzCount", buzzCount);
+        result.put("senderName", senderName);
+        result.put("senderPic", senderPic);
+        result.put("counter", counter);
+        result.put("areaName", areaName);
+        result.put("activatedTokenTime", activatedTokenTime);
+        return result;
     }
 
     @Override
@@ -147,6 +205,8 @@ public class Token {
         if (!getuId().equals(token.getuId())) return false;
         if (!getStoreId().equals(token.getStoreId())) return false;
         if (!getPhoneNumber().equals(token.getPhoneNumber())) return false;
+        if (!getAreaName().equals(token.getAreaName())) return false;
+        if (getActivatedTokenTime() != (token.getActivatedTokenTime())) return false;
         return getTimestamp() != (token.getTimestamp());
 
     }
@@ -158,8 +218,10 @@ public class Token {
         result = 31 * result + getPhoneNumber().hashCode();
         result = 31 * result + (int) (getTokenNumber() ^ (getTokenNumber() >>> 32));
         result = 31 * result + (int) (getTimestamp() ^ (getTimestamp() >>> 32));
+        result = 31 * result + (int) (getActivatedTokenTime() ^ (getActivatedTokenTime() >>> 32));
         result = 31 * result + getStatus();
         result = 31 * result + getBuzzCount();
+        result = 31 * result + getAreaName().hashCode();
         return result;
     }
 }

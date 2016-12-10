@@ -10,6 +10,7 @@ import in.mobifirst.tagtree.authentication.digits.DigitsSignInActivity;
 import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
 import in.mobifirst.tagtree.database.DatabaseModule;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.requesttoken.RequestTokenFragment;
 import in.mobifirst.tagtree.tokens.LandingFragment;
 
 @Singleton
@@ -23,6 +24,8 @@ public interface ApplicationComponent {
     void inject(GoogleSignInActivity googleSignInActivity);
 
     void inject(LandingFragment landingFragment);
+
+    void inject(RequestTokenFragment requestTokenFragment);
 
     IQSharedPreferences getIQSharedPreferences();
 

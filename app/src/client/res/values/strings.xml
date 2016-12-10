@@ -7,4 +7,5 @@
 
     <string name="no_tokens_all">You have no Tokens!</string>
     <string name="verify_mobile_number">*We need mobile number to issue tokens, your privacy is respected.</string>
+    <string name="request_token">Request Token</string>
 </resources>

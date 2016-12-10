@@ -102,7 +102,7 @@ public class AddEditTokenPresenter implements AddEditTokenContract.Presenter {
 //                    @Override
 //                    public void onError(Throwable e) {
 //                        if (mAddTokenView.isActive()) {
-//                            mAddTokenView.showEmptyTokenError();
+//                            mAddTokenView.showEmptyStoresError();
 //                        }
 //                    }
 //
