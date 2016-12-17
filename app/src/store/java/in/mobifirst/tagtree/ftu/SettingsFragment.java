@@ -75,7 +75,6 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     @Inject
     protected NetworkConnectionUtils mNetworkConnectionUtils;
 
-
     public static SettingsFragment newInstance() {
         return new SettingsFragment();
     }
@@ -140,15 +139,20 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
             public void onClick(View v) {
                 if (mNetworkConnectionUtils.isConnected()) {
                     if (validateInput()) {
+                        mIQSharedPreferences.putString(ApplicationConstants.WEBSITE_LOGO_URL_KEY, mProfilePicUri);
                         Store store = new Store(mStoreNameEditText.getText().toString(),
                                 mStoreAreaEditText.getText().toString(),
-                                mWebsiteEditText.getText().toString(),
+                                mWebsiteEditText.getText() != null ? mWebsiteEditText.getText().toString() : "",
                                 mProfilePicUri, Integer.parseInt(mCountersEditText.getText().toString()));
                         mPresenter.addStoreDetails(store);
                     }
                 }
             }
         });
+
+        //Get and load the gmail  profile pic
+        mProfilePicUri = mIQSharedPreferences.getSting(ApplicationConstants.WEBSITE_LOGO_URL_KEY);
+        loadLogo();
     }
 
     @Nullable
@@ -184,21 +188,6 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
 
             }
         });
-//        mStoreNameEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//            @Override
-//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
-//                    CharSequence storeName = mStoreNameEditText.getText();
-//                    if (TextUtils.isEmpty(storeName)) {
-//                        mStoreNameTextInputLayout.setError(getString(R.string.empty_store_name));
-//                    } else {
-//                        mStoreNameTextInputLayout.setError("");
-//                    }
-//                    return true;
-//                }
-//                return false;
-//            }
-//        });
         mStoreAreaEditText = (TextInputEditText) root.findViewById(R.id.areaName);
         mStoreAreaEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -221,20 +210,6 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
 
             }
         });
-//        mStoreAreaEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//            @Override
-//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
-//                    CharSequence storeArea = mStoreAreaEditText.getText();
-//                    if (TextUtils.isEmpty(storeArea)) {
-//                        mStoreAreaTextInputLayout.setError(getString(R.string.empty_store_area));
-//                    } else {
-//                        mStoreAreaTextInputLayout.setError("");
-//                    }
-//                }
-//                return true;
-//            }
-//        });
         mWebsiteEditText = (TextInputEditText) root.findViewById(R.id.website);
         mWebsiteEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -244,10 +219,7 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (TextUtils.isEmpty(charSequence)) {
-                    mStoreWebsiteTextInputLayout.setError(getString(R.string.empty_store_website));
-                    mStoreWebsiteTextInputLayout.setErrorEnabled(true);
-                } else if (!Patterns.WEB_URL.matcher(charSequence).matches()) {
+                if (!TextUtils.isEmpty(charSequence) && !Patterns.WEB_URL.matcher(charSequence).matches()) {
                     mStoreWebsiteTextInputLayout.setError(getString(R.string.invalid_store_website));
                     mStoreWebsiteTextInputLayout.setErrorEnabled(true);
                 } else {
@@ -262,23 +234,6 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
 
             }
         });
-//        mWebsiteEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//            @Override
-//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
-//                    CharSequence website = mWebsiteEditText.getText();
-//                    if (TextUtils.isEmpty(website)) {
-//                        mStoreWebsiteTextInputLayout.setError(getString(R.string.empty_store_website));
-//                    } else if (!Patterns.WEB_URL.matcher(website).matches()) {
-//                        mStoreWebsiteTextInputLayout.setError(getString(R.string.invalid_store_website));
-//                    } else {
-//                        mStoreWebsiteTextInputLayout.setError("");
-//                    }
-//                }
-//                return true;
-//            }
-//        });
-
         mCountersEditText = (TextInputEditText) root.findViewById(R.id.counters);
         mCountersEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -307,26 +262,6 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
 
             }
         });
-//        mCountersEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//            @Override
-//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
-//                    CharSequence counters = mCountersEditText.getText();
-//                    if (TextUtils.isEmpty(counters)) {
-//                        mStoreCountersTextInputLayout.setError(getString(R.string.empty_store_counters));
-//                    } else {
-//                        int counterValue = Integer.parseInt(counters.toString());
-//                        if (counterValue > 0 && counterValue < 100) {
-//                            mStoreCountersTextInputLayout.setError("");
-//                        } else {
-//                            mStoreCountersTextInputLayout.setError(getString(R.string.invalid_store_counters));
-//                        }
-//                    }
-//                }
-//                return true;
-//            }
-//        });
-
         mProgressBar = (ProgressBar) root.findViewById(R.id.logoProgress);
         mStoreImageView = (ImageView) root.findViewById(R.id.storeProfilePic);
         mUploadButton = (Button) root.findViewById(R.id.uploadButton);
@@ -337,10 +272,6 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
                 mPresenter.uploadFile(bitmapData);
             }
         });
-
-        //Get and load the store profile pic
-        mProfilePicUri = mIQSharedPreferences.getSting(ApplicationConstants.WEBSITE_LOGO_URL_KEY);
-        loadLogo();
 
         mStoreImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -358,10 +289,12 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
 
     private void getLogoUriUsingClearbit() {
         mProfilePicUri = mIQSharedPreferences.getSting(ApplicationConstants.WEBSITE_LOGO_URL_KEY);
-        if (!TextUtils.isEmpty(mProfilePicUri))
+
+        CharSequence website = mWebsiteEditText.getText();
+        if(TextUtils.isEmpty(website))
             return;
 
-        String url = mWebsiteEditText.getText().toString().trim();
+        String url = website.toString();
         if (url != null && !url.startsWith("http") && !url.startsWith("https")) {
             url = "http://" + url;
         }
@@ -374,6 +307,7 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     private void loadLogo() {
         if (!TextUtils.isEmpty(mProfilePicUri)) {
             mStoreImageView.setEnabled(false);
+            fab.setEnabled(false);
             Glide.with(getActivity())
                     .load(mProfilePicUri)
                     .asBitmap()
@@ -382,6 +316,8 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
                         public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
                             mProgressBar.setVisibility(View.GONE);
                             mStoreImageView.setEnabled(true);
+                            mProfilePicUri = null;
+                            fab.setEnabled(true);
                             return false;
                         }
 
@@ -394,11 +330,12 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
                             resource.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                             bitmapData = baos.toByteArray();
 
-                            mIQSharedPreferences.putString(ApplicationConstants.WEBSITE_LOGO_URL_KEY, mProfilePicUri);
                             mUploadButton.setEnabled(true);
+                            fab.setEnabled(true);
                             return false;
                         }
                     })
+                    .placeholder(R.mipmap.ic_launcher)
                     .into(mStoreImageView);
         } else {
             mProgressBar.setVisibility(View.GONE);
@@ -438,7 +375,6 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     public void onFileUploadFinished(Uri uri) {
         mProgressBar.setVisibility(View.GONE);
         mProfilePicUri = uri.toString();
-        mIQSharedPreferences.putString(ApplicationConstants.WEBSITE_LOGO_URL_KEY, mProfilePicUri);
         mUploadButton.setEnabled(false);
     }
 
@@ -498,11 +434,7 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
         }
 
         CharSequence website = mWebsiteEditText.getText();
-        if (TextUtils.isEmpty(website)) {
-            mStoreWebsiteTextInputLayout.setError(getString(R.string.empty_store_website));
-            mStoreWebsiteTextInputLayout.setErrorEnabled(true);
-            return result;
-        } else if (!Patterns.WEB_URL.matcher(website).matches()) {
+        if (!TextUtils.isEmpty(website) && !Patterns.WEB_URL.matcher(website).matches()) {
             mStoreWebsiteTextInputLayout.setError(getString(R.string.invalid_store_website));
             mStoreWebsiteTextInputLayout.setErrorEnabled(true);
             return result;
@@ -520,6 +452,21 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
                 mStoreCountersTextInputLayout.setErrorEnabled(true);
                 return result;
             }
+        }
+
+        if(!TextUtils.isEmpty(website) && TextUtils.isEmpty(mProfilePicUri)) {
+            Snackbar.make(getView(), getString(R.string.website_not_exist), Snackbar.LENGTH_LONG).show();
+            return result;
+        }
+
+        if(bitmapData == null || bitmapData.length == 0) {
+            Snackbar.make(getView(), getString(R.string.upload_store_pic), Snackbar.LENGTH_LONG).show();
+            return result;
+        }
+
+        if(TextUtils.isEmpty(mProfilePicUri)) {
+            Snackbar.make(getView(), getString(R.string.upload_store_pic), Snackbar.LENGTH_LONG).show();
+            return result;
         }
 
         mStoreNameTextInputLayout.setErrorEnabled(false);
