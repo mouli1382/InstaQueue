@@ -63,7 +63,7 @@ public class StoreCounter {
         long avgTATPerToken = getAvgTATPerToken();
 
         if (avgTATPerToken == 0)
-            return "" + 0;
+            return "N/A";
 
         if (tokens == null || tokens.size() == 0)
             return TimeUtils.getDuration(avgTATPerToken);
@@ -75,8 +75,8 @@ public class StoreCounter {
 
         //ToDo add activatedTimestamp under store counter and sort by it here instead of the token number as it need not be in a chronological order.
         Collections.sort(tokenList);
-        if (tokenList.size() > 1) {
-            long ETA = (tokenList.indexOf(given) + 1) * avgTATPerToken;
+        if (tokenList.size() > 0) {
+            long ETA = (tokenList.indexOf(given)) * avgTATPerToken;
             Log.e(TAG, "ETA = " + ETA);
             return TimeUtils.getDuration(ETA);
         }

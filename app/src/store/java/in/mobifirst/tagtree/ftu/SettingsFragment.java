@@ -13,20 +13,18 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Patterns;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
@@ -77,7 +75,6 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     @Inject
     protected NetworkConnectionUtils mNetworkConnectionUtils;
 
-
     public static SettingsFragment newInstance() {
         return new SettingsFragment();
     }
@@ -100,8 +97,6 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
         super.onResume();
         if (!mNetworkConnectionUtils.isConnected()) {
             showNetworkError(getView());
-        } else {
-            mPresenter.subscribe();
         }
         TTLocalBroadcastManager.registerReceiver(getActivity(), mNetworkBroadcastReceiver, TTLocalBroadcastManager.NETWORK_INTENT_ACTION);
     }
@@ -109,7 +104,6 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     @Override
     public void onPause() {
         super.onPause();
-        mPresenter.unsubscribe();
         TTLocalBroadcastManager.unRegisterReceiver(getActivity(), mNetworkBroadcastReceiver);
     }
 
@@ -123,6 +117,14 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
         super.onCreate(savedInstanceState);
         ((IQStoreApplication) getActivity().getApplicationContext()).getApplicationComponent()
                 .inject(this);
+
+        mPresenter.subscribe();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mPresenter.unsubscribe();
     }
 
     @Override
@@ -132,21 +134,25 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
         fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab);
         fab.setImageResource(R.drawable.ic_done);
-        fab.setEnabled(false);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mNetworkConnectionUtils.isConnected()) {
                     if (validateInput()) {
+                        mIQSharedPreferences.putString(ApplicationConstants.WEBSITE_LOGO_URL_KEY, mProfilePicUri);
                         Store store = new Store(mStoreNameEditText.getText().toString(),
                                 mStoreAreaEditText.getText().toString(),
-                                mWebsiteEditText.getText().toString(),
+                                mWebsiteEditText.getText() != null ? mWebsiteEditText.getText().toString() : "",
                                 mProfilePicUri, Integer.parseInt(mCountersEditText.getText().toString()));
                         mPresenter.addStoreDetails(store);
                     }
                 }
             }
         });
+
+        //Get and load the gmail  profile pic
+        mProfilePicUri = mIQSharedPreferences.getSting(ApplicationConstants.WEBSITE_LOGO_URL_KEY);
+        loadLogo();
     }
 
     @Nullable
@@ -161,75 +167,101 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
         mStoreCountersTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeCountersInputLayout);
 
         mStoreNameEditText = (TextInputEditText) root.findViewById(R.id.storeName);
-        mStoreNameEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mStoreNameEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
-                    CharSequence storeName = mStoreNameEditText.getText();
-                    if (TextUtils.isEmpty(storeName)) {
-                        mStoreNameTextInputLayout.setError(getString(R.string.empty_store_name));
-                    } else {
-                        mStoreNameTextInputLayout.setError("");
-                    }
-                    return true;
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (TextUtils.isEmpty(charSequence)) {
+                    mStoreNameTextInputLayout.setError(getString(R.string.empty_store_name));
+                    mStoreNameTextInputLayout.setErrorEnabled(true);
+                } else {
+                    mStoreNameTextInputLayout.setErrorEnabled(false);
                 }
-                return false;
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
             }
         });
         mStoreAreaEditText = (TextInputEditText) root.findViewById(R.id.areaName);
-        mStoreAreaEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mStoreAreaEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
-                    CharSequence storeArea = mStoreAreaEditText.getText();
-                    if (TextUtils.isEmpty(storeArea)) {
-                        mStoreAreaTextInputLayout.setError(getString(R.string.empty_store_area));
-                    } else {
-                        mStoreAreaTextInputLayout.setError("");
-                    }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (TextUtils.isEmpty(charSequence)) {
+                    mStoreAreaTextInputLayout.setError(getString(R.string.empty_store_area));
+                    mStoreAreaTextInputLayout.setErrorEnabled(true);
+                } else {
+                    mStoreAreaTextInputLayout.setErrorEnabled(false);
                 }
-                return true;
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
             }
         });
         mWebsiteEditText = (TextInputEditText) root.findViewById(R.id.website);
-        mWebsiteEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mWebsiteEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
-                    CharSequence website = mWebsiteEditText.getText();
-                    if (TextUtils.isEmpty(website)) {
-                        mStoreWebsiteTextInputLayout.setError(getString(R.string.empty_store_website));
-                    } else if (!Patterns.WEB_URL.matcher(website).matches()) {
-                        mStoreWebsiteTextInputLayout.setError(getString(R.string.invalid_store_website));
-                    } else {
-                        mStoreWebsiteTextInputLayout.setError("");
-                    }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (!TextUtils.isEmpty(charSequence) && !Patterns.WEB_URL.matcher(charSequence).matches()) {
+                    mStoreWebsiteTextInputLayout.setError(getString(R.string.invalid_store_website));
+                    mStoreWebsiteTextInputLayout.setErrorEnabled(true);
+                } else {
+                    mStoreWebsiteTextInputLayout.setErrorEnabled(false);
+                    getLogoUriUsingClearbit();
+                    loadLogo();
                 }
-                return true;
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
             }
         });
-
         mCountersEditText = (TextInputEditText) root.findViewById(R.id.counters);
-        mCountersEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mCountersEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
-                    CharSequence counters = mCountersEditText.getText();
-                    if (TextUtils.isEmpty(counters)) {
-                        mStoreCountersTextInputLayout.setError(getString(R.string.empty_store_counters));
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (TextUtils.isEmpty(charSequence)) {
+                    mStoreCountersTextInputLayout.setError(getString(R.string.empty_store_counters));
+                    mStoreCountersTextInputLayout.setErrorEnabled(true);
+                } else {
+                    int counterValue = Integer.parseInt(charSequence.toString());
+                    if (counterValue > 0 && counterValue < 100) {
+                        mStoreCountersTextInputLayout.setErrorEnabled(false);
                     } else {
-                        int counterValue = Integer.parseInt(counters.toString());
-                        if (counterValue > 0 && counterValue < 100) {
-                            mStoreCountersTextInputLayout.setError("");
-                        } else {
-                            mStoreCountersTextInputLayout.setError(getString(R.string.invalid_store_counters));
-                        }
+                        mStoreCountersTextInputLayout.setError(getString(R.string.invalid_store_counters));
+                        mStoreCountersTextInputLayout.setErrorEnabled(true);
                     }
                 }
-                return true;
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
             }
         });
-
         mProgressBar = (ProgressBar) root.findViewById(R.id.logoProgress);
         mStoreImageView = (ImageView) root.findViewById(R.id.storeProfilePic);
         mUploadButton = (Button) root.findViewById(R.id.uploadButton);
@@ -241,31 +273,6 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
             }
         });
 
-
-        //Get and load the store profile pic
-        mProfilePicUri = mIQSharedPreferences.getSting(ApplicationConstants.PROFILE_PIC_URL_KEY);
-
-        if (!TextUtils.isEmpty(mProfilePicUri)) {
-            mStoreImageView.setEnabled(false);
-            Glide.with(getActivity())
-                    .load(mProfilePicUri)
-                    .listener(new RequestListener<String, GlideDrawable>() {
-                        @Override
-                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                            mProgressBar.setVisibility(View.GONE);
-                            mStoreImageView.setEnabled(true);
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                            mProgressBar.setVisibility(View.GONE);
-                            mStoreImageView.setEnabled(true);
-                            return false;
-                        }
-                    })
-                    .into(mStoreImageView);
-        }
         mStoreImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -278,6 +285,61 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
 
         setRetainInstance(true);
         return root;
+    }
+
+    private void getLogoUriUsingClearbit() {
+        mProfilePicUri = mIQSharedPreferences.getSting(ApplicationConstants.WEBSITE_LOGO_URL_KEY);
+
+        CharSequence website = mWebsiteEditText.getText();
+        if(TextUtils.isEmpty(website))
+            return;
+
+        String url = website.toString();
+        if (url != null && !url.startsWith("http") && !url.startsWith("https")) {
+            url = "http://" + url;
+        }
+        String domain = Uri.parse(url).getHost();
+        if (!TextUtils.isEmpty(domain)) {
+            mProfilePicUri = String.format("https://logo.clearbit.com/%1$s", domain.startsWith("www.") ? domain.substring(4) : domain);
+        }
+    }
+
+    private void loadLogo() {
+        if (!TextUtils.isEmpty(mProfilePicUri)) {
+            mStoreImageView.setEnabled(false);
+            fab.setEnabled(false);
+            Glide.with(getActivity())
+                    .load(mProfilePicUri)
+                    .asBitmap()
+                    .listener(new RequestListener<String, Bitmap>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
+                            mProgressBar.setVisibility(View.GONE);
+                            mStoreImageView.setEnabled(true);
+                            mProfilePicUri = null;
+                            fab.setEnabled(true);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            mProgressBar.setVisibility(View.GONE);
+                            mStoreImageView.setEnabled(true);
+
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            resource.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                            bitmapData = baos.toByteArray();
+
+                            mUploadButton.setEnabled(true);
+                            fab.setEnabled(true);
+                            return false;
+                        }
+                    })
+                    .placeholder(R.mipmap.ic_launcher)
+                    .into(mStoreImageView);
+        } else {
+            mProgressBar.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -313,9 +375,7 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     public void onFileUploadFinished(Uri uri) {
         mProgressBar.setVisibility(View.GONE);
         mProfilePicUri = uri.toString();
-        mIQSharedPreferences.putString(ApplicationConstants.PROFILE_PIC_URL_KEY, mProfilePicUri);
         mUploadButton.setEnabled(false);
-        fab.setEnabled(true);
     }
 
     @Override
@@ -362,41 +422,57 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
         CharSequence storeName = mStoreNameEditText.getText();
         if (TextUtils.isEmpty(storeName)) {
             mStoreNameTextInputLayout.setError(getString(R.string.empty_store_name));
+            mStoreNameTextInputLayout.setErrorEnabled(true);
             return result;
         }
 
         CharSequence storeArea = mStoreAreaEditText.getText();
         if (TextUtils.isEmpty(storeArea)) {
             mStoreAreaTextInputLayout.setError(getString(R.string.empty_store_area));
+            mStoreAreaTextInputLayout.setErrorEnabled(true);
             return result;
         }
 
         CharSequence website = mWebsiteEditText.getText();
-        if (TextUtils.isEmpty(website)) {
-            mStoreWebsiteTextInputLayout.setError(getString(R.string.empty_store_website));
-            return result;
-        } else if (!Patterns.WEB_URL.matcher(website).matches()) {
+        if (!TextUtils.isEmpty(website) && !Patterns.WEB_URL.matcher(website).matches()) {
             mStoreWebsiteTextInputLayout.setError(getString(R.string.invalid_store_website));
+            mStoreWebsiteTextInputLayout.setErrorEnabled(true);
             return result;
         }
 
         CharSequence counters = mCountersEditText.getText();
         if (TextUtils.isEmpty(counters)) {
             mStoreCountersTextInputLayout.setError(getString(R.string.empty_store_counters));
+            mStoreCountersTextInputLayout.setErrorEnabled(true);
             return result;
         } else {
             int counterValue = Integer.parseInt(counters.toString());
             if (counterValue < 1 || counterValue > 100) {
                 mStoreCountersTextInputLayout.setError(getString(R.string.invalid_store_counters));
+                mStoreCountersTextInputLayout.setErrorEnabled(true);
                 return result;
             }
         }
 
+        if(!TextUtils.isEmpty(website) && TextUtils.isEmpty(mProfilePicUri)) {
+            Snackbar.make(getView(), getString(R.string.website_not_exist), Snackbar.LENGTH_LONG).show();
+            return result;
+        }
 
-        mStoreNameTextInputLayout.setError("");
-        mStoreAreaTextInputLayout.setError("");
-        mStoreWebsiteTextInputLayout.setError("");
-        mStoreCountersTextInputLayout.setError("");
+        if(bitmapData == null || bitmapData.length == 0) {
+            Snackbar.make(getView(), getString(R.string.upload_store_pic), Snackbar.LENGTH_LONG).show();
+            return result;
+        }
+
+        if(TextUtils.isEmpty(mProfilePicUri)) {
+            Snackbar.make(getView(), getString(R.string.upload_store_pic), Snackbar.LENGTH_LONG).show();
+            return result;
+        }
+
+        mStoreNameTextInputLayout.setErrorEnabled(false);
+        mStoreAreaTextInputLayout.setErrorEnabled(false);
+        mStoreWebsiteTextInputLayout.setErrorEnabled(false);
+        mStoreCountersTextInputLayout.setErrorEnabled(false);
 
         return true;
     }

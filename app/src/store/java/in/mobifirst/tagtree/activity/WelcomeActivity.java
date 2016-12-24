@@ -21,8 +21,6 @@ import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
 import in.mobifirst.tagtree.ftu.SettingsFetcherActivity;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
-import in.mobifirst.tagtree.tokens.TokensActivity;
-import in.mobifirst.tagtree.util.ApplicationConstants;
 import io.fabric.sdk.android.Fabric;
 
 /**
@@ -51,15 +49,11 @@ public class WelcomeActivity extends BaseActivity {
         SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_WIDE);
 
-        //final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) this
-                //.findViewById(android.R.id.content)).getChildAt(0);
-
         if (isInternetConnected() == false)
             showDialog();
     }
 
-    private void showDialog()
-    {
+    private void showDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Application needs to connect to Wifi or MobileData")
                 .setCancelable(false)
@@ -94,11 +88,11 @@ public class WelcomeActivity extends BaseActivity {
 
         if (mFirebaseAuth.getAuthInstance().getCurrentUser() != null) {
             Intent intent;
-            if (mIQSharedPreferences.getBoolean(ApplicationConstants.FTU_COMPLETED_KEY)) {
-                intent = new Intent(this, TokensActivity.class);
-            } else {
-                intent = new Intent(this, SettingsFetcherActivity.class);
-            }
+//            if (mIQSharedPreferences.getBoolean(ApplicationConstants.FTU_COMPLETED_KEY)) {
+//                intent = new Intent(this, TokensActivity.class);
+//            } else {
+            intent = new Intent(this, SettingsFetcherActivity.class);
+//            }
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);
             finish();
@@ -113,8 +107,7 @@ public class WelcomeActivity extends BaseActivity {
         }
     }
 
-    private boolean isInternetConnected()
-    {
+    private boolean isInternetConnected() {
         ConnectivityManager cm = (ConnectivityManager) this.getSystemService(this.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null &&

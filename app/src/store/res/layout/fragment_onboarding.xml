@@ -15,15 +15,12 @@
         <android.support.design.widget.TextInputLayout
             android:id="@+id/storeNameInputLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:errorEnabled="true">
+            android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/storeName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusableInTouchMode="true"
                 android:hint="@string/name"
                 android:imeOptions="actionNext"
                 android:inputType="text"
@@ -35,8 +32,7 @@
             android:id="@+id/storeAreaInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/storeNameInputLayout"
-            app:errorEnabled="true">
+            android:layout_below="@+id/storeNameInputLayout">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/areaName"
@@ -53,8 +49,7 @@
             android:id="@+id/storeWebsiteInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/storeAreaInputLayout"
-            app:errorEnabled="true">
+            android:layout_below="@+id/storeAreaInputLayout">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/website"
@@ -71,8 +66,7 @@
             android:id="@+id/storeCountersInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/storeWebsiteInputLayout"
-            app:errorEnabled="true">
+            android:layout_below="@+id/storeWebsiteInputLayout">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/counters"
@@ -99,7 +93,7 @@
                     android:id="@+id/storeProfilePic"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    app:srcCompat="@drawable/common_google_signin_btn_icon_dark_pressed" />
+                    app:srcCompat="@mipmap/ic_launcher" />
 
                 <ProgressBar
                     android:id="@+id/logoProgress"

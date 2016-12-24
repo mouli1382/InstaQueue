@@ -68,12 +68,13 @@
     <string name="empty_store_website">Empty Website</string>
     <string name="invalid_store_website">Invalid Website URL</string>
     <string name="empty_store_details">Kindly fill in the store details</string>
+    <string name="upload_store_pic">Kindly upload Profile picture.</string>
     <string name="upload_failed_error">File upload failed</string>
     <string name="add_store_failed">Failed to save store details</string>
     <string name="name">Store Name</string>
     <string name="area">Area Name</string>
     <string name="phone_number">Enter Phone Number</string>
-    <string name="website">Website URL</string>
+    <string name="website">(Optional) Website URL</string>
     <string name="counters">Number of Counters</string>
     <string name="upload">UPLOAD</string>
     <string name="empty_store_counters">Empty Counters</string>
@@ -90,5 +91,6 @@
     <string name="issue">ISSUE</string>
     <string name="serve">SERVE</string>
     <string name="powered_by">Powered by</string>
+    <string name="website_not_exist">Website does not exist.</string>
 
 </resources>

@@ -55,4 +55,9 @@ public class IQSharedPreferences {
     public long getLong(String key) {
         return mSharedPreferences.getLong(key, 0);
     }
+
+    public boolean remove(String key) {
+        mEditor.remove(key);
+        return mEditor.commit();
+    }
 }

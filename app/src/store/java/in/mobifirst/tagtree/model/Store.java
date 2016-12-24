@@ -115,8 +115,18 @@ public class Store {
         sharedPreferences.putString(ApplicationConstants.DISPLAY_NAME_KEY, name);
         sharedPreferences.putString(ApplicationConstants.AREA_NAME_KEY, area);
         sharedPreferences.putString(ApplicationConstants.WEBSITE_KEY, website);
-        sharedPreferences.putString(ApplicationConstants.PROFILE_PIC_URL_KEY, logoUrl);
+        sharedPreferences.putString(ApplicationConstants.WEBSITE_LOGO_URL_KEY, logoUrl);
         sharedPreferences.putInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY, numberOfCounters);
+//        sharedPreferences.putLong(ApplicationConstants.CREDITS_KEY, credits);
+    }
+
+    @Exclude
+    public static void clearStore(IQSharedPreferences sharedPreferences) {
+        sharedPreferences.remove(ApplicationConstants.DISPLAY_NAME_KEY);
+        sharedPreferences.remove(ApplicationConstants.AREA_NAME_KEY);
+        sharedPreferences.remove(ApplicationConstants.WEBSITE_KEY);
+        sharedPreferences.remove(ApplicationConstants.WEBSITE_LOGO_URL_KEY);
+        sharedPreferences.remove(ApplicationConstants.NUMBER_OF_COUNTERS_KEY);
 //        sharedPreferences.putLong(ApplicationConstants.CREDITS_KEY, credits);
     }
 }
