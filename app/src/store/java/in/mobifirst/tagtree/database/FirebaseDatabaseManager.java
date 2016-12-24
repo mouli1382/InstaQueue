@@ -55,6 +55,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String STORE_CHILD = "store/";
     private static final String COUNTERS_CHILD = "counters/";
     private static final String COUNTERS_AVG_TAT_CHILD = "avgTurnAroundTime/";
+    private static final String COUNTERS_AVG_BURST_CHILD = "avgBurstTime/";
     private static final String COUNTERS_LAST_ACTIVE_TOKEN = "activatedToken/";
     private static final String COUNTERS_USERS = "counterUserCount/";
     private static final String TOPICS_CHILD = "topics/";
@@ -66,7 +67,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     private DatabaseReference mDatabaseReference;
     private IQSharedPreferences mSharedPrefs;
-    private long waitTimePerToken = 0;
 
     @Inject
     public FirebaseDatabaseManager(IQSharedPreferences iqSharedPreferences) {
@@ -75,7 +75,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     }
 
-    public class IncremnetTransactionHander implements Transaction.Handler {
+    private class IncremnetTransactionHander implements Transaction.Handler {
 
         @Override
         public Transaction.Result doTransaction(MutableData mutableData) {
@@ -97,30 +97,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     ;
-
-    public class TATIncrementHandler implements Transaction.Handler {
-
-        @Override
-        public Transaction.Result doTransaction(MutableData mutableData) {
-            Long currentValue = mutableData.getValue(Long.class);
-            if (currentValue == null) {
-                mutableData.setValue(waitTimePerToken);
-            } else {
-                mutableData.setValue(currentValue + waitTimePerToken);
-            }
-
-
-            return Transaction.success(mutableData);
-        }
-
-        @Override
-        public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
-
-        }
-    }
-
-    ;
-
 
     public DatabaseReference getDatabaseReference() {
         return mDatabaseReference;
@@ -627,28 +603,58 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     public void updateToken(Token token) {
         if (token.isCompleted()) {
-            //Move it to token-history table.
-            mDatabaseReference
-                    .child(TOKENS_HISTORY_CHILD)
-                    .push()
-                    .setValue(token.toMap()); //Fix this to Map should not be used
-
-            //Remove it from the store counter
-            mDatabaseReference
-                    .child(STORE_CHILD)
-                    .child(token.getStoreId())
-                    .child(COUNTERS_CHILD)
-                    .child("" + token.getCounter())
-                    .child(TOKENS_CHILD)
-                    .child(token.getuId())
-                    .removeValue();
-
-            //Remove it from the token table
+            //Update the token completion time
             mDatabaseReference
                     .child(TOKENS_CHILD)
                     .child(token.getuId())
-                    .removeValue();
-        } else {            //Check for network connectivity
+                    .setValue(token);
+            mDatabaseReference
+                    .child(TOKENS_CHILD)
+                    .child(token.getuId())
+                    .child("tokenFinishTime")
+                    .setValue(ServerValue.TIMESTAMP);
+
+            ValueEventListener completionListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        Token tokenUpdated = dataSnapshot.getValue(Token.class);
+                        incrementAvgBurstTime(tokenUpdated);
+
+                        //Move it to token-history table.
+                        mDatabaseReference
+                                .child(TOKENS_HISTORY_CHILD)
+                                .push()
+                                .setValue(tokenUpdated.toMap());
+
+                        //Remove it from the token table
+                        mDatabaseReference
+                                .child(TOKENS_CHILD)
+                                .child(tokenUpdated.getuId())
+                                .removeValue();
+
+                        //Remove the activated token from the store counter so that the TAT is calculated on the issued tokens only.
+                        mDatabaseReference
+                                .child(STORE_CHILD)
+                                .child(tokenUpdated.getStoreId())
+                                .child(COUNTERS_CHILD)
+                                .child("" + tokenUpdated.getCounter())
+                                .child(TOKENS_CHILD)
+                                .child(tokenUpdated.getuId())
+                                .removeValue();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.w(TAG, "Token completion time is not updated", databaseError.toException());
+                }
+            };
+            mDatabaseReference
+                    .child(TOKENS_CHILD)
+                    .child(token.getuId()).addListenerForSingleValueEvent(completionListener);
+
+        } else {
             mDatabaseReference
                     .child(TOKENS_CHILD)
                     .child(token.getuId())
@@ -662,14 +668,26 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             ValueEventListener postListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    // Get Post object and use the values to update the UI
-                    Token tokenUpdated = dataSnapshot.getValue(Token.class);
-                    if (tokenUpdated.getBuzzCount() == 1) {
-                        //Inform user if he is not present in the user table
-                        checkSMSSending(tokenUpdated, true);
-                        incrementUserCount(tokenUpdated, new IncremnetTransactionHander());
-                        incrementAvgTAT(tokenUpdated, new TATIncrementHandler());
-                        setActiveTokenNumber(tokenUpdated);
+                    if (dataSnapshot.exists()) {
+                        Token tokenUpdated = dataSnapshot.getValue(Token.class);
+                        if (tokenUpdated.getBuzzCount() == 1) {
+                            //Inform user if he is not present in the user table
+                            checkSMSSending(tokenUpdated, true);
+                            incrementUserCount(tokenUpdated, new IncremnetTransactionHander());
+                            incrementAvgTAT(tokenUpdated);
+                            setActiveTokenNumber(tokenUpdated);
+
+
+                            //Remove the activated token from the store counter so that the TAT is calculated on the issued tokens only.
+                            mDatabaseReference
+                                    .child(STORE_CHILD)
+                                    .child(tokenUpdated.getStoreId())
+                                    .child(COUNTERS_CHILD)
+                                    .child("" + tokenUpdated.getCounter())
+                                    .child(TOKENS_CHILD)
+                                    .child(tokenUpdated.getuId())
+                                    .removeValue();
+                        }
                     }
                 }
 
@@ -683,7 +701,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             mDatabaseReference
                     .child(TOKENS_CHILD)
                     .child(token.getuId()).addListenerForSingleValueEvent(postListener);
-
         }
     }
 
@@ -726,18 +743,72 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     }
 
-    private void incrementAvgTAT(Token token, @NonNull Transaction.Handler handler) {
-        waitTimePerToken = token.getActivatedTokenTime() - token.getTimestamp();
-        if (waitTimePerToken < 0)
+    private void incrementAvgTAT(Token token) {
+        long waitTimePerToken = token.getActivatedTokenTime() - token.getTimestamp();
+        if (waitTimePerToken < 0) {
             waitTimePerToken = 0;
+        }
 
+        final long finalWaitTimePerToken = waitTimePerToken;
         mDatabaseReference
                 .child(STORE_CHILD)
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
                 .child("" + token.getCounter())
                 .child(COUNTERS_AVG_TAT_CHILD)
-                .runTransaction(handler);
+                .runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        Long currentValue = mutableData.getValue(Long.class);
+                        if (currentValue == null) {
+                            mutableData.setValue(finalWaitTimePerToken);
+                        } else {
+                            mutableData.setValue(currentValue + finalWaitTimePerToken);
+                        }
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+                    }
+                });
+
+    }
+
+    private void incrementAvgBurstTime(Token token) {
+        long burstTime = 0;
+        if (token.getActivatedTokenTime() > 0) {
+            burstTime = token.getTokenFinishTime() - token.getActivatedTokenTime();
+        }
+        if (burstTime < 0) {
+            burstTime = 0;
+        }
+
+        final long finalBurstTime = burstTime;
+        mDatabaseReference
+                .child(STORE_CHILD)
+                .child(token.getStoreId())
+                .child(COUNTERS_CHILD)
+                .child("" + token.getCounter())
+                .child(COUNTERS_AVG_BURST_CHILD)
+                .runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        Long currentValue = mutableData.getValue(Long.class);
+                        if (currentValue == null) {
+                            mutableData.setValue(finalBurstTime);
+                        } else {
+                            mutableData.setValue(currentValue + finalBurstTime);
+                        }
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+                    }
+                });
 
     }
 

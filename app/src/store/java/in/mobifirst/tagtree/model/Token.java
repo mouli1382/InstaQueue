@@ -24,6 +24,7 @@ public class Token implements Parcelable {
     private String areaName;
     private int counter;
     private long activatedTokenTime;
+    private long tokenFinishTime;
     private String userName;
 
     public enum Status {
@@ -144,6 +145,14 @@ public class Token implements Parcelable {
         this.activatedTokenTime = timestamp;
     }
 
+    public long getTokenFinishTime() {
+        return tokenFinishTime;
+    }
+
+    public void setTokenFinishTime(long tokenFinishTime) {
+        this.tokenFinishTime = tokenFinishTime;
+    }
+
     public int getBuzzCount() {
         return buzzCount;
     }
@@ -191,6 +200,7 @@ public class Token implements Parcelable {
         result.put("counter", counter);
         result.put("areaName", areaName);
         result.put("activatedTokenTime", activatedTokenTime);
+        result.put("tokenFinishTime", tokenFinishTime);
         return result;
     }
 
@@ -246,6 +256,7 @@ public class Token implements Parcelable {
         parcel.writeString(areaName);
         parcel.writeInt(counter);
         parcel.writeLong(activatedTokenTime);
+        parcel.writeLong(tokenFinishTime);
         parcel.writeString(userName);
     }
 
@@ -262,6 +273,7 @@ public class Token implements Parcelable {
         areaName = in.readString();
         counter = in.readInt();
         activatedTokenTime = in.readLong();
+        tokenFinishTime = in.readLong();
         userName = in.readString();
     }
 
