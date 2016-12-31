@@ -11,6 +11,7 @@ import javax.inject.Inject;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseActivity;
+import in.mobifirst.tagtree.activity.RequestPermissionsActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
@@ -126,7 +127,7 @@ public class SettingsFetcherActivity extends BaseActivity {
         } else {
             store.persistStore(mIQSharedPreferences);
             mIQSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
-            TokensActivity.start(SettingsFetcherActivity.this);
+            RequestPermissionsActivity.start(SettingsFetcherActivity.this);
         }
         finish();
     }

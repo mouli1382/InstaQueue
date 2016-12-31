@@ -524,9 +524,9 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             public void onDataChange(DataSnapshot usersnapshot) {
                 if (usersnapshot == null || !usersnapshot.exists()) {
                     //user is not present
-                    if (!BuildConfig.DEBUG) {
+//                    if (!BuildConfig.DEBUG) {
                         sendSMS(token, status);
-                    }
+//                    }
 //                    sendBulkSMS(token, status);
                 } else {
                     //User present. Update token table for the counter view.

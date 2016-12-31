@@ -18,6 +18,7 @@ import in.mobifirst.tagtree.ftu.SettingsActivity;
 import in.mobifirst.tagtree.ftu.SettingsFetcherActivity;
 import in.mobifirst.tagtree.ftu.SettingsFragment;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.sms.SmsReceiver;
 import in.mobifirst.tagtree.storage.FirebaseStorageManager;
 import in.mobifirst.tagtree.storage.StorageModule;
 import in.mobifirst.tagtree.tokens.SnapFragment;
@@ -50,6 +51,8 @@ public interface ApplicationComponent {
     void inject(SnapFragment snapFragment);
 
     void inject(BaseDrawerActivity baseDrawerActivity);
+
+    void inject(SmsReceiver smsReceiver);
 
     TokensRepository getTokensRepository();
 
