@@ -1,7 +1,9 @@
 package in.mobifirst.tagtree.database;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.v7.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -22,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -36,6 +39,7 @@ import java.util.TreeMap;
 import javax.inject.Inject;
 
 import in.mobifirst.tagtree.BuildConfig;
+import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.model.User;
@@ -67,12 +71,13 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     private DatabaseReference mDatabaseReference;
     private IQSharedPreferences mSharedPrefs;
+    private IQStoreApplication mIQStoreApplication;
 
     @Inject
-    public FirebaseDatabaseManager(IQSharedPreferences iqSharedPreferences) {
+    public FirebaseDatabaseManager(IQStoreApplication application, IQSharedPreferences iqSharedPreferences) {
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mIQStoreApplication = application;
         mSharedPrefs = iqSharedPreferences;
-
     }
 
     private class IncremnetTransactionHander implements Transaction.Handler {
@@ -529,15 +534,51 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         //Sender ID,While using route4 sender id should be 6 characters long.
         String senderId = "TagTre";
         String message = "";
+
         //Your message to send, Add URL encoding here.
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mIQStoreApplication);
+        String languagePrefValueString = sharedPref.getString(ApplicationConstants.LANGUAGE_PREFERENCE_KEY, "-1");
+        int languagePrefValue = Integer.parseInt(languagePrefValueString);
+
         if (status == false) {
-            message = "You've received a token from " + token.getSenderName().trim() + " "
-                    + token.getAreaName().trim() + ". Token= " + (token.getTokenNumber()) + ", Counter= " + token.getCounter()
-                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates";
+            switch (languagePrefValue) {
+                case 0: //English
+                default:
+                    message = "You've received a token from " + token.getSenderName().trim() + " "
+                            + token.getAreaName().trim() + ". Token= " + (token.getTokenNumber()) + ", Counter= " + token.getCounter()
+                            + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates";
+                    break;
+                case 1: //Telugu
+                    message = "మీకు" + " " + token.getSenderName().trim() + " మరియు శాఖ" + " "
+                            + token.getAreaName().trim() + " నుండి టోకెన్ అందింది" + "." + "టోకెన్ సంఖ్య" + "=" + (token.getTokenNumber())
+                            + "," + "కౌంటర సంఖ్య" + "=" + token.getCounter()
+                            + "." +
+                            "నిజ సమయంలో టోకెన్ స్థితిని ట్రాక్ చేయడానికి PlayStore నుండి అప్లికేషన్ డౌన్లోడ్ చేయుము"
+                            + "."
+                            + CLIENT_APP_PLAYSTORE_URL
+                            + ".";
+                    break;
+            }
         } else {
-            message = "It's your turn at " + token.getSenderName() + " " + token.getAreaName() + "."
-                    + " Token = " + token.getTokenNumber() + ", Counter = " + token.getCounter()
-                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates.";
+
+            switch (languagePrefValue) {
+                case 0: //English
+                default:
+                    message = "It's your turn at " + token.getSenderName() + " " + token.getAreaName() + "."
+                            + " Token = " + token.getTokenNumber() + ", Counter = " + token.getCounter()
+                            + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates.";
+                    break;
+                case 1: //Telugu
+                    message = token.getSenderName().trim() + " మరియు శాఖ" + " "
+                            + token.getAreaName().trim() + "వద్ద మీ వంతు" + "." + "టోకెన్ సంఖ్య" + "=" + (token.getTokenNumber())
+                            + "," + "కౌంటర సంఖ్య" + "=" + token.getCounter()
+                            + "." +
+                            "నిజ సమయంలో టోకెన్ స్థితిని ట్రాక్ చేయడానికి PlayStore నుండి అప్లికేషన్ డౌన్లోడ్ చేయుము"
+                            + "."
+                            + CLIENT_APP_PLAYSTORE_URL
+                            + ".";
+                    break;
+            }
         }
         //define route
         String route = "4"; //4 For transaction, check with msg91
@@ -547,50 +588,57 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         BufferedReader reader = null;
 
         //encoding message
-        String encoded_message = URLEncoder.encode(message);
+        String encoded_message = null;
+        try {
+            encoded_message = URLEncoder.encode(message, "UTF-8");
 
-        //Send SMS API
-        String mainUrl = mMsg91Url;
+            //Send SMS API
+            String mainUrl = mMsg91Url;
 
-        //Prepare parameter string
-        StringBuilder sbPostData = new StringBuilder(mainUrl);
-        sbPostData.append("authkey=" + authkey);
-        sbPostData.append("&mobiles=" + mobiles);
-        sbPostData.append("&message=" + encoded_message);
-        sbPostData.append("&route=" + route);
-        sbPostData.append("&sender=" + senderId);
+            //Prepare parameter string
+            StringBuilder sbPostData = new StringBuilder(mainUrl);
+            sbPostData.append("authkey=" + authkey);
+            sbPostData.append("&mobiles=" + mobiles);
+            sbPostData.append("&message=" + encoded_message);
+            sbPostData.append("&route=" + route);
+            sbPostData.append("&sender=" + senderId);
+            sbPostData.append("&unicode=1");
 
-        //final string
-        mainUrl = sbPostData.toString();
-        class SendSMSTask extends AsyncTask<String, Integer, Long> {
-            protected Long doInBackground(String... urls) {
-                try {
-                    //prepare connection
-                    URL myURL = new URL(urls[0]);
-                    URLConnection myURLConnection = myURL.openConnection();
-                    myURLConnection.connect();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(myURLConnection.getInputStream()));
+            //final string
+            mainUrl = sbPostData.toString();
+            class SendSMSTask extends AsyncTask<String, Integer, Long> {
+                protected Long doInBackground(String... urls) {
+                    try {
+                        //prepare connection
+                        URL myURL = new URL(urls[0]);
+                        URLConnection myURLConnection = myURL.openConnection();
+                        myURLConnection.connect();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(myURLConnection.getInputStream()));
 
-                    //reading response
-                    String response;
-                    while ((response = reader.readLine()) != null)
-                        //print response
-                        Log.d("RESPONSE", "" + response);
+                        //reading response
+                        String response;
+                        while ((response = reader.readLine()) != null)
+                            //print response
+                            Log.d("RESPONSE", "" + response);
 
-                    //finally close connection
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    FirebaseCrash.report(new Exception("Error in Sending SMS: " + e.getMessage()));
+                        //finally close connection
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        FirebaseCrash.report(new Exception("Error in Sending SMS: " + e.getMessage()));
+                    }
+                    return 0L;
                 }
-                return 0L;
             }
-        }
 
-        //Uncomment this  to execute the send sms
-        new SendSMSTask().execute(mainUrl);
-        incrementSMS(token, new IncremnetTransactionHander()
-        );
+            //Uncomment this  to execute the send sms
+            new SendSMSTask().execute(mainUrl);
+            incrementSMS(token, new IncremnetTransactionHander()
+            );
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateTopicsForPushNotification(Token token) {
@@ -918,5 +966,25 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         incrementSMS(token, new IncremnetTransactionHander());
     }
 
+    //Reset token counter
+    public void resetTokenCounter(String storeId) {
+        DatabaseReference tokenCounterRef = mDatabaseReference
+                .child("store")
+                .child(storeId)
+                .child("tokenCounter");
+        tokenCounterRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                mutableData.setValue(0);
+
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+            }
+        });
+    }
 }
 

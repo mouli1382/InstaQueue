@@ -29,6 +29,10 @@
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".config.PrefsActivity"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".activity.CreditsActivity"
             android:label="@string/title_activity_credits"
             android:theme="@style/AppTheme.NoActionBar"

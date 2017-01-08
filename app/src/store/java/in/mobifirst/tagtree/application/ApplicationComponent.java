@@ -10,6 +10,7 @@ import in.mobifirst.tagtree.addedittoken.AddEditTokenFragment;
 import in.mobifirst.tagtree.authentication.AuthenticationModule;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
+import in.mobifirst.tagtree.config.ResetPreference;
 import in.mobifirst.tagtree.data.token.TokensRepository;
 import in.mobifirst.tagtree.data.token.TokensRepositoryModule;
 import in.mobifirst.tagtree.database.DatabaseModule;
@@ -50,6 +51,8 @@ public interface ApplicationComponent {
     void inject(SnapFragment snapFragment);
 
     void inject(BaseDrawerActivity baseDrawerActivity);
+
+    void inject(ResetPreference resetPreference);
 
     TokensRepository getTokensRepository();
 
