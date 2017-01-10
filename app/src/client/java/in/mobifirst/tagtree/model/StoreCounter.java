@@ -123,4 +123,22 @@ public class StoreCounter {
         }
         return TimeUtils.getDuration(avgBurstPerToken);
     }
+
+    public String getPosition(long given) {
+        if (tokens == null || tokens.size() == 0)
+            return "";
+
+        List<Long> tokenList = new ArrayList<>(tokens.values());
+        if (tokenList.size() == 0) {
+            return "";
+        }
+
+        Collections.sort(tokenList);
+        int index = tokenList.indexOf(given);
+        if(index <= 0) {
+            return "You are next.";
+        } else {
+            return "You are number " + index + " in-line.";
+        }
+    }
 }
