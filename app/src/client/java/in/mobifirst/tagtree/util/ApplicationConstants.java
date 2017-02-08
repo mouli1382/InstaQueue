@@ -13,7 +13,9 @@ public class ApplicationConstants {
     public static final String PROFILE_PIC_URL_KEY = "profile_url_key";
     public static final String DISPLAY_NAME_KEY = "display_name_key";
 
-    public static String FTU_COMPLETED_KEY = "ftu_completed";
+    public static final String FTU_COMPLETED_KEY = "ftu_completed";
     public static final int REQUEST_CODE_RECEIVE_SMS = 1;
     public static final int REQUEST_CODE_READ_PHONE_STATE = 2;
+
+    public static final String FIRST_LAUNCH_COMPLETED_KEY = "first_launch_completed";
 }

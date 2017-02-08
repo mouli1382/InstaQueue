@@ -1,7 +1,7 @@
 def versionMajor = 1
 def versionMinor = 0
 def versionPatch = 0
-def versionBuild = 9 // bump for dogfood builds, public betas, etc.
+def versionBuild = 10 // bump for dogfood builds, public betas, etc.
 
 def gitSha = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim()
 def gitBranchName = 'git rev-parse --abbrev-ref HEAD'.execute([], project.rootDir).text.trim()
@@ -123,7 +123,6 @@ dependencies {
     compile "com.google.firebase:firebase-auth:$rootProject.firebaseVersion"
     compile "com.google.firebase:firebase-messaging:$rootProject.firebaseVersion"
     compile "com.google.firebase:firebase-storage:$rootProject.firebaseVersion"
-    compile 'com.firebaseui:firebase-ui-database:0.4.0'
     compile "com.google.firebase:firebase-crash:$rootProject.firebaseVersion"
 
     compile "com.google.android.gms:play-services-auth:$rootProject.firebaseVersion"
@@ -145,11 +144,13 @@ dependencies {
     compile "com.github.bumptech.glide:glide:$rootProject.glideVersion"
     compile "com.google.code.findbugs:jsr305:$rootProject.findbugsVersion"
 
+
+
+    compile 'com.firebaseui:firebase-ui-database:0.4.0'
     compile 'com.razorpay:checkout:1.0.2'
-
-    testCompile 'junit:junit:4.12'
-
     compile 'com.commonsware.cwac:presentation:0.4.6'
+    compile 'com.android.support:support-v4:25.1.0'
+    testCompile 'junit:junit:4.12'
 }
 
 apply plugin: 'com.google.gms.google-services'
