@@ -9,6 +9,10 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.extensions.android.json.AndroidJsonFactory;
+import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
+import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -40,6 +44,7 @@ import javax.inject.Inject;
 
 import in.mobifirst.tagtree.BuildConfig;
 import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.backend.myApi.MyApi;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.model.User;
@@ -48,9 +53,11 @@ import in.mobifirst.tagtree.tokens.Snap;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.schedulers.Schedulers;
 
 public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String TAG = "FirebaseDatabaseManager";
@@ -72,6 +79,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private DatabaseReference mDatabaseReference;
     private IQSharedPreferences mSharedPrefs;
     private IQStoreApplication mIQStoreApplication;
+    private MyApi myApiService;
 
     @Inject
     public FirebaseDatabaseManager(IQStoreApplication application, IQSharedPreferences iqSharedPreferences) {
@@ -322,81 +330,143 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .setValue(token.getTokenNumber());
     }
 
-    public void addNewToken(final Token token, final Subscriber<? super String> subscriber) {
-        incrementTokenCounter(token, new Transaction.Handler() {
-            @Override
-            public Transaction.Result doTransaction(MutableData mutableData) {
-                Long currentValue = mutableData.getValue(Long.class);
-                if (currentValue == null) {
-                    mutableData.setValue(1);
-                } else {
-                    mutableData.setValue(currentValue + 1);
-                }
-
-                return Transaction.success(mutableData);
-            }
-
-            @Override
-            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
-                if (databaseError == null) {
-                    if (committed) {
-                        {
-                            final Long currentToken = (Long) dataSnapshot.getValue();
-                            DatabaseReference storeRef = mDatabaseReference.getRef()
-                                    .child("store")
-                                    .child(token.getStoreId());
-
-
-                            storeRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot storeDataSnapshot) {
-                                    if (storeDataSnapshot.exists()) {
-
-                                        String key = mDatabaseReference.child(TOKENS_CHILD)
-                                                .push().getKey();
-                                        Store store = storeDataSnapshot.getValue(Store.class);
-                                        String areaName = store.getArea();
-                                        final Token newToken = new Token(key, token.getStoreId(),
-                                                token.getPhoneNumber(),
-                                                currentToken,
-                                                mSharedPrefs.getSting((ApplicationConstants.WEBSITE_LOGO_URL_KEY)),
-                                                mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY),
-                                                token.getCounter(),
-                                                areaName);
-
-                                        mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
-                                        addTokenUnderStoreCounter(newToken);
-
-                                        //ToDo replicate the entire tokens under store. Too much but easy.
-//                                        Map<String, Object> childUpdates = new HashMap<>();
-//                                        childUpdates.put(TOKENS_CHILD + key, tokenValues);
-//                                        childUpdates.put(STORE_CHILD + newToken.getStoreId() + "/" + newToken.getCounter() + "/" + TOKENS_CHILD + key, tokenValues);
-//
-//                                        mDatabaseReference.updateChildren(childUpdates);
-                                        checkSMSSending(newToken, false);
-                                    } else {
-                                        Log.e(TAG, "Snapshot is null");
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                    Log.e(TAG, "[fetch Area name] onCancelled:" + databaseError);
-                                }
-                            });
-
-                            subscriber.onNext(null);
-                            subscriber.onCompleted();
+    private void createToken(Token token) {
+        if (myApiService == null) {  // Only do this once
+            MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
+                    new AndroidJsonFactory(), null)
+                    // options for running against local devappserver
+                    // - 10.0.2.2 is localhost's IP address in Android emulator
+                    // - turn off compression when running against local devappserver
+                    .setRootUrl("http://192.168.1.4:8080/_ah/api/")
+//                    .setRootUrl("https://tagtree-dev.appspot.com/_ah/api/")
+                    .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                        @Override
+                        public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
+                            abstractGoogleClientRequest.setDisableGZipContent(true);
                         }
-                    } else {
-                        subscriber.onError(databaseError.toException());
-                    }
-                } else {
-                    subscriber.onError(databaseError.toException());
-                }
+                    });
+            // end options for devappserver
+            myApiService = builder.build();
+        }
 
+        try {
+            //Copy the app token model into backend model
+            in.mobifirst.tagtree.backend.myApi.model.Token token1 = new in.mobifirst.tagtree.backend.myApi.model.Token();
+            token1.setSenderName(token.getSenderName());
+            token1.setSenderPic(token.getSenderPic());
+            token1.setStoreId(token.getStoreId());
+            token1.setPhoneNumber(token.getPhoneNumber());
+            token1.setCounter(token.getCounter());
+
+            Log.e(TAG, "addToken = " + myApiService.addNewToken(token1).execute().getStatus());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addNewToken(final Token token, final Subscriber<? super String> subscriber) {
+        token.setSenderPic(mSharedPrefs.getSting((ApplicationConstants.WEBSITE_LOGO_URL_KEY)));
+        token.setSenderName(mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY));
+
+        Observable.create(new Observable.OnSubscribe<Boolean>() {
+            @Override
+            public void call(Subscriber<? super Boolean> subscriber) {
+                createToken(token);
             }
-        });
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Boolean>() {
+                    @Override
+                    public void onCompleted() {
+                        subscriber.onCompleted();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Boolean aBoolean) {
+
+                    }
+                });
+
+//        incrementTokenCounter(token, new Transaction.Handler() {
+//            @Override
+//            public Transaction.Result doTransaction(MutableData mutableData) {
+//                Long currentValue = mutableData.getValue(Long.class);
+//                if (currentValue == null) {
+//                    mutableData.setValue(1);
+//                } else {
+//                    mutableData.setValue(currentValue + 1);
+//                }
+//
+//                return Transaction.success(mutableData);
+//            }
+//
+//            @Override
+//            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+//                if (databaseError == null) {
+//                    if (committed) {
+//                        {
+//                            final Long currentToken = (Long) dataSnapshot.getValue();
+//                            DatabaseReference storeRef = mDatabaseReference.getRef()
+//                                    .child("store")
+//                                    .child(token.getStoreId());
+//
+//
+//                            storeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                @Override
+//                                public void onDataChange(DataSnapshot storeDataSnapshot) {
+//                                    if (storeDataSnapshot.exists()) {
+//
+//                                        String key = mDatabaseReference.child(TOKENS_CHILD)
+//                                                .push().getKey();
+//                                        Store store = storeDataSnapshot.getValue(Store.class);
+//                                        String areaName = store.getArea();
+//                                        final Token newToken = new Token(key, token.getStoreId(),
+//                                                token.getPhoneNumber(),
+//                                                currentToken,
+//                                                mSharedPrefs.getSting((ApplicationConstants.WEBSITE_LOGO_URL_KEY)),
+//                                                mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY),
+//                                                token.getCounter(),
+//                                                areaName);
+//
+//                                        mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
+//                                        addTokenUnderStoreCounter(newToken);
+//
+//                                        //ToDo replicate the entire tokens under store. Too much but easy.
+////                                        Map<String, Object> childUpdates = new HashMap<>();
+////                                        childUpdates.put(TOKENS_CHILD + key, tokenValues);
+////                                        childUpdates.put(STORE_CHILD + newToken.getStoreId() + "/" + newToken.getCounter() + "/" + TOKENS_CHILD + key, tokenValues);
+////
+////                                        mDatabaseReference.updateChildren(childUpdates);
+//                                        checkSMSSending(newToken, false);
+//                                    } else {
+//                                        Log.e(TAG, "Snapshot is null");
+//                                    }
+//                                }
+//
+//                                @Override
+//                                public void onCancelled(DatabaseError databaseError) {
+//                                    Log.e(TAG, "[fetch Area name] onCancelled:" + databaseError);
+//                                }
+//                            });
+//
+//                            subscriber.onNext(null);
+//                            subscriber.onCompleted();
+//                        }
+//                    } else {
+//                        subscriber.onError(databaseError.toException());
+//                    }
+//                } else {
+//                    subscriber.onError(databaseError.toException());
+//                }
+//
+//            }
+//        });
     }
 
     public void getStoreById(String storeId, ValueEventListener valueEventListener) {

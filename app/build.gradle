@@ -149,8 +149,10 @@ dependencies {
     compile 'com.firebaseui:firebase-ui-database:0.4.0'
     compile 'com.razorpay:checkout:1.0.2'
     compile 'com.commonsware.cwac:presentation:0.4.6'
-    compile 'com.android.support:support-v4:25.1.0'
+    compile 'com.android.support:support-v4:25.1.1'
+    compile 'com.google.code.findbugs:jsr305:2.0.1'
     testCompile 'junit:junit:4.12'
+    compile project(path: ':backend', configuration: 'android-endpoints')
 }
 
 apply plugin: 'com.google.gms.google-services'
