@@ -40,6 +40,13 @@ import javax.servlet.ServletContext;
 )
 public class MyEndpoint {
     static Logger Log = Logger.getLogger("in.mobifirst.tagtree.backend.myApi");
+
+    static class myLogger {
+        static void info(String logMe) {
+            Log.info("Running in Thread: " + Thread.currentThread() + " " + logMe);
+        }
+    }
+
     private static final String TOKENS_CHILD = "tokens";
     private static final String STORE_CHILD = "store";
     private static final String COUNTERS_CHILD = "counters";
@@ -73,7 +80,7 @@ public class MyEndpoint {
 //    }
 
     private void incrementTokenCounter(DatabaseReference mDatabaseReference, Token token, @NonNull Transaction.Handler handler) {
-        Log.info("passed in parameter = " + token.toMap());
+        myLogger.info("passed in parameter = " + token.toMap());
         DatabaseReference tokenRef = mDatabaseReference
                 .child("store")
                 .child(token.getStoreId())
@@ -93,9 +100,9 @@ public class MyEndpoint {
                 .setValue(token.getTokenNumber());
     }
 
-    @ApiMethod(name = "addNewToken")
+    @ApiMethod(name = "addNewToken", httpMethod = "POST", path = "")
     public AddTokenResponse addNewToken(final Token token, ServletContext context) {
-        Log.info("passed in parameter = " + token.toMap());
+        myLogger.info("passed in parameter = " + token.toMap());
 
         final AddTokenResponse addTokenResponse = new AddTokenResponse();
 
@@ -107,20 +114,20 @@ public class MyEndpoint {
         try {
             FirebaseApp.getInstance();
         } catch (Exception error) {
-            Log.info("doesn't exist...");
+            myLogger.info("doesn't exist...");
         }
 
         try {
             FirebaseApp.initializeApp(options);
         } catch (Exception error) {
-            Log.info("already exists...");
+            myLogger.info("already exists...");
         }
 
         // As an admin, the app has access to read and write all data, regardless of Security Rules
         final DatabaseReference mDatabaseReference = FirebaseDatabase
                 .getInstance()
                 .getReference();
-        Log.info("DatabaseRef obtained...");
+        myLogger.info("DatabaseRef obtained...");
 
 //        mDatabaseReference
 //                .child("store")
@@ -155,8 +162,12 @@ public class MyEndpoint {
                         } else {
                             mutableData.setValue(currentValue + 1);
                         }
-                        Log.info("token counter incremented..." + mutableData);
-                        return Transaction.success(mutableData);
+                        myLogger.info("token counter incremented..." + mutableData);
+                        if (mutableData.equals(currentValue)) {
+                            return Transaction.abort();
+                        } else {
+                            return Transaction.success(mutableData);
+                        }
                     }
 
                     @Override
@@ -171,7 +182,7 @@ public class MyEndpoint {
                             storeRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot storeDataSnapshot) {
-                                    Log.info("store details fetched...");
+                                    myLogger.info("store details fetched...");
                                     if (storeDataSnapshot.exists()) {
                                         String key = mDatabaseReference.child(TOKENS_CHILD)
                                                 .push().getKey();
@@ -188,11 +199,11 @@ public class MyEndpoint {
                                         mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap()).addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
-                                                Log.info("token is created...");
+                                                myLogger.info("token is created...");
                                                 addTokenUnderStoreCounter(mDatabaseReference, newToken).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
-                                                        Log.info("token is updated under store structure too...");
+                                                        myLogger.info("token is updated under store structure too...");
                                                         addTokenResponse.setStatus(true);
                                                     }
                                                 });
@@ -201,22 +212,20 @@ public class MyEndpoint {
 //                                        checkSMSSending(newToken, false);
                                     } else {
                                         addTokenResponse.setStatus(false);
-                                        Log.info("Snapshot is null");
+                                        myLogger.info("Snapshot is null");
                                     }
                                 }
 
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
                                     addTokenResponse.setStatus(false);
-                                    Log.info("[fetch Area name] onCancelled:" + databaseError);
+                                    myLogger.info("[fetch Area name] onCancelled:" + databaseError);
                                 }
                             });
-                        } else {
-                            addTokenResponse.setStatus(false);
-                            Log.info("Transaction failed" + databaseError);
                         }
                     }
                 });
+        myLogger.info("Returning the result");
         return addTokenResponse;
     }
 }

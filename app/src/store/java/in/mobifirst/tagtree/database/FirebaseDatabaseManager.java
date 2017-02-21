@@ -53,11 +53,9 @@ import in.mobifirst.tagtree.tokens.Snap;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import rx.Observable;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
-import rx.schedulers.Schedulers;
 
 public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String TAG = "FirebaseDatabaseManager";
@@ -330,7 +328,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .setValue(token.getTokenNumber());
     }
 
-    private void createToken(Token token) {
+    private boolean createToken(Token token) {
         if (myApiService == null) {  // Only do this once
             MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
@@ -358,40 +356,59 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             token1.setPhoneNumber(token.getPhoneNumber());
             token1.setCounter(token.getCounter());
 
-            Log.e(TAG, "addToken = " + myApiService.addNewToken(token1).execute().getStatus());
+            return myApiService.addNewToken(token1).execute().getStatus();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public void addNewToken(final Token token, final Subscriber<? super String> subscriber) {
         token.setSenderPic(mSharedPrefs.getSting((ApplicationConstants.WEBSITE_LOGO_URL_KEY)));
         token.setSenderName(mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY));
 
-        Observable.create(new Observable.OnSubscribe<Boolean>() {
+
+        new AsyncTask<Token, Void, Boolean>() {
             @Override
-            public void call(Subscriber<? super Boolean> subscriber) {
-                createToken(token);
+            protected Boolean doInBackground(Token... params) {
+                return createToken(token);
             }
-        })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Boolean>() {
-                    @Override
-                    public void onCompleted() {
-                        subscriber.onCompleted();
-                    }
 
-                    @Override
-                    public void onError(Throwable e) {
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                if (aBoolean) {
+                    subscriber.onCompleted();
+                } else {
+                    subscriber.onError(new Throwable("Failed to create token!"));
+                }
+            }
+        }.execute(token);
 
-                    }
 
-                    @Override
-                    public void onNext(Boolean aBoolean) {
-
-                    }
-                });
+//        Observable.create(new Observable.OnSubscribe<Boolean>() {
+//            @Override
+//            public void call(Subscriber<? super Boolean> subscriber) {
+//                createToken(token);
+//            }
+//        })
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Subscriber<Boolean>() {
+//                    @Override
+//                    public void onCompleted() {
+//                        subscriber.onCompleted();
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onNext(Boolean aBoolean) {
+//
+//                    }
+//                });
 
 //        incrementTokenCounter(token, new Transaction.Handler() {
 //            @Override
