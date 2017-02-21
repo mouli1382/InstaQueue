@@ -34,7 +34,7 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
-import in.mobifirst.tagtree.display.TokenDisplayService;
+//import in.mobifirst.tagtree.display.TokenDisplayService;
 import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
@@ -331,10 +331,10 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         mNoTokensView.setVisibility(View.GONE);
 
         //Send broadcast to TokenDisplayService here.
-        Intent intent = new Intent(TTLocalBroadcastManager.TOKEN_CHANGE_INTENT_ACTION);
-        intent.putParcelableArrayListExtra(TokenDisplayService.SNAP_LIST_INTENT_KEY,
-                (ArrayList<? extends Parcelable>) snaps);
-        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+//        Intent intent = new Intent(TTLocalBroadcastManager.TOKEN_CHANGE_INTENT_ACTION);
+//        intent.putParcelableArrayListExtra(TokenDisplayService.SNAP_LIST_INTENT_KEY,
+//                (ArrayList<? extends Parcelable>) snaps);
+//        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
     }
 
     @Override
@@ -355,10 +355,10 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         );
 
         //Send broadcast to TokenDisplayService here that there are no tokens.
-        Intent intent = new Intent(TTLocalBroadcastManager.TOKEN_CHANGE_INTENT_ACTION);
-        intent.putParcelableArrayListExtra(TokenDisplayService.SNAP_LIST_INTENT_KEY,
-                new ArrayList<Snap>());
-        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+//        Intent intent = new Intent(TTLocalBroadcastManager.TOKEN_CHANGE_INTENT_ACTION);
+//        intent.putParcelableArrayListExtra(TokenDisplayService.SNAP_LIST_INTENT_KEY,
+//                new ArrayList<Snap>());
+//        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
     }
 
     @Override

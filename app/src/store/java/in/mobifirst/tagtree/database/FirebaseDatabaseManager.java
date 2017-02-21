@@ -53,9 +53,11 @@ import in.mobifirst.tagtree.tokens.Snap;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.schedulers.Schedulers;
 
 public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String TAG = "FirebaseDatabaseManager";
@@ -343,7 +345,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                             abstractGoogleClientRequest.setDisableGZipContent(true);
                         }
                     });
-            // end options for devappserver
             myApiService = builder.build();
         }
 
@@ -401,7 +402,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 //
 //                    @Override
 //                    public void onError(Throwable e) {
-//
+//                        subscriber.onError(e);
 //                    }
 //
 //                    @Override

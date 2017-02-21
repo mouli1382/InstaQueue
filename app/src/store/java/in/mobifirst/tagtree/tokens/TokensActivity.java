@@ -15,7 +15,7 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseDrawerActivity;
 import in.mobifirst.tagtree.activity.CreditsActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
-import in.mobifirst.tagtree.display.TokenDisplayService;
+//import in.mobifirst.tagtree.display.TokenDisplayService;
 import in.mobifirst.tagtree.util.ActivityUtilities;
 
 public class TokensActivity extends BaseDrawerActivity {
@@ -94,7 +94,7 @@ public class TokensActivity extends BaseDrawerActivity {
             mTokensPresenter.setFiltering(currentFiltering);
         }
 
-        startService(new Intent(this, TokenDisplayService.class));
+//        startService(new Intent(this, TokenDisplayService.class));
     }
 
     @Override
@@ -132,7 +132,7 @@ public class TokensActivity extends BaseDrawerActivity {
 
     @Override
     protected void onDestroy() {
-        stopService(new Intent(this, TokenDisplayService.class));
+//        stopService(new Intent(this, TokenDisplayService.class));
         super.onDestroy();
     }
 }
