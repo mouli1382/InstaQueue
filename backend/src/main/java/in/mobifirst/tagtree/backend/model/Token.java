@@ -1,4 +1,4 @@
-package in.mobifirst.tagtree.backend;
+package in.mobifirst.tagtree.backend.model;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.ServerValue;
@@ -165,16 +165,16 @@ public class Token {
         this.userName = userName;
     }
 
-//    @Exclude
-//    public boolean isCompleted() {
-//        return status == Status.COMPLETED.ordinal();
-//    }
-//
-//    @Exclude
-//    public boolean isActive() {
-//        return status == Status.READY.ordinal();
-//    }
-//
+    @Exclude
+    public boolean isCompleted() {
+        return status == Status.COMPLETED.ordinal();
+    }
+
+    @Exclude
+    public boolean isActive() {
+        return status == Status.READY.ordinal();
+    }
+
 //    @Exclude
 //    public boolean isEmpty() {
 //        return TextUtils.isEmpty(phoneNumber);

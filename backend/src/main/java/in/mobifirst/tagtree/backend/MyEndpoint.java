@@ -26,6 +26,10 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletContext;
 
+import in.mobifirst.tagtree.backend.model.AddTokenResponse;
+import in.mobifirst.tagtree.backend.model.Store;
+import in.mobifirst.tagtree.backend.model.Token;
+
 /**
  * An endpoint class we are exposing
  */

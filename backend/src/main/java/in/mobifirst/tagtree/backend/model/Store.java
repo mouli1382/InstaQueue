@@ -1,4 +1,4 @@
-package in.mobifirst.tagtree.backend;
+package in.mobifirst.tagtree.backend.model;
 
 import com.google.firebase.database.Exclude;
 

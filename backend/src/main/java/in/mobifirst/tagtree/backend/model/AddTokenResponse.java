@@ -1,4 +1,4 @@
-package in.mobifirst.tagtree.backend;
+package in.mobifirst.tagtree.backend.model;
 
 /**
  * The object model for the data we are sending through endpoints
