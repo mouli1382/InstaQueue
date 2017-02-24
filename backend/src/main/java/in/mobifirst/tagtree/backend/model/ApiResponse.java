@@ -23,4 +23,20 @@ public class ApiResponse {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    public static ApiResponse successResponse() {
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setCode(0);
+        apiResponse.setMessage("Successfully called the next person in line.");
+
+        return apiResponse;
+    }
+
+    public static ApiResponse errorResponse() {
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setCode(-1);
+        apiResponse.setMessage("Failed to call the next person in line.");
+
+        return apiResponse;
+    }
 }

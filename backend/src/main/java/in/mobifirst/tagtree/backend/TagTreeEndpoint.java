@@ -13,6 +13,10 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.tasks.Task;
+import com.google.firebase.tasks.Tasks;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 
@@ -60,12 +64,17 @@ public class TagTreeEndpoint {
                 .getReference();
         TagTreeLogger.info("DatabaseRef obtained...");
 
-        new FirebaseDatabaseManager(databaseReference).activate(rationShopItem);
-
-        ApiResponse apiResponse = new ApiResponse();
-        apiResponse.setCode(0);
-        apiResponse.setMessage("SUPER COOL!");
-
-        return apiResponse;
+        try {
+            // Block on the task for a maximum of 500 milliseconds, otherwise time out.
+            Task<Boolean> task = new FirebaseDatabaseManager(databaseReference)
+                    .activate(rationShopItem);
+            Tasks.await(task, 500, TimeUnit.MILLISECONDS);
+            TagTreeLogger.info("Successfully called the next person in the Queue...");
+            return ApiResponse.successResponse();
+        } catch (Exception e) {
+            TagTreeLogger.info("Failed to call the next person in the Queue...");
+        }
+        return ApiResponse.errorResponse();
     }
+
 }

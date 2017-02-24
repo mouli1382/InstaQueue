@@ -7,13 +7,13 @@ import com.google.firebase.database.MutableData;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.internal.Log;
 import com.google.firebase.internal.NonNull;
 import com.google.firebase.tasks.Continuation;
 import com.google.firebase.tasks.OnFailureListener;
 import com.google.firebase.tasks.OnSuccessListener;
 import com.google.firebase.tasks.Task;
 import com.google.firebase.tasks.TaskCompletionSource;
+import com.google.firebase.tasks.Tasks;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,12 +22,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import in.mobifirst.tagtree.backend.model.ApiResponse;
 import in.mobifirst.tagtree.backend.model.RationShopItem;
 import in.mobifirst.tagtree.backend.model.Token;
 
@@ -58,7 +56,16 @@ public class FirebaseDatabaseManager {
                 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
     }
 
-    private class IncremnetTransactionHander implements Transaction.Handler {
+    private class IncrementTransactionHander implements Transaction.Handler {
+        private TaskCompletionSource<Boolean> taskCompletionSource;
+
+        IncrementTransactionHander() {
+            taskCompletionSource = new TaskCompletionSource<>();
+        }
+
+        public Task<Boolean> getTask() {
+            return taskCompletionSource.getTask();
+        }
 
         @Override
         public Transaction.Result doTransaction(MutableData mutableData) {
@@ -73,7 +80,11 @@ public class FirebaseDatabaseManager {
 
         @Override
         public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
-
+            if (databaseError == null && committed) {
+                taskCompletionSource.setResult(true);
+            } else {
+                taskCompletionSource.setException(databaseError.toException());
+            }
         }
     }
 
@@ -198,8 +209,7 @@ public class FirebaseDatabaseManager {
 //                        sendSMS(token, status);
 //                    }
 ////                    sendBulkSMS(token, status);
-//                }
-//                else {
+//                } else {
 //                    //User present. Update token table for the counter view.
 //                    HashMap<String, User> userMap = usersnapshot.getValue(new GenericTypeIndicator<HashMap<String, User>>() {
 //                    });
@@ -221,7 +231,7 @@ public class FirebaseDatabaseManager {
 //        });
 //    }
 
-    private Task<Boolean> sendSMS(final Token token, final boolean status) {
+    private Task<Void> sendSMS(final Token token, final boolean status) {
         //Android SMS API integration code
         final TaskCompletionSource<Boolean> sendSmsSource = new TaskCompletionSource<>();
 
@@ -303,13 +313,9 @@ public class FirebaseDatabaseManager {
                     reader = new BufferedReader(new InputStreamReader(myURLConnection.getInputStream()));
 
                     //reading response
-                    String response;
-                    while ((response = reader.readLine()) != null)
-                        //print response
-                        Log.d("RESPONSE", "" + response);
+                    while (reader.readLine() != null) ;
 
-
-                    incrementSMS(token, new IncremnetTransactionHander());
+                    sendSmsSource.setResult(true);
                 } catch (Exception e) {
                     e.printStackTrace();
                     sendSmsSource.setException(e);
@@ -323,10 +329,11 @@ public class FirebaseDatabaseManager {
                 }
             }
         });
-        return sendSmsSource.getTask();
+
+        return Tasks.whenAll(sendSmsSource.getTask(), incrementSMS(token));
     }
 
-    public Future<ApiResponse> activate(RationShopItem rationShopItem) throws TagTreeException {
+    public Task<Boolean> activate(RationShopItem rationShopItem) throws TagTreeException {
         //Fetch the store from the given FP shop ID and lookup the current active token
 //        mDatabaseReference
 //                .child(STORE_CHILD)
@@ -350,9 +357,11 @@ public class FirebaseDatabaseManager {
         return completeCurrentToken(rationShopItem);
     }
 
-    private Future<ApiResponse> completeCurrentToken(final RationShopItem rationShopItem) throws TagTreeException {
+    private Task<Boolean> completeCurrentToken(final RationShopItem rationShopItem) throws TagTreeException {
         //ToDo handle it better
         // For now assuming that there will only be one token in the Tokens table for a ration card number.
+
+        final TaskCompletionSource<Boolean> completionSource = new TaskCompletionSource<>();
         mDatabaseReference
                 .child(TOKENS_CHILD)
                 .orderByChild("cardNumber")
@@ -363,15 +372,33 @@ public class FirebaseDatabaseManager {
                         if (dataSnapshot.exists()) {
                             Token token = dataSnapshot.getValue(Token.class);
                             if (token.getStoreId().equalsIgnoreCase(rationShopItem.getId()) && token.isActive()) {
-                                String storeId = token.getStoreId();
-                                Long tokenNumber = token.getTokenNumber();
+                                final String storeId = token.getStoreId();
+                                final Long tokenNumber = token.getTokenNumber();
 
                                 //Bingo - Mark it COMPLETED
                                 token.setStatus(Token.Status.COMPLETED.ordinal());
-                                updateToken(token);
+                                updateToken(token)
+                                        .continueWithTask(new Continuation<Boolean, Task<Boolean>>() {
+                                            @Override
+                                            public Task<Boolean> then(@NonNull Task<Boolean> task) throws Exception {
 
-                                //Active the next token
-                                activateNextToken(storeId, tokenNumber);
+                                                //Active the next token
+                                                return activateNextToken(storeId, tokenNumber);
+                                            }
+                                        })
+                                        .addOnSuccessListener(new OnSuccessListener<Boolean>() {
+                                            @Override
+                                            public void onSuccess(Boolean aBoolean) {
+                                                completionSource.setResult(true);
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                completionSource.setException(e);
+                                            }
+                                        });
+
                             }
                         }
                     }
@@ -379,12 +406,14 @@ public class FirebaseDatabaseManager {
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         TagTreeLogger.info(TAG + "Failed to complete the current token " + databaseError.toException());
-                        throw new TagTreeException(databaseError.getMessage());
+                        completionSource.setException(databaseError.toException());
                     }
                 });
+        return completionSource.getTask();
     }
 
-    private void activateNextToken(String storeId, Long tokenNumber) {
+    private Task<Boolean> activateNextToken(String storeId, Long tokenNumber) {
+        final TaskCompletionSource<Boolean> nextTokenSource = new TaskCompletionSource<>();
         mDatabaseReference
                 .child(TOKENS_CHILD)
                 .orderByChild("storeId")
@@ -400,7 +429,19 @@ public class FirebaseDatabaseManager {
                                 //Bingo - Mark it READY
                                 token.setStatus(Token.Status.READY.ordinal());
                                 token.setBuzzCount(token.getBuzzCount() + 1);
-                                updateToken(token);
+                                updateToken(token)
+                                        .addOnSuccessListener(new OnSuccessListener<Boolean>() {
+                                            @Override
+                                            public void onSuccess(Boolean aBoolean) {
+                                                nextTokenSource.setResult(true);
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                nextTokenSource.setException(e);
+                                            }
+                                        });
                             }
                         }
                     }
@@ -408,10 +449,10 @@ public class FirebaseDatabaseManager {
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         TagTreeLogger.info(TAG + "Failed to activate next token " + databaseError.toException());
-                        throw new TagTreeException(databaseError.getMessage());
+                        nextTokenSource.setException(databaseError.toException());
                     }
                 });
-
+        return nextTokenSource.getTask();
     }
 
     private Task<Void> moveToHistory(Token token) {
@@ -431,7 +472,7 @@ public class FirebaseDatabaseManager {
 
     private Task<Void> removeTokenFromStore(Token token) {
         //Remove the activated token from the store counter so that the TAT is calculated on the issued tokens only.
-        mDatabaseReference
+        return mDatabaseReference
                 .child(STORE_CHILD)
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
@@ -525,30 +566,39 @@ public class FirebaseDatabaseManager {
                         }
                     });
         } else {
-
-            ValueEventListener valueEventListener = new ValueEventListener() {
+            final ValueEventListener valueEventListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
-                        Token tokenUpdated = dataSnapshot.getValue(Token.class);
+                        final Token tokenUpdated = dataSnapshot.getValue(Token.class);
                         if (tokenUpdated.getBuzzCount() == 1) {
-                            //Inform user if he is not present in the user table
-                            sendSMS(tokenUpdated, true);
-//                            checkSMSSending(tokenUpdated, true);
-                            incrementUserCount(tokenUpdated, new IncremnetTransactionHander());
-                            incrementAvgTAT(tokenUpdated);
-                            setActiveTokenNumber(tokenUpdated);
 
+                            Tasks.whenAll(sendSMS(tokenUpdated, true)
+                                    , incrementUserCount(tokenUpdated)
+                                    , incrementAvgTAT(tokenUpdated)
+                                    , setActiveTokenNumber(tokenUpdated))
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            updateToken.setResult(true);
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            updateToken.setException(e);
+                                        }
+                                    });
 
                             //Remove the activated token from the store counter so that the TAT is calculated on the issued tokens only.
-                            mDatabaseReference
-                                    .child(STORE_CHILD)
-                                    .child(tokenUpdated.getStoreId())
-                                    .child(COUNTERS_CHILD)
-                                    .child("" + tokenUpdated.getCounter())
-                                    .child(TOKENS_CHILD)
-                                    .child(tokenUpdated.getuId())
-                                    .removeValue();
+//                            mDatabaseReference
+//                                    .child(STORE_CHILD)
+//                                    .child(tokenUpdated.getStoreId())
+//                                    .child(COUNTERS_CHILD)
+//                                    .child("" + tokenUpdated.getCounter())
+//                                    .child(TOKENS_CHILD)
+//                                    .child(tokenUpdated.getuId())
+//                                    .removeValue();
                         }
                     }
                 }
@@ -590,6 +640,7 @@ public class FirebaseDatabaseManager {
                         }
                     });
         }
+        return updateToken.getTask();
     }
 
 //    private void decrementCredits(Token token, Transaction.Handler handler) {
@@ -601,17 +652,18 @@ public class FirebaseDatabaseManager {
 //
 //    }
 
-    private void incrementSMS(Token token, Transaction.Handler handler) {
+    private Task<Boolean> incrementSMS(Token token) {
+        IncrementTransactionHander handler = new IncrementTransactionHander();
         DatabaseReference creditsRef = mDatabaseReference
                 .child("store")
                 .child(token.getStoreId())
                 .child("smsCounter");
         creditsRef.runTransaction(handler);
-
+        return handler.getTask();
     }
 
-    private void setActiveTokenNumber(Token token) {
-        mDatabaseReference
+    private Task<Void> setActiveTokenNumber(Token token) {
+        return mDatabaseReference
                 .child(STORE_CHILD)
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
@@ -620,7 +672,8 @@ public class FirebaseDatabaseManager {
                 .setValue(token.getTokenNumber());
     }
 
-    private void incrementUserCount(Token token, Transaction.Handler handler) {
+    private Task<Boolean> incrementUserCount(Token token) {
+        IncrementTransactionHander handler = new IncrementTransactionHander();
         mDatabaseReference
                 .child(STORE_CHILD)
                 .child(token.getStoreId())
@@ -628,10 +681,11 @@ public class FirebaseDatabaseManager {
                 .child("" + token.getCounter())
                 .child(COUNTERS_USERS)
                 .runTransaction(handler);
-
+        return handler.getTask();
     }
 
-    private void incrementAvgTAT(Token token) {
+    private Task<Boolean> incrementAvgTAT(Token token) {
+        final TaskCompletionSource<Boolean> tatSource = new TaskCompletionSource<>();
         long waitTimePerToken = token.getActivatedTokenTime() - token.getTimestamp();
         if (waitTimePerToken < 0) {
             waitTimePerToken = 0;
@@ -658,10 +712,14 @@ public class FirebaseDatabaseManager {
 
                     @Override
                     public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-
+                        if (databaseError == null && b) {
+                            tatSource.setResult(true);
+                        } else {
+                            tatSource.setException(databaseError.toException());
+                        }
                     }
                 });
-
+        return tatSource.getTask();
     }
 
     private Task<Boolean> incrementAvgBurstTime(Token token) {
@@ -695,7 +753,7 @@ public class FirebaseDatabaseManager {
 
                     @Override
                     public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                        if (databaseError == null && dataSnapshot.exists()) {
+                        if (databaseError == null && b) {
                             burstSource.setResult(true);
                         } else {
                             burstSource.setException(databaseError.toException());
