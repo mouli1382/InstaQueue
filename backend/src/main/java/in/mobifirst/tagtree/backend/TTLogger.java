@@ -2,8 +2,8 @@ package in.mobifirst.tagtree.backend;
 
 import java.util.logging.Logger;
 
-public class TagTreeLogger {
-    static Logger Log = Logger.getLogger("in.mobifirst.tagtree.backend");
+public class TTLogger {
+    static Logger Log = Logger.getLogger(TTLogger.class.getSimpleName());
 
     public static void info(String logMe) {
         Log.info("Running in Thread: " + Thread.currentThread() + " " + logMe);

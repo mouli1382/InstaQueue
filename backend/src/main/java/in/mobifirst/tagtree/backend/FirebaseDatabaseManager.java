@@ -21,12 +21,9 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import in.mobifirst.tagtree.backend.model.RationShopItem;
+import in.mobifirst.tagtree.backend.model.Store;
 import in.mobifirst.tagtree.backend.model.Token;
 
 public class FirebaseDatabaseManager {
@@ -47,13 +44,13 @@ public class FirebaseDatabaseManager {
     private final static String CLIENT_APP_PLAYSTORE_URL = "https://goo.gl/mVAdpT";
 
     private DatabaseReference mDatabaseReference;
-    private Executor executor;
+//    private Executor executor;
 
     public FirebaseDatabaseManager(DatabaseReference databaseReference) {
         mDatabaseReference = databaseReference;
-        int numCores = Runtime.getRuntime().availableProcessors();
-        executor = new ThreadPoolExecutor(numCores * 2, numCores * 2,
-                60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+//        int numCores = Runtime.getRuntime().availableProcessors();
+//        executor = new ThreadPoolExecutor(numCores * 2, numCores * 2,
+//                60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
     }
 
     private class IncrementTransactionHander implements Transaction.Handler {
@@ -75,123 +72,121 @@ public class FirebaseDatabaseManager {
             } else {
                 mutableData.setValue(currentValue + 1);
             }
-            return Transaction.success(mutableData);
+            if (mutableData.equals(currentValue)) {
+                return Transaction.abort();
+            } else {
+                return Transaction.success(mutableData);
+            }
         }
 
         @Override
         public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
             if (databaseError == null && committed) {
                 taskCompletionSource.setResult(true);
-            } else {
+            } /*else {
                 taskCompletionSource.setException(databaseError.toException());
-            }
+            }*/
         }
     }
 
     ;
 
-//    public Query getTokensRef(String uId) {
-//        return mDatabaseReference
-//                .child(TOKENS_CHILD)
-//                .orderByChild("storeId")
-//                .equalTo(uId);
-//    }
+    private Task<Void> addTokenUnderStoreCounter(Token token) {
+        //Save the token Id under the token number which makes client job easy in sorting and calculating TAT.
+        return mDatabaseReference
+                .child(STORE_CHILD)
+                .child(token.getStoreId())
+                .child(COUNTERS_CHILD)
+                .child("" + token.getCounter())
+                .child(TOKENS_CHILD)
+                .child(token.getuId())
+                .setValue(token.getTokenNumber());
+    }
 
-//    private Task<Void> addTokenUnderStoreCounter(Token token) {
-//        //Save the token Id under the token number which makes client job easy in sorting and calculating TAT.
-//        return mDatabaseReference
-//                .child(STORE_CHILD)
-//                .child(token.getStoreId())
-//                .child(COUNTERS_CHILD)
-//                .child("" + token.getCounter())
-//                .child(TOKENS_CHILD)
-//                .child(token.getuId())
-//                .setValue(token.getTokenNumber());
-//    }
+    public Task<Boolean> addNewToken(final Token token) {
+        TTLogger.info(TAG + "addNewToken START ------");
+        final TaskCompletionSource<Boolean> addTokenSource = new TaskCompletionSource<>();
 
-//    public void addNewToken(final Token token, final AddTokenResponse addTokenResponse) {
-//        incrementTokenCounter(token, new Transaction.Handler() {
-//            @Override
-//            public Transaction.Result doTransaction(MutableData mutableData) {
-//                Long currentValue = mutableData.getValue(Long.class);
-//                if (currentValue == null) {
-//                    mutableData.setValue(1);
-//                } else {
-//                    mutableData.setValue(currentValue + 1);
-//                }
-//
-//                return Transaction.success(mutableData);
-//            }
-//
-//            @Override
-//            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
-//                if (databaseError == null) {
-//                    if (committed) {
-//                        {
-//                            final Long currentToken = (Long) dataSnapshot.getValue();
-//                            DatabaseReference storeRef = mDatabaseReference.getRef()
-//                                    .child("store")
-//                                    .child(token.getStoreId());
-//
-//
-//                            storeRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                                @Override
-//                                public void onDataChange(DataSnapshot storeDataSnapshot) {
-//                                    if (storeDataSnapshot.exists()) {
-//
-//                                        String key = mDatabaseReference.child(TOKENS_CHILD)
-//                                                .push().getKey();
-//                                        Store store = storeDataSnapshot.getValue(Store.class);
-//                                        String areaName = store.getArea();
-//                                        final Token newToken = new Token(key, token.getStoreId(),
-//                                                token.getPhoneNumber(),
-//                                                currentToken,
-//                                                mSharedPrefs.getSting((ApplicationConstants.WEBSITE_LOGO_URL_KEY)),
-//                                                mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY),
-//                                                token.getCounter(),
-//                                                areaName);
-//
-//                                        mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
-//                                        addTokenUnderStoreCounter(newToken);
-//
-//                                        //ToDo replicate the entire tokens under store. Too much but easy.
-////                                        Map<String, Object> childUpdates = new HashMap<>();
-////                                        childUpdates.put(TOKENS_CHILD + key, tokenValues);
-////                                        childUpdates.put(STORE_CHILD + newToken.getStoreId() + "/" + newToken.getCounter() + "/" + TOKENS_CHILD + key, tokenValues);
-////
-////                                        mDatabaseReference.updateChildren(childUpdates);
-//                                        checkSMSSending(newToken, false);
-//                                    } else {
-//                                        Log.e(TAG, "Snapshot is null");
-//                                    }
-//                                }
-//
-//                                @Override
-//                                public void onCancelled(DatabaseError databaseError) {
-//                                    Log.e(TAG, "[fetch Area name] onCancelled:" + databaseError);
-//                                }
-//                            });
-//
-//                            subscriber.onNext(null);
-//                            subscriber.onCompleted();
-//                        }
-//                    } else {
-//                        subscriber.onError(databaseError.toException());
-//                    }
-//                } else {
-//                    subscriber.onError(databaseError.toException());
-//                }
-//
-//            }
-//        });
-//    }
+        decrementCredits(token)
+                .continueWithTask(new Continuation<Boolean, Task<Long>>() {
+                    @Override
+                    public Task<Long> then(@NonNull Task<Boolean> task) throws Exception {
+                        TTLogger.info(TAG + "decrementCredits DONE ------");
+                        return incrementTokenCounter(token);
+                    }
+                })
+                .addOnSuccessListener(new OnSuccessListener<Long>() {
+                    @Override
+                    public void onSuccess(final Long currentToken) {
+                        TTLogger.info(TAG + "incrementTokenCounter DONE ------" + currentToken);
+                        DatabaseReference storeRef = mDatabaseReference.getRef()
+                                .child("store")
+                                .child(token.getStoreId());
 
-//    public void getStoreById(String storeId, ValueEventListener valueEventListener) {
-//        DatabaseReference storeRef = mDatabaseReference
-//                .child(STORE_CHILD)
-//                .child(storeId);
-//        storeRef.addListenerForSingleValueEvent(valueEventListener);
-//    }
+                        storeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.exists()) {
+                                    String key = mDatabaseReference.child(TOKENS_CHILD)
+                                            .push().getKey();
+                                    Store store = dataSnapshot.getValue(Store.class);
+                                    String areaName = store.getArea();
+                                    final Token newToken = new Token(key, token.getStoreId(),
+                                            token.getPhoneNumber(),
+                                            currentToken,
+                                            token.getSenderPic(),
+                                            token.getSenderName(),
+                                            token.getCounter(),
+                                            areaName);
+
+                                    mDatabaseReference
+                                            .child(TOKENS_CHILD)
+                                            .child(key)
+                                            .setValue(newToken.toMap())
+                                            .continueWithTask(new Continuation<Void, Task<Void>>() {
+                                                @Override
+                                                public Task<Void> then(@NonNull Task<Void> task) throws Exception {
+                                                    return addTokenUnderStoreCounter(newToken);
+                                                }
+                                            })
+                                            .continueWithTask(new Continuation<Void, Task<Void>>() {
+                                                @Override
+                                                public Task<Void> then(@NonNull Task<Void> task) throws Exception {
+                                                    return sendSMS(newToken, false);
+                                                }
+                                            })
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    addTokenSource.setResult(true);
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    addTokenSource.setException(e);
+                                                }
+                                            });
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                TTLogger.info(TAG + "Token creation failed" + databaseError.toException());
+                                addTokenSource.setException(databaseError.toException());
+                            }
+                        });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        TTLogger.info(TAG + "Token creation failed" + e);
+                        addTokenSource.setException(e);
+                    }
+                });
+        return addTokenSource.getTask();
+    }
 
 
 //    private void checkSMSSending(final Token token, final boolean status) {
@@ -333,7 +328,7 @@ public class FirebaseDatabaseManager {
         return Tasks.whenAll(sendSmsSource.getTask(), incrementSMS(token));
     }
 
-    public Task<Boolean> activate(RationShopItem rationShopItem) throws TagTreeException {
+    public Task<Boolean> activate(RationShopItem rationShopItem) {
         //Fetch the store from the given FP shop ID and lookup the current active token
 //        mDatabaseReference
 //                .child(STORE_CHILD)
@@ -357,7 +352,7 @@ public class FirebaseDatabaseManager {
         return completeCurrentToken(rationShopItem);
     }
 
-    private Task<Boolean> completeCurrentToken(final RationShopItem rationShopItem) throws TagTreeException {
+    private Task<Boolean> completeCurrentToken(final RationShopItem rationShopItem) {
         //ToDo handle it better
         // For now assuming that there will only be one token in the Tokens table for a ration card number.
 
@@ -405,7 +400,7 @@ public class FirebaseDatabaseManager {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        TagTreeLogger.info(TAG + "Failed to complete the current token " + databaseError.toException());
+                        TTLogger.info(TAG + "Failed to complete the current token " + databaseError.toException());
                         completionSource.setException(databaseError.toException());
                     }
                 });
@@ -448,7 +443,7 @@ public class FirebaseDatabaseManager {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        TagTreeLogger.info(TAG + "Failed to activate next token " + databaseError.toException());
+                        TTLogger.info(TAG + "Failed to activate next token " + databaseError.toException());
                         nextTokenSource.setException(databaseError.toException());
                     }
                 });
@@ -482,7 +477,7 @@ public class FirebaseDatabaseManager {
                 .removeValue();
     }
 
-    public Task<Boolean> updateToken(final Token token) throws TagTreeException {
+    public Task<Boolean> updateToken(final Token token) {
         final TaskCompletionSource<Boolean> updateToken = new TaskCompletionSource<>();
         if (token.isCompleted()) {
             final ValueEventListener completionListener = new ValueEventListener() {
@@ -531,7 +526,7 @@ public class FirebaseDatabaseManager {
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-                    TagTreeLogger.info(TAG + "Token completion time is not updated" + databaseError.toException());
+                    TTLogger.info(TAG + "Token completion time is not updated" + databaseError.toException());
                     updateToken.setException(databaseError.toException());
                 }
             };
@@ -606,7 +601,7 @@ public class FirebaseDatabaseManager {
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                     // Getting Post failed, log a message
-                    TagTreeLogger.info(TAG + "SMS won't be sent" + databaseError.toException());
+                    TTLogger.info(TAG + "SMS won't be sent" + databaseError.toException());
                     updateToken.setException(databaseError.toException());
                 }
             };
@@ -643,14 +638,42 @@ public class FirebaseDatabaseManager {
         return updateToken.getTask();
     }
 
-//    private void decrementCredits(Token token, Transaction.Handler handler) {
-//        DatabaseReference creditsRef = mDatabaseReference
-//                .child("store")
-//                .child(token.getStoreId())
-//                .child("credits");
-//        creditsRef.runTransaction(handler);
-//
-//    }
+    private Task<Boolean> decrementCredits(Token token) {
+        TTLogger.info(TAG + "decrementCredits START ------");
+        final TaskCompletionSource<Boolean> completionSource = new TaskCompletionSource<>();
+        DatabaseReference creditsRef = mDatabaseReference
+                .child("store")
+                .child(token.getStoreId())
+                .child("credits");
+        creditsRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Long currentValue = mutableData.getValue(Long.class);
+                if (currentValue == null) {
+                    mutableData.setValue(1000);
+                } else {
+                    mutableData.setValue(currentValue - 1);
+                }
+                if (mutableData.equals(currentValue)) {
+                    return Transaction.abort();
+                } else {
+                    TTLogger.info(TAG + "decrementCredits SUCCESS ------");
+                    return Transaction.success(mutableData);
+                }
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+                if (databaseError == null && committed) {
+                    TTLogger.info(TAG + "decrementCredits END ------");
+                    completionSource.setResult(true);
+                } /*else {
+                    completionSource.setException(databaseError.toException());
+                }*/
+            }
+        });
+        return completionSource.getTask();
+    }
 
     private Task<Boolean> incrementSMS(Token token) {
         IncrementTransactionHander handler = new IncrementTransactionHander();
@@ -707,16 +730,20 @@ public class FirebaseDatabaseManager {
                         } else {
                             mutableData.setValue(currentValue + finalWaitTimePerToken);
                         }
-                        return Transaction.success(mutableData);
+                        if (mutableData.equals(currentValue)) {
+                            return Transaction.abort();
+                        } else {
+                            return Transaction.success(mutableData);
+                        }
                     }
 
                     @Override
                     public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
                         if (databaseError == null && b) {
                             tatSource.setResult(true);
-                        } else {
+                        } /*else {
                             tatSource.setException(databaseError.toException());
-                        }
+                        }*/
                     }
                 });
         return tatSource.getTask();
@@ -748,49 +775,63 @@ public class FirebaseDatabaseManager {
                         } else {
                             mutableData.setValue(currentValue + finalBurstTime);
                         }
-                        return Transaction.success(mutableData);
+                        if (mutableData.equals(currentValue)) {
+                            return Transaction.abort();
+                        } else {
+                            return Transaction.success(mutableData);
+                        }
                     }
 
                     @Override
                     public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
                         if (databaseError == null && b) {
                             burstSource.setResult(true);
-                        } else {
+                        } /*else {
                             burstSource.setException(databaseError.toException());
-                        }
+                        }*/
                     }
                 });
         return burstSource.getTask();
     }
 
-//    private void incrementTokenCounter(Token token, Transaction.Handler handler) {
-//        DatabaseReference tokenCounterRef = mDatabaseReference
-//                .child("store")
-//                .child(token.getStoreId())
-//                .child("tokenCounter");
-//        tokenCounterRef.runTransaction(handler);
-//
-//
-//        decrementCredits(token, new Transaction.Handler() {
-//            @Override
-//            public Transaction.Result doTransaction(MutableData mutableData) {
-//                Long currentValue = mutableData.getValue(Long.class);
-//                if (currentValue == null) {
-//                    mutableData.setValue(1000);
-//                } else {
-//                    mutableData.setValue(currentValue - 1);
-//                }
-//
-//
-//                return Transaction.success(mutableData);
-//            }
-//
-//            @Override
-//            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
-//
-//            }
-//        });
-//    }
+    private Task<Long> incrementTokenCounter(Token token) {
+        final TaskCompletionSource<Long> incrementTokenTask = new TaskCompletionSource<>();
+        TTLogger.info(TAG + "incrementTokenCounter START ------");
+        DatabaseReference tokenCounterRef = mDatabaseReference
+                .child("store")
+                .child(token.getStoreId())
+                .child("tokenCounter");
+        tokenCounterRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Long currentValue = mutableData.getValue(Long.class);
+                if (currentValue == null) {
+                    mutableData.setValue(1);
+                } else {
+                    mutableData.setValue(currentValue + 1);
+                }
+
+                if (mutableData.equals(currentValue)) {
+                    return Transaction.abort();
+                } else {
+                    TTLogger.info(TAG + "incrementTokenCounter SUCCESS ------");
+                    return Transaction.success(mutableData);
+                }
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                if (databaseError == null && b) {
+                    TTLogger.info(TAG + "incrementTokenCounter END ------");
+                    incrementTokenTask.setResult(dataSnapshot.getValue(Long.class));
+                } /*else {
+                    incrementTokenTask.setException(databaseError.toException());
+                }*/
+            }
+        });
+
+        return incrementTokenTask.getTask();
+    }
 
     //Reset token counter
 //    public void resetTokenCounter(String storeId) {

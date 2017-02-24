@@ -27,7 +27,7 @@ import in.mobifirst.tagtree.backend.model.RationShopItem;
  * An endpoint class we are exposing
  */
 @Api(
-        name = "tokenApi",
+        name = "activateTokenApi",
         version = "v1",
         namespace = @ApiNamespace(
                 ownerDomain = "backend.tagtree.mobifirst.in",
@@ -35,11 +35,11 @@ import in.mobifirst.tagtree.backend.model.RationShopItem;
                 packagePath = ""
         )
 )
-public class TagTreeEndpoint {
+public class TTActivationEndpoint {
 
     @ApiMethod(name = "activate", httpMethod = "POST", path = "")
     public ApiResponse activate(final RationShopItem rationShopItem, ServletContext context) {
-        TagTreeLogger.info("passed in parameter = " + rationShopItem.toString());
+        TTLogger.info("passed in parameter = " + rationShopItem.toString());
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setServiceAccount(context.getResourceAsStream("/WEB-INF/TagTree-Dev-5c7176a14844.json"))
@@ -49,30 +49,30 @@ public class TagTreeEndpoint {
         try {
             FirebaseApp.getInstance();
         } catch (Exception error) {
-            TagTreeLogger.info("doesn't exist...");
+            TTLogger.info("doesn't exist...");
         }
 
         try {
             FirebaseApp.initializeApp(options);
         } catch (Exception error) {
-            TagTreeLogger.info("already exists...");
+            TTLogger.info("already exists...");
         }
 
         // As an admin, the app has access to read and write all data, regardless of Security Rules
         final DatabaseReference databaseReference = FirebaseDatabase
                 .getInstance()
                 .getReference();
-        TagTreeLogger.info("DatabaseRef obtained...");
+        TTLogger.info("DatabaseRef obtained...");
 
         try {
             // Block on the task for a maximum of 500 milliseconds, otherwise time out.
             Task<Boolean> task = new FirebaseDatabaseManager(databaseReference)
                     .activate(rationShopItem);
             Tasks.await(task, 500, TimeUnit.MILLISECONDS);
-            TagTreeLogger.info("Successfully called the next person in the Queue...");
+            TTLogger.info("Successfully called the next person in the Queue...");
             return ApiResponse.successResponse();
         } catch (Exception e) {
-            TagTreeLogger.info("Failed to call the next person in the Queue...");
+            TTLogger.info("Failed to call the next person in the Queue...");
         }
         return ApiResponse.errorResponse();
     }
