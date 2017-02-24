@@ -40,7 +40,6 @@ import javax.inject.Inject;
 
 import in.mobifirst.tagtree.BuildConfig;
 import in.mobifirst.tagtree.application.IQStoreApplication;
-import in.mobifirst.tagtree.backend.myApi.MyApi;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.model.User;
@@ -73,7 +72,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private DatabaseReference mDatabaseReference;
     private IQSharedPreferences mSharedPrefs;
     private IQStoreApplication mIQStoreApplication;
-    private MyApi myApiService;
 
     @Inject
     public FirebaseDatabaseManager(IQStoreApplication application, IQSharedPreferences iqSharedPreferences) {
