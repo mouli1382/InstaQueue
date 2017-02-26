@@ -93,6 +93,7 @@ public class WelcomeActivity extends BaseActivity {
 //            } else {
             intent = new Intent(this, SettingsFetcherActivity.class);
 //            }
+            mIQSharedPreferences.putString(mIQSharedPreferences.UUID_KEY, mFirebaseAuth.getAuthInstance().getCurrentUser().getUid());
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);
             finish();

@@ -3,6 +3,7 @@ package in.mobifirst.tagtree.sms;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.telephony.SmsMessage;
@@ -14,6 +15,8 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 import rx.Subscriber;
 
 public class SmsReceiver extends BroadcastReceiver {
@@ -22,6 +25,9 @@ public class SmsReceiver extends BroadcastReceiver {
 
     @Inject
     protected FirebaseDatabaseManager mFirebaseDatabaseManager;
+
+    @Inject
+    IQSharedPreferences mIQSharedPreferences;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -53,15 +59,41 @@ public class SmsReceiver extends BroadcastReceiver {
         if (TextUtils.isEmpty(phoneNumber) || TextUtils.isEmpty(message)) {
             return;
         }
-        if (message.contains("TT_ISSUE")) {
-            String[] tokens = message.split(",");
-            addNewToken(phoneNumber, 1 /* ToDo change later*/, tokens[1]);
+
+        if (message.startsWith("TOKEN")) {
+
+
+            String[] words=message.split("\\s");
+            String keyWord = null;
+            String rationCard = null;
+            int wordCount = 0 ;
+            for(String w:words){
+                wordCount++;
+                if (wordCount == 1)
+                    keyWord = w;
+                else if (wordCount == 2)
+                    rationCard = w;
+            }
+
+            if (keyWord!= null && rationCard != null)
+            {
+                addNewTokenForThisStore(phoneNumber, rationCard, 1 );
+            }
+            else
+            {
+                //Send token rejected sms
+            }
+
         }
+        else {
+            Log.e(TAG, "WRONG SMS FORMAT RECEIVED = " + message);
+        }
+
     }
 
-    public void addNewToken(String phoneNumber, int counterNumber, String storeId) {
+    public void addNewTokenForThisStore(String phoneNumber, String metaRationCard, int counterNumber/*, String storeId*/) {
         Token token = new Token();
-        int storeSwitch = Integer.parseInt(storeId);
+        /*int storeSwitch = Integer.parseInt(storeId);
         switch (storeSwitch) {
             case 1:
                 token.setStoreId("4ayX5hricwSo6wQjUW7yUULrhZg2");
@@ -70,9 +102,11 @@ public class SmsReceiver extends BroadcastReceiver {
             default:
                 token.setStoreId("LEPo6aD44vTLrqSYVJJooUgItl82");
                 break;
-        }
+        }*/
+
         token.setPhoneNumber(phoneNumber);
         token.setCounter(counterNumber);
+        token.setStoreId(mIQSharedPreferences.getSting(mIQSharedPreferences.UUID_KEY));
         saveToken(token);
     }
 

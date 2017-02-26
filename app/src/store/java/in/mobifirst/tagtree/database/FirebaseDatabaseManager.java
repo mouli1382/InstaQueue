@@ -36,6 +36,8 @@ import java.util.TreeMap;
 import javax.inject.Inject;
 
 import in.mobifirst.tagtree.BuildConfig;
+import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
+import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager_Factory;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.model.User;
@@ -69,10 +71,12 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private long waitTimePerToken = 0;
 
     @Inject
+    FirebaseAuthenticationManager mAuthenticationManager;
+
+    @Inject
     public FirebaseDatabaseManager(IQSharedPreferences iqSharedPreferences) {
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mSharedPrefs = iqSharedPreferences;
-
     }
 
     public class IncremnetTransactionHander implements Transaction.Handler {
