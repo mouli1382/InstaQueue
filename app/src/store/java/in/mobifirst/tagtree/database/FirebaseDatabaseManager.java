@@ -386,6 +386,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                 mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY),
                                                 token.getCounter(),
                                                 areaName,
+                                                token.getMappingId());
 
                                         mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
                                         addTokenUnderStoreCounter(newToken);
