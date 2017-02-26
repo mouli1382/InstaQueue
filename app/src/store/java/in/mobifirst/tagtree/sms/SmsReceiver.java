@@ -107,6 +107,7 @@ public class SmsReceiver extends BroadcastReceiver {
         token.setPhoneNumber(phoneNumber);
         token.setCounter(counterNumber);
         token.setStoreId(mIQSharedPreferences.getSting(mIQSharedPreferences.UUID_KEY));
+        token.setMappingId(metaRationCard);
         saveToken(token);
     }
 

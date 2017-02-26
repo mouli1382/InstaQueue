@@ -23,6 +23,7 @@ public class Token {
     private int counter;
     private long activatedTokenTime;
     private String userName;
+    private String mappingId;
 
     public enum Status {
         ISSUED, READY, CANCELLED, COMPLETED
@@ -34,7 +35,7 @@ public class Token {
         // Default constructor required for calls to DataSnapshot.getValue(Token.class)
     }
 
-    public Token(String uId, String storeId, String phoneNumber, long tokenNumber, String senderPic, String senderName, int counter, String areaName) {
+    public Token(String uId, String storeId, String phoneNumber, long tokenNumber, String senderPic, String senderName, int counter, String areaName, String mappingId) {
         this.uId = uId;
         this.storeId = storeId;
         this.phoneNumber = phoneNumber;
@@ -45,6 +46,7 @@ public class Token {
         this.senderName = senderName;
         this.areaName = areaName;
         this.counter = counter;
+        this.mappingId = mappingId;
     }
 
     public boolean needsBuzz() {
@@ -158,6 +160,9 @@ public class Token {
         this.userName = userName;
     }
 
+    public String getMappingId()  { return mappingId; }
+    public void setMappingId(String mappingId) {this.mappingId = mappingId; }
+
     @Exclude
     public boolean isCompleted() {
         return status == Status.COMPLETED.ordinal();
@@ -189,6 +194,7 @@ public class Token {
         result.put("counter", counter);
         result.put("areaName", areaName);
         result.put("activatedTokenTime", activatedTokenTime);
+        result.put("mappingId", mappingId);
         return result;
     }
 
@@ -207,6 +213,7 @@ public class Token {
         if (!getPhoneNumber().equals(token.getPhoneNumber())) return false;
         if (!getAreaName().equals(token.getAreaName())) return false;
         if (getActivatedTokenTime() != (token.getActivatedTokenTime())) return false;
+        if (!getMappingId().equals(token.getMappingId())) return false;
         return getTimestamp() != (token.getTimestamp());
 
     }
@@ -222,6 +229,7 @@ public class Token {
         result = 31 * result + getStatus();
         result = 31 * result + getBuzzCount();
         result = 31 * result + getAreaName().hashCode();
+        result = 31 * result + getMappingId().hashCode();
         return result;
     }
 }
