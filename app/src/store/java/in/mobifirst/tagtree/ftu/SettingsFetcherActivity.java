@@ -129,6 +129,7 @@ public class SettingsFetcherActivity extends BaseActivity {
         } else {
             store.persistStore(mIQSharedPreferences);
             mIQSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
+            mIQSharedPreferences.putString(ApplicationConstants.STORE_UID, mAuthenticationManager.getAuthInstance().getCurrentUser().getUid());
             RequestPermissionsActivity.start(SettingsFetcherActivity.this);
         }
         finish();

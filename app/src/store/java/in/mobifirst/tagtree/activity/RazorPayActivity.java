@@ -21,6 +21,7 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 
 public class RazorPayActivity extends Activity implements PaymentResultListener {
     private static final String TAG = RazorPayActivity.class.getSimpleName();
@@ -106,7 +107,7 @@ public class RazorPayActivity extends Activity implements PaymentResultListener 
     public void onPaymentSuccess(String razorpayPaymentID) {
         try {
             Toast.makeText(this, "Payment Successful: " + razorpayPaymentID, Toast.LENGTH_SHORT).show();
-            mFirebaseDatabaseManager.getDatabaseReference().child(mIQSharedPreferences.getSting(mIQSharedPreferences.UUID_KEY)).child("credits")
+            mFirebaseDatabaseManager.getDatabaseReference().child(mIQSharedPreferences.getSting(ApplicationConstants.STORE_UID)).child("credits")
                     .push().setValue(mCredits);
         } catch (Exception e) {
             Log.e(TAG, "Exception in onPaymentSuccess", e);

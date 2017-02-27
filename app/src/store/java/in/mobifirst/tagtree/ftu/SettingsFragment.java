@@ -35,6 +35,7 @@ import javax.inject.Inject;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
@@ -71,6 +72,9 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
 
     @Inject
     IQSharedPreferences mIQSharedPreferences;
+
+    @Inject
+    protected FirebaseAuthenticationManager mFirebaseAuth;
 
     @Inject
     protected NetworkConnectionUtils mNetworkConnectionUtils;
@@ -395,6 +399,7 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
             return;
 
         mIQSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
+        mIQSharedPreferences.putString(ApplicationConstants.STORE_UID, mFirebaseAuth.getAuthInstance().getCurrentUser().getUid());
         store.persistStore(mIQSharedPreferences);
 
         TokensActivity.start(getActivity());
