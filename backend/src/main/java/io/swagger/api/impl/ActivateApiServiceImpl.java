@@ -7,6 +7,7 @@ import io.swagger.model.ModelApiResponse;
 import io.swagger.model.RationShopItem;
 
 import java.util.List;
+
 import io.swagger.api.NotFoundException;
 
 import java.io.InputStream;
@@ -29,6 +30,7 @@ import com.google.firebase.auth.FirebaseCredentials;
 import com.google.firebase.auth.FirebaseCredential;
 
 import javax.servlet.ServletContext;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.File;
@@ -52,7 +54,7 @@ public class ActivateApiServiceImpl extends ActivateApiService {
         // return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Narasimha Garu")).build();
         // }
 
-        if(rationShopItem != null) {
+        if (rationShopItem != null) {
             System.out.println(" RationshopItem phone number = " + rationShopItem.getPhone());
             ApiResponse apiResponse = activate(rationShopItem);
             return Response.ok().entity(apiResponse).build();
@@ -64,25 +66,25 @@ public class ActivateApiServiceImpl extends ActivateApiService {
     private ApiResponse activate(final RationShopItem rationShopItem) {
         TTLogger.info("passed in parameter = " + rationShopItem.getPhone());
 
-        String str = "{\n" +
+        String prod = "{\n" +
                 "  \"type\": \"service_account\",\n" +
-                "  \"project_id\": \"tagtree-dev\",\n" +
-                "  \"private_key_id\": \"3ded15b2737dac42b80c4a1a462bcdcdb6edd98a\",\n" +
-                "  \"private_key\": \"-----BEGIN PRIVATE KEY-----\\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC/jB3ouQ4X8rUm\\nRpghJbPnJfGGNnsuZPXNqA1ITjZjqlMHFwXpCwi3C4vcs/hqdPW8zmGwgtvv0uIe\\ndNxFTDHghSlEsNOlDUYvGI3WTxXUM8+hAbEx1eAM/GGN9puyQcv/OP7jcounCqM1\\nqvtsfeCWGf5ArHbjcdW3VoY/r0bt+VQPnvbHZVrI0QL3C9+K9IlY90jVT7QACbnd\\ndjEe6pGjOENQYqvlhUfedo6Ic/XA9GrOckmGJ7KxpVCqU0hnLYg0kjCF6icLk9gp\\n5LsYDQxJ2lthj9cLn/+3p8/1THYGopp/KGDN4eompWFXqvgnLYmCuzZknkt7HahS\\nYj5exIDDAgMBAAECggEATW0a7eZXrxB5bvZcKhHubYHl5iWBl1hSD4ZdkBulWpYP\\np68DwZanOC5fo5/Py2BpsJ8P1+SdeIyawErmetB43NOWweBkPLRn6UOYmccwAK3M\\nwL1JXeahAT7HRDYp610zU4A7b77uemAPZvMtXEZpkOMC5iuQhxGNnOVJsNZt6mUK\\nG7bhFUDk0JvCAwotBnHaXI1oDsu54OOedCH3RleI7zi4VuW6DGaZEIZgqtVY09wO\\nShcSW7OqjDNOrfMbVqxCmodoJkENhgNTiw+x1zdm/L6Eq5DMR8bf2aohRGINSqI0\\nt5kV3Hh9gpE8DaFeFUg/M1oan8QZPYb8H3HGwswRsQKBgQDknOsUKnV033EBpPAA\\n4VVevlG3VWUdJn7HpQJgd0Jus89lz8n3C2GyjYMWRRIC8iZpqkSCj0t3nKPyppRB\\ngUfjvq21DYZbLFdD65vpgecyJvEnRE89hENWDiWSA7UTK5uHHKp4C0S6TGjG8V9t\\ncZfuqYEowT9A2HHq8NJ+QREgaQKBgQDWfnkfWQzUlujTsN5v8Kab++AEl4bakRbp\\nSy+pugn1gjko9bqlT8wm0hx7AXKD59qiJ+LcNQuyPvTpdXDzkqYDo9LjTMaZiwTw\\npLoClQZHaV+bvx02f+thF68wNOo8YL+g/3XnPNYp/umsWyEmbtLqh3+N9pGBTwyN\\nvqmFfZ+ySwKBgQDUHeTgqSSidE/ePrORnYIgjmYzvUA8c+NeSnSSHRW+sYfV5551\\nYlIb4cGngB7eLOAHWryGh352VRippHYa8WFKpzl1rD7liZbOpmXbm3RwzEElNfRw\\nF7CCwE2L1XTFfMip7KcfCxWR5iOxs3PfkG5wO0ZkEiomeK36V8h27Nh/QQKBgEmi\\nDS6HwXHRhIf3dcTz1h5CLzskUXUCzdy0pN4dMYIIfFrlUHejly/UfVZ0vr0tgM6d\\n5rE1vJgqKKVkXawgMcGaIbFKD/txz/ZUdk6gnhExyVKMHxkwfLtOCCQCZk7n36ED\\nUZRaPCMakVlLx2uMK/e7IDy54mWDn4mhZEyhPYtVAoGBAIerFxR4Hz5u7gDqQWPx\\nGlos5kyuelhnjl+SN0Fq6zfdBANByi6IwKVzMANyiOA8REshklqJ+8nHq+KgCPts\\noUY9T0jKXV/Fq3Acp04iff41TxA2y5JCOpZHu51vko7UqRSUHsw1YeiNDqtoOwiD\\nMK975LE5LaEXBfsdl6p3QbEN\\n-----END PRIVATE KEY-----\\n\",\n" +
-                "  \"client_email\": \"firebase-adminsdk-0kwyr@tagtree-dev.iam.gserviceaccount.com\",\n" +
-                "  \"client_id\": \"109094219084630798122\",\n" +
+                "  \"project_id\": \"tagtree-4ef29\",\n" +
+                "  \"private_key_id\": \"ad97d383e48fca5f58496c637ccaeabeb97b5b36\",\n" +
+                "  \"private_key\": \"-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC36wWm0yj7H5vG\\nsMuWrBOvOzT7x46zAtfyPBgKup5uXptUs5LJt4Et/mZ6cO8WCsurmoVbKvpYVTpb\\nk1ulOkP98wXMAd34H1C2OpQ9+9cnD1jaUlSfS6IXMHvTXAZ01J9Vm7SYh/ULZL/I\\n+xkOifPN8lODMUi+1itBFDAWIMW79uHUwbVp9X/4Akn3zMY4EM4+moIrGtitdZN2\\nvGEBn6JusmLGt1g0RTO1JXjj13LqDaG8pTM2COYhtrDzy7r/4fzkOnww8GEgBW/W\\nFHNXvICk8NGRHPyZvcDS6q/kVGAS3ysTuX1etJ8QtaOWOgkbDE5srBnJIGEbfcgV\\n0+oO6b1FAgMBAAECggEAXG0gtvixRJpa55wbhAnQDqTbeJiN7wpDyblHf8TPL7od\\np5Bi+TpeEeYiS/ALRvF/7ypFUE6l5tRV8oV4be19E9cYl7Bsg3ABWMLRkuDH/Bor\\nVfRAEJmqyKqV398EY5wiwpvwQyM4E1S7SN5fdj3/pwTb0TdoTndE33ysucIYfN+2\\n0gFAlLIVPCMnxaq8N/YUJ1MRIBVCUg4JAM62LDmpGlMGhsq56TlwXOuL+fl1gybJ\\nPmzHN8S8qTOVmxmPoF42SoMjl176buCCgHbiAvGXa5ip4PEOK0o+pDVQHrap3fF4\\np25fuWnhFG+YdZbHOn5R4X1ZiV5+f9M+q0S7ImwFgQKBgQDwxrFqP6cD7ucZnHmC\\nIKyW1ss/doOIX3lT6XC5wt5Y1YwPDsgbHE068JrGhwuiwEOhjJ7kzUkuefQVmq95\\n93t/f9XNjxJspELCq2UI+0j9Ll/HqrAvAmKKphq+E7F0A8xehkev6lMHb1rc7oJQ\\nKbbOisYlZC+zoSALEjHWSBW0JQKBgQDDi//XdV84VvzMMF5L7cXrs8W2Q4YQAT+n\\nfgAtwWMvtvMwu/GAu9F/yaoxeej1Kkq/bBnhlaM98qxgvDafLbYiKfgMKNK9gcbw\\n2G/0NPPXTszBCkYpyGJq6RpgDMLpKaN2ncJ16QYz4N6O7g17aw+WWPgknJgBbjIg\\n7EHGnTIKoQKBgDMkAMrweij7tVpbQfPBvObM+J6iLY3puXt5Odg6678ynG0WVqpr\\neHvsXvOL+4y2CadmltlCQSj9/joYgO0HA9Qw8tiWavNocEWo4ezmcrpT/0QJnSJe\\n/08zuLpmtGpP5DivjMpwmvIZVNNYVZVxRsLX9v46KWed8ZBobO12oiWBAoGAPFQl\\n41gfv2b+6RQHE4/Q3w4AcmHUq31nIQp7jaI7Mo5T6vYg5OGNGcqiyk7dMz4P/4yf\\nU3xx93u1+MY4Z9WXemTOVRoHIlY2hTmRGJt5mzSBcRD1YpCi5G70JyvoujyRZNf5\\nFZ2Fv12h7CC/YhM+pNjf/ZOeRdq0dnnNNTRsKuECgYEAzz8RHpDgPkHLU3Z/sojt\\ncRI0hrQqdCxfiUbMYeBkH5AodzLJzp88kh3RDy/sDieQh9IdakDWYMQCwu9htpHE\\nClop9ztSf0+Yy2a/0YwWXyB5BDo/QYNyadE1TvCnfA3gsHHNsVbfO3hpG0FFfCuM\\nLpWkfgiAw1gS88vWYsiinkM=\\n-----END PRIVATE KEY-----\\n\",\n" +
+                "  \"client_email\": \"firebase-adminsdk-jzbed@tagtree-4ef29.iam.gserviceaccount.com\",\n" +
+                "  \"client_id\": \"116244324420969168832\",\n" +
                 "  \"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\",\n" +
                 "  \"token_uri\": \"https://accounts.google.com/o/oauth2/token\",\n" +
                 "  \"auth_provider_x509_cert_url\": \"https://www.googleapis.com/oauth2/v1/certs\",\n" +
-                "  \"client_x509_cert_url\": \"https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-0kwyr%40tagtree-dev.iam.gserviceaccount.com\"\n" +
+                "  \"client_x509_cert_url\": \"https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-jzbed%40tagtree-4ef29.iam.gserviceaccount.com\"\n" +
                 "}\n";
 
-        InputStream serviceAccount = new ByteArrayInputStream(str.getBytes());
+        InputStream serviceAccount = new ByteArrayInputStream(prod.getBytes());
 
         FirebaseOptions options = new FirebaseOptions.Builder()
-            .setCredential(FirebaseCredentials.fromCertificate(serviceAccount))
-            .setDatabaseUrl("https://tagtree-dev.firebaseio.com/")
-            .build();
+                .setCredential(FirebaseCredentials.fromCertificate(serviceAccount))
+                .setDatabaseUrl("https://tagtree-4ef29.firebaseio.com")
+                .build();
 
         try {
             FirebaseApp.getInstance();
