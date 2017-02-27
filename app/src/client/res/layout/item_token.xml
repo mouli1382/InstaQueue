@@ -1,71 +1,181 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-xmlns:card_view="http://schemas.android.com/apk/res-auto"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/token"
-    tools:alpha="10"
-    card_view:layout_collapseParallaxMultiplier="0.0">
-    <!-- A CardView that contains a TextView -->
-    <android.support.v7.widget.CardView
-        android:id="@+id/card_view"
     android:layout_gravity="center"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    card_view:cardCornerRadius="4dp"
-        card_view:cardElevation="2dp"
-        card_view:cardBackgroundColor="@android:color/transparent"
-        card_view:contentPadding="0dp"
-        android:background="@drawable/token">
+    android:layout_margin="5dp"
+    card_view:cardCornerRadius="5dp"
+    card_view:cardElevation="@dimen/cardview_default_elevation">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:orientation="vertical"
+        <TextView
+            android:id="@+id/tokenStoreName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/token">
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="372dp"
-            android:layout_height="match_parent"
-            android:layout_margin="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp">
+            android:background="@color/colorPrimary"
+            android:padding="5dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor="@color/tw__solid_white"
+            android:textSize="18sp"
+            android:textStyle="normal|bold"
+            android:typeface="sans"
+            tools:text="Name" />
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/storeImageView"
-                android:layout_width="51dp"
-                android:layout_height="85dp"
-                android:src="@drawable/ic_account_circle_black_36dp"
-                android:adjustViewBounds="false" />
+
+        <RelativeLayout
+            android:id="@+id/linearLL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tokenStoreName"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/storeImageView"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:adjustViewBounds="false"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_account_circle_black_36dp" />
+
+                <TextView
+                    android:id="@+id/areaName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="5dp"
+                    android:text="Kondapur" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="5dp">
+
+                <TextView
+                    android:id="@+id/tokenNumberText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="5dp"
+                    android:padding="2dp"
+                    android:text="3000"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                    android:textSize="50sp"
+                    android:textStyle="normal|bold" />
+
+                <TextView
+                    android:id="@+id/counterText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tokenNumberText"
+                    android:layout_centerHorizontal="true"
+                    android:padding="2dp"
+                    android:text="Counter" />
+
+                <TextView
+                    android:id="@+id/counterNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/counterText"
+                    android:layout_centerHorizontal="true"
+                    android:padding="2dp"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                    android:textSize="25sp"
+                    android:textStyle="normal|bold"
+                    tools:text="100" />
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/counterLL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linearLL"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tokenTextView"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                tools:text="57"
-                android:typeface="monospace"
-                android:textColor="?android:attr/textColorPrimaryDisableOnly"
+                android:id="@+id/currentActiveToken"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="2dp"
+                android:textColor="@android:color/holo_green_dark"
+                android:textSize="18sp"
                 android:textStyle="normal|bold"
-                android:layout_width="match_parent" />
-        </LinearLayout>
+                tools:text="Currently running 67" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/positionLL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/counterLL"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tokenStoreName"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                tools:text="Store Name"
-                android:typeface="monospace"
-                android:textColor="?android:attr/textColorPrimaryDisableOnly"
+                android:id="@+id/tokenPosition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textSize="16sp"
+                android:padding="2dp"
                 android:textStyle="normal|bold"
-                android:textSize="12sp" />
-        </LinearLayout>
-    </android.support.v7.widget.CardView>
-</LinearLayout>
+                tools:text="You are number 2 in-line." />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/positionLL"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tokenDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:gravity="bottom"
+                android:inputType="date"
+                android:padding="5dp"
+                tools:text="01/01/2016" />
+
+            <TextView
+                android:id="@+id/tokenTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:padding="5dp"
+                tools:text="23:59:59" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>
+
+

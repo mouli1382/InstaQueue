@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_credits"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".activity.CreditsActivity"
+    tools:showIn="@layout/app_bar_credits">
+
+    <TextView
+        android:text="Available credits"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="57dp"
+        android:id="@+id/counterText"
+        android:textSize="30sp" />
+
+    <TextView
+        android:text="500"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="38dp"
+        android:layout_marginStart="38dp"
+        android:id="@+id/textView3"
+        android:textSize="30sp"
+        android:textStyle="normal|bold"
+        android:layout_alignBaseline="@+id/counterText"
+        android:layout_alignBottom="@+id/counterText"
+        android:layout_toRightOf="@+id/counterText"
+        android:layout_toEndOf="@+id/counterText" />
+
+    <TextView
+        android:text="Add Credits"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="94dp"
+        android:id="@+id/textView6"
+        android:textSize="30sp"
+        android:layout_below="@+id/counterText"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="Buy credits"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button2"
+        android:background="@color/colorPrimaryDark"
+        android:layout_below="@+id/textView6"
+        android:layout_marginTop="217dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:ems="10"
+        android:layout_alignBottom="@+id/textView6"
+        android:id="@+id/creditEdit"
+        android:text="500"
+        android:textSize="30sp"
+        />
+</RelativeLayout>

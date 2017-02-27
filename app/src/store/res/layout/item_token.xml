@@ -1,25 +1,108 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:weightSum="3">
+    android:layout_gravity="center"
+    android:layout_margin="5dp"
+    card_view:cardCornerRadius="5dp"
+    card_view:cardElevation="5dp">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/userImageView"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_weight="0"
-        android:src="@drawable/ic_account_circle_black_36dp" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/tokenTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_weight="3"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        tools:text="57" />
+        <RelativeLayout
+            android:id="@+id/relativeLL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:orientation="horizontal">
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/tokenDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:gravity="bottom"
+                android:inputType="date"
+                android:padding="5dp"
+                tools:text="01/01/2016" />
+
+            <TextView
+                android:id="@+id/tokenTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:padding="5dp"
+                tools:text="23:59:59" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/tokenNumber"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <ImageButton
+                android:id="@+id/imageBuzzButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorAccent"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:padding="3dp"
+                android:src="@drawable/token_button_activate_selector" />
+
+            <ImageButton
+                android:id="@+id/imageCompleteButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:padding="3dp"
+                android:backgroundTint="@color/colorAccent"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/token_button_complete_selector" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tokenCustomerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/tokenNumber"
+            android:layout_alignBottom="@+id/tokenNumber"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_margin="5dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
+            android:textSize="18sp"
+            android:typeface="monospace"
+            tools:text="Name" />
+
+        <TextView
+            android:id="@+id/tokenNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/relativeLL"
+            android:layout_margin="5dp"
+            android:text="5000"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
+            android:textSize="75sp"
+            android:textStyle="normal|bold" />
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
+
+

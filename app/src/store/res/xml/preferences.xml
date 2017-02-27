@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <in.mobifirst.tagtree.config.ResetPreference
+        android:key="reset_preference"
+        android:summary="@string/summary_reset_preference"
+        android:title="@string/title_reset_preference" />
+
+    <ListPreference
+        android:defaultValue="0"
+        android:dialogTitle="@string/language_title_preference"
+        android:entries="@array/entries_language_preference"
+        android:entryValues="@array/entryvalues_language_preference"
+        android:key="@string/language_preference_key"
+        android:summary="@string/summary_language_preference"
+        android:title="@string/title_language_preference" />
+
+
+</PreferenceScreen>

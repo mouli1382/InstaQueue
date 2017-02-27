@@ -1,3 +1,23 @@
 <resources>
-    <string name="app_name">InstaQueue</string>
+    <string name="invalid_phone_number">Kindly enter 10 digit mobile number.</string>
+    <string name="token_incremented">Your token is incremented.</string>
+    <string name="token_could_not_be_incremented">Your token could not incremented.</string>
+    <string name="first_token">You are first in the queue.</string>
+    <string name="fetch_token_text">Fetching token....</string>
+    <string name="no_connectivity">Network error...</string>
+    <string name="title_activity_base_drawer">BaseDrawerActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="granted_permission_read_sms">READ_SMS permission granted.</string>
+    <string name="rejected_permission_read_sms">READ_SMS permission rejected.</string>
+    <string name="granted_permission_read_phonestate">READ_PHONE_STATE permission granted.</string>
+    <string name="rejected_permission_read_phonestate">READ_PHONE_STATE permission rejected.</string>
+    <string name="use_my_phone_number">Use My Phone Number</string>
+    <string name="no_network">Please check your network and try again.</string>
 </resources>
