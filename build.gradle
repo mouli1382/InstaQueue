@@ -14,6 +14,8 @@ buildscript {
 
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
 
+        classpath 'com.google.firebase:firebase-plugins:1.0.4'
+
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -31,7 +33,7 @@ task clean(type: Delete) {
 
 ext {
     // Sdk and tools
-    minSdkVersion = 15
+    minSdkVersion = 17
     targetSdkVersion = 25
     compileSdkVersion = 25
     buildToolsVersion = '25.0.0'

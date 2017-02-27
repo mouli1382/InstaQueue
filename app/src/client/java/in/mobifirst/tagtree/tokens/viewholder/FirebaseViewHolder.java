@@ -16,6 +16,7 @@ public class FirebaseViewHolder extends RecyclerView.ViewHolder {
     public TextView mTime;
     public TextView mArea;
     public TextView mCurrentActiveToken;
+    public TextView mCurrentPosition;
 
     public FirebaseViewHolder(View view) {
         super(view);
@@ -27,5 +28,6 @@ public class FirebaseViewHolder extends RecyclerView.ViewHolder {
         mCounterNumber = (TextView) view.findViewById(R.id.counterNumber);
         mArea = (TextView) view.findViewById(R.id.areaName);
         mCurrentActiveToken = (TextView) view.findViewById(R.id.currentActiveToken);
+        mCurrentPosition = (TextView) view.findViewById(R.id.tokenPosition);
     }
 }

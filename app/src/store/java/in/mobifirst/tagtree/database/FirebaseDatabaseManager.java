@@ -1,7 +1,9 @@
 package in.mobifirst.tagtree.database;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.v7.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -22,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -38,6 +41,7 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.BuildConfig;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager_Factory;
+import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.model.User;
@@ -57,6 +61,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String STORE_CHILD = "store/";
     private static final String COUNTERS_CHILD = "counters/";
     private static final String COUNTERS_AVG_TAT_CHILD = "avgTurnAroundTime/";
+    private static final String COUNTERS_AVG_BURST_CHILD = "avgBurstTime/";
     private static final String COUNTERS_LAST_ACTIVE_TOKEN = "activatedToken/";
     private static final String COUNTERS_USERS = "counterUserCount/";
     private static final String TOPICS_CHILD = "topics/";
@@ -68,18 +73,19 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     private DatabaseReference mDatabaseReference;
     private IQSharedPreferences mSharedPrefs;
-    private long waitTimePerToken = 0;
+    private IQStoreApplication mIQStoreApplication;
 
     @Inject
     FirebaseAuthenticationManager mAuthenticationManager;
 
     @Inject
-    public FirebaseDatabaseManager(IQSharedPreferences iqSharedPreferences) {
+    public FirebaseDatabaseManager(IQStoreApplication application, IQSharedPreferences iqSharedPreferences) {
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mIQStoreApplication = application;
         mSharedPrefs = iqSharedPreferences;
     }
 
-    public class IncremnetTransactionHander implements Transaction.Handler {
+    private class IncremnetTransactionHander implements Transaction.Handler {
 
         @Override
         public Transaction.Result doTransaction(MutableData mutableData) {
@@ -101,30 +107,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     ;
-
-    public class TATIncrementHandler implements Transaction.Handler {
-
-        @Override
-        public Transaction.Result doTransaction(MutableData mutableData) {
-            Long currentValue = mutableData.getValue(Long.class);
-            if (currentValue == null) {
-                mutableData.setValue(waitTimePerToken);
-            } else {
-                mutableData.setValue(currentValue + waitTimePerToken);
-            }
-
-
-            return Transaction.success(mutableData);
-        }
-
-        @Override
-        public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
-
-        }
-    }
-
-    ;
-
 
     public DatabaseReference getDatabaseReference() {
         return mDatabaseReference;
@@ -567,15 +549,51 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         //Sender ID,While using route4 sender id should be 6 characters long.
         String senderId = "TagTre";
         String message = "";
+
         //Your message to send, Add URL encoding here.
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mIQStoreApplication);
+        String languagePrefValueString = sharedPref.getString(ApplicationConstants.LANGUAGE_PREFERENCE_KEY, "-1");
+        int languagePrefValue = Integer.parseInt(languagePrefValueString);
+
         if (status == false) {
-            message = "You've received a token from " + token.getSenderName().trim() + " "
-                    + token.getAreaName().trim() + ". Token= " + (token.getTokenNumber()) + ", Counter= " + token.getCounter()
-                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates";
+            switch (languagePrefValue) {
+                case 0: //English
+                default:
+                    message = "You've received a token from " + token.getSenderName().trim() + " "
+                            + token.getAreaName().trim() + ". Token= " + (token.getTokenNumber()) + ", Counter= " + token.getCounter()
+                            + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates";
+                    break;
+                case 1: //Telugu
+                    message = "మీకు" + " " + token.getSenderName().trim() + " మరియు శాఖ" + " "
+                            + token.getAreaName().trim() + " నుండి టోకెన్ అందింది" + "." + "టోకెన్ సంఖ్య" + "=" + (token.getTokenNumber())
+                            + "," + "కౌంటర సంఖ్య" + "=" + token.getCounter()
+                            + "." +
+                            "నిజ సమయంలో టోకెన్ స్థితిని ట్రాక్ చేయడానికి PlayStore నుండి అప్లికేషన్ డౌన్లోడ్ చేయుము"
+                            + "."
+                            + CLIENT_APP_PLAYSTORE_URL
+                            + ".";
+                    break;
+            }
         } else {
-            message = "It's your turn at " + token.getSenderName() + " " + token.getAreaName() + "."
-                    + " Token = " + token.getTokenNumber() + ", Counter = " + token.getCounter()
-                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates.";
+
+            switch (languagePrefValue) {
+                case 0: //English
+                default:
+                    message = "It's your turn at " + token.getSenderName() + " " + token.getAreaName() + "."
+                            + " Token = " + token.getTokenNumber() + ", Counter = " + token.getCounter()
+                            + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates.";
+                    break;
+                case 1: //Telugu
+                    message = token.getSenderName().trim() + " మరియు శాఖ" + " "
+                            + token.getAreaName().trim() + "వద్ద మీ వంతు" + "." + "టోకెన్ సంఖ్య" + "=" + (token.getTokenNumber())
+                            + "," + "కౌంటర సంఖ్య" + "=" + token.getCounter()
+                            + "." +
+                            "నిజ సమయంలో టోకెన్ స్థితిని ట్రాక్ చేయడానికి PlayStore నుండి అప్లికేషన్ డౌన్లోడ్ చేయుము"
+                            + "."
+                            + CLIENT_APP_PLAYSTORE_URL
+                            + ".";
+                    break;
+            }
         }
         //define route
         String route = "4"; //4 For transaction, check with msg91
@@ -585,50 +603,57 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         BufferedReader reader = null;
 
         //encoding message
-        String encoded_message = URLEncoder.encode(message);
+        String encoded_message = null;
+        try {
+            encoded_message = URLEncoder.encode(message, "UTF-8");
 
-        //Send SMS API
-        String mainUrl = mMsg91Url;
+            //Send SMS API
+            String mainUrl = mMsg91Url;
 
-        //Prepare parameter string
-        StringBuilder sbPostData = new StringBuilder(mainUrl);
-        sbPostData.append("authkey=" + authkey);
-        sbPostData.append("&mobiles=" + mobiles);
-        sbPostData.append("&message=" + encoded_message);
-        sbPostData.append("&route=" + route);
-        sbPostData.append("&sender=" + senderId);
+            //Prepare parameter string
+            StringBuilder sbPostData = new StringBuilder(mainUrl);
+            sbPostData.append("authkey=" + authkey);
+            sbPostData.append("&mobiles=" + mobiles);
+            sbPostData.append("&message=" + encoded_message);
+            sbPostData.append("&route=" + route);
+            sbPostData.append("&sender=" + senderId);
+            sbPostData.append("&unicode=1");
 
-        //final string
-        mainUrl = sbPostData.toString();
-        class SendSMSTask extends AsyncTask<String, Integer, Long> {
-            protected Long doInBackground(String... urls) {
-                try {
-                    //prepare connection
-                    URL myURL = new URL(urls[0]);
-                    URLConnection myURLConnection = myURL.openConnection();
-                    myURLConnection.connect();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(myURLConnection.getInputStream()));
+            //final string
+            mainUrl = sbPostData.toString();
+            class SendSMSTask extends AsyncTask<String, Integer, Long> {
+                protected Long doInBackground(String... urls) {
+                    try {
+                        //prepare connection
+                        URL myURL = new URL(urls[0]);
+                        URLConnection myURLConnection = myURL.openConnection();
+                        myURLConnection.connect();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(myURLConnection.getInputStream()));
 
-                    //reading response
-                    String response;
-                    while ((response = reader.readLine()) != null)
-                        //print response
-                        Log.d("RESPONSE", "" + response);
+                        //reading response
+                        String response;
+                        while ((response = reader.readLine()) != null)
+                            //print response
+                            Log.d("RESPONSE", "" + response);
 
-                    //finally close connection
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    FirebaseCrash.report(new Exception("Error in Sending SMS: " + e.getMessage()));
+                        //finally close connection
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        FirebaseCrash.report(new Exception("Error in Sending SMS: " + e.getMessage()));
+                    }
+                    return 0L;
                 }
-                return 0L;
             }
-        }
 
-        //Uncomment this  to execute the send sms
-        new SendSMSTask().execute(mainUrl);
-        incrementSMS(token, new IncremnetTransactionHander()
-        );
+            //Uncomment this  to execute the send sms
+            new SendSMSTask().execute(mainUrl);
+            incrementSMS(token, new IncremnetTransactionHander()
+            );
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateTopicsForPushNotification(Token token) {
@@ -641,28 +666,58 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     public void updateToken(Token token) {
         if (token.isCompleted()) {
-            //Move it to token-history table.
-            mDatabaseReference
-                    .child(TOKENS_HISTORY_CHILD)
-                    .push()
-                    .setValue(token.toMap()); //Fix this to Map should not be used
-
-            //Remove it from the store counter
-            mDatabaseReference
-                    .child(STORE_CHILD)
-                    .child(token.getStoreId())
-                    .child(COUNTERS_CHILD)
-                    .child("" + token.getCounter())
-                    .child(TOKENS_CHILD)
-                    .child(token.getuId())
-                    .removeValue();
-
-            //Remove it from the token table
+            //Update the token completion time
             mDatabaseReference
                     .child(TOKENS_CHILD)
                     .child(token.getuId())
-                    .removeValue();
-        } else {            //Check for network connectivity
+                    .setValue(token);
+            mDatabaseReference
+                    .child(TOKENS_CHILD)
+                    .child(token.getuId())
+                    .child("tokenFinishTime")
+                    .setValue(ServerValue.TIMESTAMP);
+
+            ValueEventListener completionListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        Token tokenUpdated = dataSnapshot.getValue(Token.class);
+                        incrementAvgBurstTime(tokenUpdated);
+
+                        //Move it to token-history table.
+                        mDatabaseReference
+                                .child(TOKENS_HISTORY_CHILD)
+                                .push()
+                                .setValue(tokenUpdated.toMap());
+
+                        //Remove it from the token table
+                        mDatabaseReference
+                                .child(TOKENS_CHILD)
+                                .child(tokenUpdated.getuId())
+                                .removeValue();
+
+                        //Remove the activated token from the store counter so that the TAT is calculated on the issued tokens only.
+                        mDatabaseReference
+                                .child(STORE_CHILD)
+                                .child(tokenUpdated.getStoreId())
+                                .child(COUNTERS_CHILD)
+                                .child("" + tokenUpdated.getCounter())
+                                .child(TOKENS_CHILD)
+                                .child(tokenUpdated.getuId())
+                                .removeValue();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.w(TAG, "Token completion time is not updated", databaseError.toException());
+                }
+            };
+            mDatabaseReference
+                    .child(TOKENS_CHILD)
+                    .child(token.getuId()).addListenerForSingleValueEvent(completionListener);
+
+        } else {
             mDatabaseReference
                     .child(TOKENS_CHILD)
                     .child(token.getuId())
@@ -676,14 +731,26 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             ValueEventListener postListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    // Get Post object and use the values to update the UI
-                    Token tokenUpdated = dataSnapshot.getValue(Token.class);
-                    if (tokenUpdated.getBuzzCount() == 1) {
-                        //Inform user if he is not present in the user table
-                        checkSMSSending(tokenUpdated, true);
-                        incrementUserCount(tokenUpdated, new IncremnetTransactionHander());
-                        incrementAvgTAT(tokenUpdated, new TATIncrementHandler());
-                        setActiveTokenNumber(tokenUpdated);
+                    if (dataSnapshot.exists()) {
+                        Token tokenUpdated = dataSnapshot.getValue(Token.class);
+                        if (tokenUpdated.getBuzzCount() == 1) {
+                            //Inform user if he is not present in the user table
+                            checkSMSSending(tokenUpdated, true);
+                            incrementUserCount(tokenUpdated, new IncremnetTransactionHander());
+                            incrementAvgTAT(tokenUpdated);
+                            setActiveTokenNumber(tokenUpdated);
+
+
+                            //Remove the activated token from the store counter so that the TAT is calculated on the issued tokens only.
+                            mDatabaseReference
+                                    .child(STORE_CHILD)
+                                    .child(tokenUpdated.getStoreId())
+                                    .child(COUNTERS_CHILD)
+                                    .child("" + tokenUpdated.getCounter())
+                                    .child(TOKENS_CHILD)
+                                    .child(tokenUpdated.getuId())
+                                    .removeValue();
+                        }
                     }
                 }
 
@@ -697,7 +764,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             mDatabaseReference
                     .child(TOKENS_CHILD)
                     .child(token.getuId()).addListenerForSingleValueEvent(postListener);
-
         }
     }
 
@@ -740,18 +806,72 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     }
 
-    private void incrementAvgTAT(Token token, @NonNull Transaction.Handler handler) {
-        waitTimePerToken = token.getActivatedTokenTime() - token.getTimestamp();
-        if (waitTimePerToken < 0)
+    private void incrementAvgTAT(Token token) {
+        long waitTimePerToken = token.getActivatedTokenTime() - token.getTimestamp();
+        if (waitTimePerToken < 0) {
             waitTimePerToken = 0;
+        }
 
+        final long finalWaitTimePerToken = waitTimePerToken;
         mDatabaseReference
                 .child(STORE_CHILD)
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
                 .child("" + token.getCounter())
                 .child(COUNTERS_AVG_TAT_CHILD)
-                .runTransaction(handler);
+                .runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        Long currentValue = mutableData.getValue(Long.class);
+                        if (currentValue == null) {
+                            mutableData.setValue(finalWaitTimePerToken);
+                        } else {
+                            mutableData.setValue(currentValue + finalWaitTimePerToken);
+                        }
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+                    }
+                });
+
+    }
+
+    private void incrementAvgBurstTime(Token token) {
+        long burstTime = 0;
+        if (token.getActivatedTokenTime() > 0) {
+            burstTime = token.getTokenFinishTime() - token.getActivatedTokenTime();
+        }
+        if (burstTime < 0) {
+            burstTime = 0;
+        }
+
+        final long finalBurstTime = burstTime;
+        mDatabaseReference
+                .child(STORE_CHILD)
+                .child(token.getStoreId())
+                .child(COUNTERS_CHILD)
+                .child("" + token.getCounter())
+                .child(COUNTERS_AVG_BURST_CHILD)
+                .runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        Long currentValue = mutableData.getValue(Long.class);
+                        if (currentValue == null) {
+                            mutableData.setValue(finalBurstTime);
+                        } else {
+                            mutableData.setValue(currentValue + finalBurstTime);
+                        }
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+                    }
+                });
 
     }
 
@@ -861,5 +981,25 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         incrementSMS(token, new IncremnetTransactionHander());
     }
 
+    //Reset token counter
+    public void resetTokenCounter(String storeId) {
+        DatabaseReference tokenCounterRef = mDatabaseReference
+                .child("store")
+                .child(storeId)
+                .child("tokenCounter");
+        tokenCounterRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                mutableData.setValue(0);
+
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+            }
+        });
+    }
 }
 

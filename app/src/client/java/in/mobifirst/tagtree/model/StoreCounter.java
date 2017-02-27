@@ -16,7 +16,16 @@ public class StoreCounter {
     private long activatedToken;
     private long avgTurnAroundTime;
     private int counterUserCount;
+    private long avgBurstTime;
     private Map<String, Long> tokens;
+
+    public long getAvgBurstTime() {
+        return avgBurstTime;
+    }
+
+    public void setAvgBurstTime(long avgBurstTime) {
+        this.avgBurstTime = avgBurstTime;
+    }
 
     public long getAvgTurnAroundTime() {
         return avgTurnAroundTime;
@@ -81,5 +90,55 @@ public class StoreCounter {
             return TimeUtils.getDuration(ETA);
         }
         return TimeUtils.getDuration(avgTATPerToken);
+    }
+
+    private long getAvgBurstPerToken() {
+        if (counterUserCount > 0) {
+            long result = (new BigDecimal(avgBurstTime).divide(new BigDecimal(counterUserCount), BigDecimal.ROUND_HALF_UP)).longValue();
+            Log.e(TAG, "avgBurstTimePerToken = " + result);
+            return result;
+        }
+        return 0;
+    }
+
+    public String ETS(long given) {
+        long avgBurstPerToken = getAvgBurstPerToken();
+
+        if (avgBurstPerToken == 0)
+            return "N/A";
+
+        if (tokens == null || tokens.size() == 0)
+            return TimeUtils.getDuration(avgBurstPerToken);
+
+        List<Long> tokenList = new ArrayList<>(tokens.values());
+        if (tokenList.size() == 0) {
+            return TimeUtils.getDuration(avgBurstPerToken);
+        }
+
+        Collections.sort(tokenList);
+        if (tokenList.size() > 0) {
+            long ETS = (tokenList.indexOf(given)) * avgBurstPerToken;
+            Log.e(TAG, "ETA = " + ETS);
+            return TimeUtils.getDuration(ETS);
+        }
+        return TimeUtils.getDuration(avgBurstPerToken);
+    }
+
+    public String getPosition(long given) {
+        if (tokens == null || tokens.size() == 0)
+            return "";
+
+        List<Long> tokenList = new ArrayList<>(tokens.values());
+        if (tokenList.size() == 0) {
+            return "";
+        }
+
+        Collections.sort(tokenList);
+        int index = tokenList.indexOf(given);
+        if(index <= 0) {
+            return "You are next.";
+        } else {
+            return "You are number " + index + " in-line.";
+        }
     }
 }

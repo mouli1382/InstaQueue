@@ -17,12 +17,10 @@
             android:theme="@style/AppTheme.Background" />
         <activity
             android:name=".tokens.TokensActivity"
-            android:theme="@style/AppTheme.Background"
             android:screenOrientation="portrait" />
         <activity
             android:name=".addedittoken.AddEditTokenActivity"
             android:parentActivityName=".tokens.TokensActivity"
-            android:theme="@style/AppTheme.Background"
             android:screenOrientation="portrait" >
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
@@ -32,6 +30,10 @@
         </activity>
         <activity
             android:name=".ftu.SettingsActivity"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".config.PrefsActivity"
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait" />
         <activity
@@ -59,6 +61,8 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+
+        <service android:name=".display.TokenDisplayService"/>
     </application>
 
 </manifest>

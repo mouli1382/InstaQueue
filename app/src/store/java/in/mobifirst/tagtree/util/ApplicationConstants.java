@@ -25,5 +25,5 @@ public class ApplicationConstants {
 
     public static String FTU_COMPLETED_KEY = "ftu_completed";
 
-
+    public static String LANGUAGE_PREFERENCE_KEY = "language_preference_key";
 }

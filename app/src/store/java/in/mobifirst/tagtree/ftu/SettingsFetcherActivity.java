@@ -56,6 +56,8 @@ public class SettingsFetcherActivity extends BaseActivity {
         ((IQStoreApplication) getApplication()).getApplicationComponent()
                 .inject(this);
 
+        Store.clearStore(mIQSharedPreferences);
+
         if (mNetworkConnectionUtils.isConnected()) {
             fetchStore();
         } else {

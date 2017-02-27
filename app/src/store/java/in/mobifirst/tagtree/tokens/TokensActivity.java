@@ -15,6 +15,7 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseDrawerActivity;
 import in.mobifirst.tagtree.activity.CreditsActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.display.TokenDisplayService;
 import in.mobifirst.tagtree.util.ActivityUtilities;
 
 public class TokensActivity extends BaseDrawerActivity {
@@ -56,7 +57,6 @@ public class TokensActivity extends BaseDrawerActivity {
                                 .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
                                 .tokensPresenterModule(new TokensPresenterModule(snapFragment)).build()
                                 .inject(TokensActivity.this);
-
                     } else {
                         FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
                         frameLayout.removeAllViewsInLayout();
@@ -93,6 +93,8 @@ public class TokensActivity extends BaseDrawerActivity {
                     (TokensFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
             mTokensPresenter.setFiltering(currentFiltering);
         }
+
+        startService(new Intent(this, TokenDisplayService.class));
     }
 
     @Override
@@ -126,5 +128,11 @@ public class TokensActivity extends BaseDrawerActivity {
             outState.putSerializable(CURRENT_FILTERING_KEY, mTokensPresenter.getFiltering());
 
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(new Intent(this, TokenDisplayService.class));
+        super.onDestroy();
     }
 }
