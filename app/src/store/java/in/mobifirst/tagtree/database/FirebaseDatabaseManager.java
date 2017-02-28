@@ -7,8 +7,11 @@ import android.support.v7.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,10 +42,10 @@ import java.util.TreeMap;
 import javax.inject.Inject;
 
 import in.mobifirst.tagtree.BuildConfig;
-import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
-import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager_Factory;
 import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.model.Store;
+import in.mobifirst.tagtree.model.StoreCounter;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.model.User;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
@@ -327,6 +330,48 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .setValue(token.getTokenNumber());
     }
 
+    private Task<Integer> positionInQueue(String storeId, int counter) {
+        Log.e(TAG, "positionInQueue START.... ");
+        final TaskCompletionSource<StoreCounter> completionSource = new TaskCompletionSource<>();
+
+        mDatabaseReference
+                .child(STORE_CHILD)
+                .child(storeId)
+                .child(COUNTERS_CHILD)
+                .child("" + counter)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            StoreCounter storeCounter = dataSnapshot.getValue(StoreCounter.class);
+                            completionSource.setResult(storeCounter);
+                        } else {
+                            completionSource.setResult(null);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(TAG, "[fetch Store] onCancelled:" + databaseError);
+                        completionSource.setException(databaseError.toException());
+                    }
+                });
+
+        return completionSource.getTask()
+                .continueWith(new Continuation<StoreCounter, Integer>() {
+                    @Override
+                    public Integer then(@NonNull Task<StoreCounter> task) throws Exception {
+                        StoreCounter storeCounter = task.getResult();
+                        if (storeCounter == null) {
+                            return -1;
+                        } else {
+                            return storeCounter.positionOfNewToken();
+                        }
+                    }
+                });
+    }
+
+
     public void addNewToken(final Token token, final Subscriber<? super String> subscriber) {
         incrementTokenCounter(token, new Transaction.Handler() {
             @Override
@@ -343,14 +388,68 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
             @Override
             public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
-                if (databaseError == null) {
-                    if (committed) {
-                        {
-                            final Long currentToken = (Long) dataSnapshot.getValue();
+                if (databaseError == null && committed) {
+                    if (dataSnapshot.exists()) {
+                        final Long currentToken = (Long) dataSnapshot.getValue();
+                        if (currentToken > 2) {
+                            positionInQueue(token.getStoreId(), token.getCounter())
+                                    .addOnSuccessListener(new OnSuccessListener<Integer>() {
+                                        @Override
+                                        public void onSuccess(Integer position) {
+                                            int currentPosition = position;
+                                            Log.e(TAG, "Currently there are "+ position+" people before you.");
+
+                                            DatabaseReference storeRef = mDatabaseReference.getRef()
+                                                    .child("store")
+                                                    .child(token.getStoreId());
+
+                                            storeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot storeDataSnapshot) {
+                                                    if (storeDataSnapshot.exists()) {
+
+                                                        String key = mDatabaseReference.child(TOKENS_CHILD)
+                                                                .push().getKey();
+                                                        Store store = storeDataSnapshot.getValue(Store.class);
+                                                        String areaName = store.getArea();
+                                                        final Token newToken = new Token(key, token.getStoreId(),
+                                                                token.getPhoneNumber(),
+                                                                currentToken,
+                                                                mSharedPrefs.getSting((ApplicationConstants.WEBSITE_LOGO_URL_KEY)),
+                                                                mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY),
+                                                                token.getCounter(),
+                                                                areaName,
+                                                                token.getMappingId());
+
+                                                        mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
+                                                        addTokenUnderStoreCounter(newToken);
+
+                                                        checkSMSSending(newToken, false);
+                                                    } else {
+                                                        Log.e(TAG, "Snapshot is null");
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(DatabaseError databaseError) {
+                                                    Log.e(TAG, "[fetch Area name] onCancelled:" + databaseError);
+                                                }
+                                            });
+
+                                            subscriber.onNext(null);
+                                            subscriber.onCompleted();
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            subscriber.onError(e);
+                                        }
+                                    });
+                        } else {
                             DatabaseReference storeRef = mDatabaseReference.getRef()
                                     .child("store")
                                     .child(token.getStoreId());
-
 
                             storeRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
@@ -373,12 +472,6 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                         mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
                                         addTokenUnderStoreCounter(newToken);
 
-                                        //ToDo replicate the entire tokens under store. Too much but easy.
-//                                        Map<String, Object> childUpdates = new HashMap<>();
-//                                        childUpdates.put(TOKENS_CHILD + key, tokenValues);
-//                                        childUpdates.put(STORE_CHILD + newToken.getStoreId() + "/" + newToken.getCounter() + "/" + TOKENS_CHILD + key, tokenValues);
-//
-//                                        mDatabaseReference.updateChildren(childUpdates);
                                         checkSMSSending(newToken, false);
                                     } else {
                                         Log.e(TAG, "Snapshot is null");
@@ -512,7 +605,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 if (usersnapshot == null || !usersnapshot.exists()) {
                     //user is not present
 //                    if (!BuildConfig.DEBUG) {
-                        sendSMS(token, status);
+                    sendSMS(token, status);
 //                    }
 //                    sendBulkSMS(token, status);
                 } else {
@@ -563,11 +656,11 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                             + token.getAreaName().trim() + ". To avoid standing in Q, download TagTree app or click on the link" + CLIENT_APP_PLAYSTORE_URL + " and save your time and energy";
                     break;
                 case 1: //Telugu
-                    message = "మీ టోకెన్=" + (token.getTokenNumber())+ "," + token.getSenderName().trim() + " "
+                    message = "మీ టోకెన్=" + (token.getTokenNumber()) + "," + token.getSenderName().trim() + " "
                             + token.getAreaName().trim() + "." +
                             "Q లో  నిలబడటం నివారించేందుకు, ఇప్పుడే  క్రింద లింక్ క్లిక్ చేయండి."
                             + CLIENT_APP_PLAYSTORE_URL
-                            + "." +" TagTree app ద్వారా మీరు మీ సమయం, డబ్బు ఆదా చేయవచ్చు";
+                            + "." + " TagTree app ద్వారా మీరు మీ సమయం, డబ్బు ఆదా చేయవచ్చు";
                     break;
             }
         } else {
@@ -575,15 +668,15 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             switch (languagePrefValue) {
                 case 0: //English
                 default:
-                    message = "Now it's turn for Token=" + token.getTokenNumber() + ","  +  token.getSenderName()+  token.getAreaName().trim()+"."
-                    +"To avoid standing in Q, download TagTree app or click on the link" + CLIENT_APP_PLAYSTORE_URL + " and save your time and energy";
+                    message = "Now it's turn for Token=" + token.getTokenNumber() + "," + token.getSenderName() + token.getAreaName().trim() + "."
+                            + "To avoid standing in Q, download TagTree app or click on the link" + CLIENT_APP_PLAYSTORE_URL + " and save your time and energy";
                     break;
                 case 1: //Telugu
-                    message = "ఇప్పుడు మీ వంతు వచ్చింది. టోకెన్=" + (token.getTokenNumber()) + "," + token.getSenderName().trim()  + " "
-                            + token.getAreaName().trim()+
+                    message = "ఇప్పుడు మీ వంతు వచ్చింది. టోకెన్=" + (token.getTokenNumber()) + "," + token.getSenderName().trim() + " "
+                            + token.getAreaName().trim() +
                             ". Q లో  నిలబడటం నివారించేందుకు, ఇప్పుడే  క్రింద లింక్ క్లిక్ చేయండి."
                             + CLIENT_APP_PLAYSTORE_URL
-                            + "." +" TagTree app ద్వారా మీరు మీ సమయం, డబ్బు ఆదా చేయవచ్చు";
+                            + "." + " TagTree app ద్వారా మీరు మీ సమయం, డబ్బు ఆదా చేయవచ్చు";
                     break;
             }
         }
@@ -734,14 +827,14 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
 
                             //Remove the activated token from the store counter so that the TAT is calculated on the issued tokens only.
-                            mDatabaseReference
-                                    .child(STORE_CHILD)
-                                    .child(tokenUpdated.getStoreId())
-                                    .child(COUNTERS_CHILD)
-                                    .child("" + tokenUpdated.getCounter())
-                                    .child(TOKENS_CHILD)
-                                    .child(tokenUpdated.getuId())
-                                    .removeValue();
+//                            mDatabaseReference
+//                                    .child(STORE_CHILD)
+//                                    .child(tokenUpdated.getStoreId())
+//                                    .child(COUNTERS_CHILD)
+//                                    .child("" + tokenUpdated.getCounter())
+//                                    .child(TOKENS_CHILD)
+//                                    .child(tokenUpdated.getuId())
+//                                    .removeValue();
                         }
                     }
                 }

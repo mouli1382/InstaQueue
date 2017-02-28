@@ -320,38 +320,30 @@ public class FirebaseDatabaseManager {
                     switch (1 /*Defult to Telugu*/) {
                         case 0: //English
                         default:
-                            message = "You've received a token from " + token.getSenderName().trim() + " "
-                                    + token.getAreaName().trim() + ". Token= " + (token.getTokenNumber()) + ", Counter= " + token.getCounter()
-                                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates";
+                            message = "Your token=" + (token.getTokenNumber()) + " from " + token.getSenderName().trim() + " "
+                                    + token.getAreaName().trim() + ". To avoid standing in Q, download TagTree app or click on the link" + CLIENT_APP_PLAYSTORE_URL + " and save your time and energy";
                             break;
                         case 1: //Telugu
-                            message = "మీకు" + " " + token.getSenderName().trim() + " మరియు శాఖ" + " "
-                                    + token.getAreaName().trim() + " నుండి టోకెన్ అందింది" + "." + "టోకెన్ సంఖ్య" + "=" + (token.getTokenNumber())
-                                    + "," + "కౌంటర సంఖ్య" + "=" + token.getCounter()
-                                    + "." +
-                                    "నిజ సమయంలో టోకెన్ స్థితిని ట్రాక్ చేయడానికి PlayStore నుండి అప్లికేషన్ డౌన్లోడ్ చేయుము"
-                                    + "."
+                            message = "మీ టోకెన్=" + (token.getTokenNumber())+ "," + token.getSenderName().trim() + " "
+                                    + token.getAreaName().trim() + "." +
+                                    "Q లో  నిలబడటం నివారించేందుకు, ఇప్పుడే  క్రింద లింక్ క్లిక్ చేయండి."
                                     + CLIENT_APP_PLAYSTORE_URL
-                                    + ".";
+                                    + "." +" TagTree app ద్వారా మీరు మీ సమయం, డబ్బు ఆదా చేయవచ్చు";
                             break;
                     }
                 } else {
                     switch (1 /*Defult to Telugu*/) {
                         case 0: //English
                         default:
-                            message = "It's your turn at " + token.getSenderName() + " " + token.getAreaName() + "."
-                                    + " Token = " + token.getTokenNumber() + ", Counter = " + token.getCounter()
-                                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates.";
+                            message = "Now it's turn for Token=" + token.getTokenNumber() + ","  +  token.getSenderName()+  token.getAreaName().trim()+"."
+                                    +"To avoid standing in Q, download TagTree app or click on the link" + CLIENT_APP_PLAYSTORE_URL + " and save your time and energy";
                             break;
                         case 1: //Telugu
-                            message = token.getSenderName().trim() + " మరియు శాఖ" + " "
-                                    + token.getAreaName().trim() + "వద్ద మీ వంతు" + "." + "టోకెన్ సంఖ్య" + "=" + (token.getTokenNumber())
-                                    + "," + "కౌంటర సంఖ్య" + "=" + token.getCounter()
-                                    + "." +
-                                    "నిజ సమయంలో టోకెన్ స్థితిని ట్రాక్ చేయడానికి PlayStore నుండి అప్లికేషన్ డౌన్లోడ్ చేయుము"
-                                    + "."
+                            message = "ఇప్పుడు మీ వంతు వచ్చింది. టోకెన్=" + (token.getTokenNumber()) + "," + token.getSenderName().trim()  + " "
+                                    + token.getAreaName().trim()+
+                                    ". Q లో  నిలబడటం నివారించేందుకు, ఇప్పుడే  క్రింద లింక్ క్లిక్ చేయండి."
                                     + CLIENT_APP_PLAYSTORE_URL
-                                    + ".";
+                                    + "." +" TagTree app ద్వారా మీరు మీ సమయం, డబ్బు ఆదా చేయవచ్చు";
                             break;
                     }
                 }

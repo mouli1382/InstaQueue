@@ -20,7 +20,6 @@ public class SettingsActivity extends BaseActivity {
     @Inject
     SettingsPresenter mSettingsPresenter;
 
-    @Inject
     IQSharedPreferences mIQSharedPreferences;
 
     public static void start(Context caller) {
@@ -39,6 +38,8 @@ public class SettingsActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
 
+        //ToDo inject it - avoid cyclic dependency.
+        mIQSharedPreferences = ((IQStoreApplication) getApplicationContext()).getApplicationComponent().getIQSharedPreferences();
         if (mIQSharedPreferences.getBoolean(ApplicationConstants.FTU_COMPLETED_KEY)) {
             actionBar.setTitle(R.string.my_account);
             actionBar.setDisplayHomeAsUpEnabled(true);
