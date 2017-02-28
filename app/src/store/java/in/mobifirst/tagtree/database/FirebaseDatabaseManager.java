@@ -395,8 +395,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                             positionInQueue(token.getStoreId(), token.getCounter())
                                     .addOnSuccessListener(new OnSuccessListener<Integer>() {
                                         @Override
-                                        public void onSuccess(Integer position) {
-                                            int currentPosition = position;
+                                        public void onSuccess(final Integer position) {
                                             Log.e(TAG, "Currently there are "+ position+" people before you.");
 
                                             DatabaseReference storeRef = mDatabaseReference.getRef()
@@ -424,7 +423,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                         mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
                                                         addTokenUnderStoreCounter(newToken);
 
-                                                        checkSMSSending(newToken, false);
+                                                        checkSMSSending(newToken, false, position);
                                                     } else {
                                                         Log.e(TAG, "Snapshot is null");
                                                     }
@@ -472,7 +471,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                         mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
                                         addTokenUnderStoreCounter(newToken);
 
-                                        checkSMSSending(newToken, false);
+                                        checkSMSSending(newToken, false,  -1 /*Dummy value*/);
                                     } else {
                                         Log.e(TAG, "Snapshot is null");
                                     }
@@ -593,7 +592,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
 
-    private void checkSMSSending(final Token token, final boolean status) {
+    private void checkSMSSending(final Token token, final boolean status, final Integer position) {
 
         Query query = mDatabaseReference.getRef()
                 .child("users")
@@ -605,7 +604,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 if (usersnapshot == null || !usersnapshot.exists()) {
                     //user is not present
 //                    if (!BuildConfig.DEBUG) {
-                    sendSMS(token, status);
+                    sendSMS(token, status, position);
 //                    }
 //                    sendBulkSMS(token, status);
                 } else {
@@ -630,9 +629,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         });
     }
 
-    private void sendSMS(Token token, boolean status) {
-
-
+    private void sendSMS(Token token, boolean status, Integer position) {
         //Android SMS API integration code
 
         //Your authentication key
@@ -820,7 +817,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         Token tokenUpdated = dataSnapshot.getValue(Token.class);
                         if (tokenUpdated.getBuzzCount() == 1) {
                             //Inform user if he is not present in the user table
-                            checkSMSSending(tokenUpdated, true);
+                            checkSMSSending(tokenUpdated, true, -1 /*Dummy value*/);
                             incrementUserCount(tokenUpdated, new IncremnetTransactionHander());
                             incrementAvgTAT(tokenUpdated);
                             setActiveTokenNumber(tokenUpdated);
