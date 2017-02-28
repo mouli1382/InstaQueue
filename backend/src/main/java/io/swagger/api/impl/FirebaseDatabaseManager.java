@@ -48,7 +48,7 @@ public class FirebaseDatabaseManager {
     private final static String mMsgBulkSMSUrl = "http://login.bulksmsgateway.in/sendmessage.php?";
     private static final String FP_SHOP_CHILD = "rationshopmapping/";
 
-    private final static String CLIENT_APP_PLAYSTORE_URL = "https://goo.gl/mVAdpT";
+    private final static String CLIENT_APP_PLAYSTORE_URL = "https://goo.gl/4nR8wl";
 
     private DatabaseReference mDatabaseReference;
 //    private Executor executor;

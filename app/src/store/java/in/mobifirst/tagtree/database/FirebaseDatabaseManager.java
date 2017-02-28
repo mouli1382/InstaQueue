@@ -72,7 +72,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private final static String mMsg91Url = "https://control.msg91.com/api/sendhttp.php?";
     private final static String mMsgBulkSMSUrl = "http://login.bulksmsgateway.in/sendmessage.php?";
 
-    private final static String CLIENT_APP_PLAYSTORE_URL = "https://goo.gl/mVAdpT";
+    private final static String CLIENT_APP_PLAYSTORE_URL = "https://goo.gl/4nR8wl";
 
     private DatabaseReference mDatabaseReference;
     private IQSharedPreferences mSharedPrefs;
