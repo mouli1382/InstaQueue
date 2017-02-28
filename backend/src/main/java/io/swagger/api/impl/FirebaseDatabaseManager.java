@@ -46,6 +46,7 @@ public class FirebaseDatabaseManager {
     private static final String TOKENS_HISTORY_CHILD = "token-history";
     private final static String mMsg91Url = "https://control.msg91.com/api/sendhttp.php?";
     private final static String mMsgBulkSMSUrl = "http://login.bulksmsgateway.in/sendmessage.php?";
+    private static final String FP_SHOP_CHILD = "rationshopmapping/";
 
     private final static String CLIENT_APP_PLAYSTORE_URL = "https://goo.gl/mVAdpT";
 
@@ -113,8 +114,8 @@ public class FirebaseDatabaseManager {
         TTLogger.info(TAG + "getStore START ------");
         final TaskCompletionSource<Token> getStoreSource = new TaskCompletionSource<>();
 
-    
-                // final TaskCompletionSource<Boolean> getStoreSource = new TaskCompletionSource<>();
+
+        // final TaskCompletionSource<Boolean> getStoreSource = new TaskCompletionSource<>();
 
         // mDatabaseReference
         //         .child("store")
@@ -209,7 +210,8 @@ public class FirebaseDatabaseManager {
                                             token.getSenderPic(),
                                             token.getSenderName(),
                                             token.getCounter(),
-                                            areaName);
+                                            areaName,
+                                            /*mappingId*/"");
 
                                     mDatabaseReference
                                             .child(TOKENS_CHILD)
@@ -431,15 +433,20 @@ public class FirebaseDatabaseManager {
         mDatabaseReference
                 .child("/")
                 .child(TOKENS_CHILD)
-                .orderByChild("cardNumber")
+                .orderByChild("mappingId")
                 .equalTo(cardNumber)
-                .limitToFirst(1)
+                // .limitToFirst(1)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
-                            Token token = dataSnapshot.getValue(Token.class);
-                            completionSource.setResult(token);
+                            HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
+                            });
+                            TTLogger.info(TAG + "tokenFromCardNumber token fetched.... ");
+                            ArrayList<Token> tokenList = new ArrayList<>(tokens.values());
+                            completionSource.setResult(tokenList.get(0));
+                        } else {
+                            completionSource.setResult(null);
                         }
                     }
 
@@ -485,20 +492,48 @@ public class FirebaseDatabaseManager {
 //        return completionSource.getTask();
 //    }
 
-    private Task<Boolean> noOpTask() {
-        final TaskCompletionSource<Boolean> noOp = new TaskCompletionSource<>();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                TTLogger.info(TAG + " noOpTask ");
-                noOp.setResult(true);
-            }
-        }).start();
+//    private Task<Boolean> noOpTask() {
+//        final TaskCompletionSource<Boolean> noOp = new TaskCompletionSource<>();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                TTLogger.info(TAG + " noOpTask ");
+//                noOp.setResult(true);
+//            }
+//        }).start();
+//
+//        return noOp.getTask();
+//    }
 
-        return noOp.getTask();
+    private Task<String> storeFromFPShopId(String FPShopId) {
+        final TaskCompletionSource<String> completionSource = new TaskCompletionSource<>();
+        mDatabaseReference
+                .child("/")
+                .child(FP_SHOP_CHILD)
+                .child(FPShopId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            String storeUid = dataSnapshot.getValue(String.class);
+                            TTLogger.info(TAG + "storeFromFPShopId fetching store UID SUCCESSFUL.... ");
+                            completionSource.setResult(storeUid);
+                        } else {
+                            TTLogger.info(TAG + "storeFromFPShopId fetching store UID FAILED.... ");
+                            completionSource.setResult(null);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        TTLogger.info(TAG + "storeFromFPShopId fetching store UID FAILED.... ");
+                        completionSource.setException(databaseError.toException());
+                    }
+                });
+        return completionSource.getTask();
     }
 
-        private Task<Token> getInactiveToken(String storeId) {
+    private Task<Token> getInactiveToken(String storeId) {
         TTLogger.info(TAG + "getInactiveToken START.... ");
 
         final TaskCompletionSource<ArrayList<Token>> completionSource = new TaskCompletionSource<>();
@@ -571,7 +606,7 @@ public class FirebaseDatabaseManager {
 
         // Complete the one we got kicked for in a separate async piece
         // ToDo replace tokenFromUid with tokenFromCardNumber
-        Task<Boolean> completeTask = tokenFromUid(rationShopItem.getCardNumber())
+        Task<Boolean> completeTask = tokenFromCardNumber(rationShopItem.getCardNumber())
                 .continueWithTask(new Continuation<Token, Task<Boolean>>() {
                     @Override
                     public Task<Boolean> then(@NonNull Task<Token> task) throws Exception {
@@ -585,7 +620,18 @@ public class FirebaseDatabaseManager {
                 });
 
         // Activate the next inactive token in another async piece
-        Task<Boolean> activateTask = getInactiveToken(rationShopItem.getId())
+        Task<Boolean> activateTask = storeFromFPShopId(rationShopItem.getId())
+                .continueWithTask(new Continuation<String, Task<Token>>() {
+                    @Override
+                    public Task<Token> then(@NonNull Task<String> task) throws Exception {
+                        TTLogger.info(TAG + "activateOrComplete activate token.... ");
+                        if (task.getResult() == null) {
+                            throw new Exception("No token to activate");
+                        } else {
+                            return getInactiveToken(task.getResult());
+                        }
+                    }
+                })
                 .continueWithTask(new Continuation<Token, Task<Boolean>>() {
                     @Override
                     public Task<Boolean> then(@NonNull Task<Token> task) throws Exception {
