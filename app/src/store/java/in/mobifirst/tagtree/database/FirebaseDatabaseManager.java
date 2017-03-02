@@ -396,7 +396,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                     .addOnSuccessListener(new OnSuccessListener<Integer>() {
                                         @Override
                                         public void onSuccess(final Integer position) {
-                                            Log.e(TAG, "Currently there are "+ position+" people before you.");
+                                            Log.e(TAG, "Currently there are " + position + " people before you.");
 
                                             DatabaseReference storeRef = mDatabaseReference.getRef()
                                                     .child("store")
@@ -471,7 +471,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                         mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
                                         addTokenUnderStoreCounter(newToken);
 
-                                        checkSMSSending(newToken, false,  -1 /*Dummy value*/);
+                                        checkSMSSending(newToken, false, -1 /*Dummy value*/);
                                     } else {
                                         Log.e(TAG, "Snapshot is null");
                                     }
@@ -645,16 +645,19 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         String languagePrefValueString = sharedPref.getString(ApplicationConstants.LANGUAGE_PREFERENCE_KEY, "-1");
         int languagePrefValue = Integer.parseInt(languagePrefValueString);
 
+        String positionTelugu = "మీ వంతు " + position + " మంది తరువాత ఉంది" + ".";
+        String positionEnglish = ". There are " + position + " members before you";
+
         if (status == false) {
             switch (languagePrefValue) {
                 case 0: //English
                 default:
                     message = "Your token=" + (token.getTokenNumber()) + " from " + token.getSenderName().trim() + " "
-                            + token.getAreaName().trim() + ". To avoid standing in Q, download TagTree app or click on the link" + CLIENT_APP_PLAYSTORE_URL + " and save your time and energy";
+                            + token.getAreaName().trim() + (position != -1 ? positionEnglish : "") + ". To avoid standing in Q, download TagTree app or click on the link." + CLIENT_APP_PLAYSTORE_URL + " and save your time and energy";
                     break;
                 case 1: //Telugu
                     message = "మీ టోకెన్=" + (token.getTokenNumber()) + "," + token.getSenderName().trim() + " "
-                            + token.getAreaName().trim() + "." +
+                            + token.getAreaName().trim() + "." + (position != -1 ? positionTelugu : "") +
                             "Q లో  నిలబడటం నివారించేందుకు, ఇప్పుడే  క్రింద లింక్ క్లిక్ చేయండి."
                             + CLIENT_APP_PLAYSTORE_URL
                             + "." + " TagTree app ద్వారా మీరు మీ సమయం, డబ్బు ఆదా చేయవచ్చు";
@@ -665,8 +668,8 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             switch (languagePrefValue) {
                 case 0: //English
                 default:
-                    message = "Now it's turn for Token=" + token.getTokenNumber() + "," + token.getSenderName() + token.getAreaName().trim() + "."
-                            + "To avoid standing in Q, download TagTree app or click on the link" + CLIENT_APP_PLAYSTORE_URL + " and save your time and energy";
+                    message = "Now it's turn for Token=" + token.getTokenNumber() + "," + token.getSenderName() + " " + token.getAreaName().trim() + "."
+                            + "To avoid standing in Q, download TagTree app or click on the link." + CLIENT_APP_PLAYSTORE_URL + " and save your time and energy";
                     break;
                 case 1: //Telugu
                     message = "ఇప్పుడు మీ వంతు వచ్చింది. టోకెన్=" + (token.getTokenNumber()) + "," + token.getSenderName().trim() + " "
