@@ -3,7 +3,6 @@ package in.mobifirst.tagtree.sms;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.telephony.SmsMessage;
@@ -60,35 +59,21 @@ public class SmsReceiver extends BroadcastReceiver {
             return;
         }
 
-        if (message.startsWith("TOKEN")) {
+        String[] words = message.split("\\s");
+        if (words.length == 2) {
+            String keyWord = words[0];
+            String rationCard = words[1];
 
-
-            String[] words=message.split("\\s");
-            String keyWord = null;
-            String rationCard = null;
-            int wordCount = 0 ;
-            for(String w:words){
-                wordCount++;
-                if (wordCount == 1)
-                    keyWord = w;
-                else if (wordCount == 2)
-                    rationCard = w;
-            }
-
-            if (keyWord!= null && rationCard != null)
-            {
-                addNewTokenForThisStore(phoneNumber, rationCard, 1 );
-            }
-            else
-            {
+            if (!TextUtils.isEmpty(keyWord) && keyWord.equalsIgnoreCase("token") && !TextUtils.isEmpty(rationCard)) {
+                addNewTokenForThisStore(phoneNumber, rationCard, 1);
+            } else {
                 //Send token rejected sms
+                Log.e(TAG, "INVALID INPUT RECEIVED = " + message);
             }
-
-        }
-        else {
+        } else {
+            //Send token rejected sms
             Log.e(TAG, "WRONG SMS FORMAT RECEIVED = " + message);
         }
-
     }
 
     public void addNewTokenForThisStore(String phoneNumber, String metaRationCard, int counterNumber/*, String storeId*/) {
