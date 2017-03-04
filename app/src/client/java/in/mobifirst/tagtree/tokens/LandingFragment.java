@@ -195,8 +195,11 @@ public class LandingFragment extends BaseFragment {
 
                                         holder.mCurrentPosition.setText("");
                                     } else {
+//                                        holder.mCurrentActiveToken
+//                                                .setText("Currently running  " + storeCounter.getActivatedToken() + " ETA " + storeCounter.ETS(token.getTokenNumber()));
+
                                         holder.mCurrentActiveToken
-                                                .setText("Currently running  " + storeCounter.getActivatedToken() + " ETA " + storeCounter.ETS(token.getTokenNumber()));
+                                                .setText(/*"Currently running  " + storeCounter.getActivatedToken() + " with " + */storeCounter.speed());
 
                                         holder.mCurrentPosition.setText(storeCounter.getPosition(token.getTokenNumber()));
                                     }

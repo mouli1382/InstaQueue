@@ -18,6 +18,7 @@ public class StoreCounter {
     private int counterUserCount;
     private long avgBurstTime;
     private Map<String, Long> tokens;
+    private long speedIndicator;
 
     public long getAvgBurstTime() {
         return avgBurstTime;
@@ -57,6 +58,15 @@ public class StoreCounter {
 
     public void setActivatedToken(long activatedToken) {
         this.activatedToken = activatedToken;
+    }
+
+
+    public long getSpeedIndicator() {
+        return speedIndicator;
+    }
+
+    public void setSpeedIndicator(long speedIndicator) {
+        this.speedIndicator = speedIndicator;
     }
 
     private long getAvgTATPerToken() {
@@ -135,10 +145,17 @@ public class StoreCounter {
 
         Collections.sort(tokenList);
         int index = tokenList.indexOf(given);
-        if(index <= 0) {
+        if (index <= 0) {
             return "You are next.";
         } else {
-            return "You are number " + index + " in-line.";
+            return "You are number " + index + " in line.";
         }
+    }
+
+    public String speed() {
+        if (speedIndicator == 0)
+            return "N/A";
+
+        return "Min. serving time per person: " + TimeUtils.getDuration(speedIndicator);
     }
 }

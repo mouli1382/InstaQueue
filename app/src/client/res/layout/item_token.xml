@@ -121,7 +121,7 @@
                 android:layout_centerHorizontal="true"
                 android:padding="2dp"
                 android:textColor="@android:color/holo_green_dark"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="normal|bold"
                 tools:text="Currently running 67" />
         </RelativeLayout>

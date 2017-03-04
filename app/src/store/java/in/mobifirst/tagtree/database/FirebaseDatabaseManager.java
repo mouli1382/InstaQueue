@@ -63,6 +63,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String TOKENS_CHILD = "tokens/";
     private static final String STORE_CHILD = "store/";
     private static final String COUNTERS_CHILD = "counters/";
+    private static final String COUNTERS_SPEED_CHILD = "speedIndicator/";
     private static final String COUNTERS_AVG_TAT_CHILD = "avgTurnAroundTime/";
     private static final String COUNTERS_AVG_BURST_CHILD = "avgBurstTime/";
     private static final String COUNTERS_LAST_ACTIVE_TOKEN = "activatedToken/";
@@ -891,11 +892,45 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     }
 
+    private void updateSpeedIndicator(Token token) {
+        long processTime = token.isActive()
+                ? token.getActivatedTokenTime() - token.getTimestamp()
+                : token.getTokenFinishTime() - token.getActivatedTokenTime();
+
+        final long speedIndicator = processTime > 0 ? processTime : 0;
+
+        mDatabaseReference
+                .child(STORE_CHILD)
+                .child(token.getStoreId())
+                .child(COUNTERS_CHILD)
+                .child("" + token.getCounter())
+                .child(COUNTERS_SPEED_CHILD)
+                .runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        Long currentValue = mutableData.getValue(Long.class);
+                        if (currentValue == null) {
+                            mutableData.setValue(speedIndicator);
+                        } else {
+                            mutableData.setValue(Math.min(currentValue, speedIndicator));
+                        }
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+                    }
+                });
+    }
+
     private void incrementAvgTAT(Token token) {
         long waitTimePerToken = token.getActivatedTokenTime() - token.getTimestamp();
         if (waitTimePerToken < 0) {
             waitTimePerToken = 0;
         }
+
+        updateSpeedIndicator(token);
 
         final long finalWaitTimePerToken = waitTimePerToken;
         mDatabaseReference
@@ -932,6 +967,8 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         if (burstTime < 0) {
             burstTime = 0;
         }
+
+        updateSpeedIndicator(token);
 
         final long finalBurstTime = burstTime;
         mDatabaseReference
