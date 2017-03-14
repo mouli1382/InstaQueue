@@ -58,7 +58,7 @@ public class SnapAdapter extends RecyclerView.Adapter<SnapAdapter.ViewHolder> {
         holder.recyclerView.setOnFlingListener(null);
         new LinearSnapHelper().attachToRecyclerView(holder.recyclerView);
 
-        holder.recyclerView.setAdapter(new TokensIssueAdapter(mContext, tokens));
+        holder.recyclerView.setAdapter(new TokensIssueAdapter(mContext, tokens.size() > 3 ? tokens.subList(0, 3) : tokens));
     }
 
     @Override

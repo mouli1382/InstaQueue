@@ -23,31 +23,31 @@
             android:layout_margin="5dp"
             android:layout_centerHorizontal="true"
             android:typeface="sans"
-            tools:text="80" />
+            tools:text="8888" />
 
-        <TextView
-            android:id="@+id/time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="?android:attr/textColorPrimaryDisableOnly"
-            android:textStyle="normal"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@+id/token_number"
-            android:layout_marginBottom="2dp"
-            android:typeface="sans"
-            tools:text="12:59:59" />
+        <!--<TextView-->
+            <!--android:id="@+id/time"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textColor="?android:attr/textColorPrimaryDisableOnly"-->
+            <!--android:textStyle="normal"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:layout_below="@+id/token_number"-->
+            <!--android:layout_marginBottom="2dp"-->
+            <!--android:typeface="sans"-->
+            <!--tools:text="12:59:59" />-->
 
-        <TextView
-            android:id="@+id/date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="?android:attr/textColorPrimaryDisableOnly"
-            android:textStyle="normal"
-            android:layout_marginBottom="5dp"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@+id/time"
-            android:typeface="sans"
-            tools:text="31/12/1982" />
+        <!--<TextView-->
+            <!--android:id="@+id/date"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textColor="?android:attr/textColorPrimaryDisableOnly"-->
+            <!--android:textStyle="normal"-->
+            <!--android:layout_marginBottom="5dp"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:layout_below="@+id/time"-->
+            <!--android:typeface="sans"-->
+            <!--tools:text="31/12/1982" />-->
 
     </RelativeLayout>
 

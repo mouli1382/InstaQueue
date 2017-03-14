@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -27,6 +29,7 @@ public class TokenDisplayService extends PresentationService implements
     private SnapAdapter mSnapAdapter;
     private boolean flipMe = false;
     private LinearLayoutManager mLinearLayoutManager;
+    private GridLayoutManager mGridLayoutManager;
     private View mRootView;
 
     private BroadcastReceiver mSnapBroadcastReceiver = new BroadcastReceiver() {
@@ -56,8 +59,12 @@ public class TokenDisplayService extends PresentationService implements
     protected View buildPresoView(Context context, LayoutInflater inflater) {
         mRootView = inflater.inflate(R.layout.extended_display, null);
         mRecyclerView = (RecyclerView) mRootView.findViewById(R.id.display_recyclerview);
-        mLinearLayoutManager = new LinearLayoutManager(context);
-        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mGridLayoutManager = new GridLayoutManager(context, 2, LinearLayoutManager.VERTICAL, false);
+        ItemOffsetDecoration itemDecoration = new ItemOffsetDecoration(context, R.dimen.item_offset);
+        mRecyclerView.addItemDecoration(itemDecoration);
+//        mLinearLayoutManager = new LinearLayoutManager(context);
+        mRecyclerView.setLayoutManager(mGridLayoutManager);
+        mRecyclerView.setAdapter(mSnapAdapter);
 
         run();
 
@@ -66,23 +73,48 @@ public class TokenDisplayService extends PresentationService implements
 
     @Override
     public void run() {
-        mRecyclerView.setAdapter(mSnapAdapter);
         int itemCount = mSnapAdapter.getItemCount();
         if (itemCount > 0) {
-            if (flipMe) {
-                //Scroll to end
-                mRecyclerView.scrollToPosition(itemCount - 1);
-//                int lastVisiblePosition =
-//                        mLinearLayoutManager.findLastVisibleItemPosition();
-//                if (lastVisiblePosition != -1 && (lastVisiblePosition < itemCount - 1)) {
-//                    mRecyclerView.scrollToPosition(itemCount - 1);
-//                }
+            int firstVisiblePosition =
+                    mGridLayoutManager.findFirstVisibleItemPosition();
+            int lastVisiblePosition =
+                    mGridLayoutManager.findLastVisibleItemPosition();
+            int window = lastVisiblePosition - firstVisiblePosition;
+            int scrollBy = lastVisiblePosition + window / 2;
+            Log.e("TokenDisplayService", "scrollBy = "+scrollBy);
+            if (scrollBy > 0 && scrollBy < itemCount) {
+                mRecyclerView.scrollToPosition(scrollBy);
             } else {
-                //Scroll to start
-                mRecyclerView.scrollToPosition(0);
+                if (!flipMe) {
+                    //Scroll to end to show the non-window multiples
+                    mRecyclerView.scrollToPosition(itemCount - 1);
+                    flipMe = !flipMe;
+                } else {
+                    //Scroll to start
+                    mRecyclerView.scrollToPosition(0);
+                    flipMe = !flipMe;
+                }
             }
         }
-        flipMe = !flipMe;
+//        if (flipMe) {
+//            int lastVisiblePosition =
+//                    mGridLayoutManager.findLastCompletelyVisibleItemPosition();
+//            if (lastVisiblePosition != RecyclerView.NO_POSITION && lastVisiblePosition < itemCount) {
+//                mRecyclerView.scrollToPosition(lastVisiblePosition);
+//            }
+//            if (flipMe) {
+//                //Scroll to end
+////                mRecyclerView.scrollToPosition(itemCount - 1);
+//
+//                } else {
+//                    flipMe = !flipMe;
+//                }
+//            } else {
+//                //Scroll to start
+//                mRecyclerView.scrollToPosition(0);
+//                flipMe = !flipMe;
+//            }
+//        }
         handler.postDelayed(this, 5000);
     }
 

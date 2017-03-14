@@ -27,5 +27,6 @@
     <dimen name="nav_header_height">160dp</dimen>
 
     <dimen name="fab_press_translation_z">9dp</dimen>
+    <dimen name="item_offset">10dp</dimen>
 
 </resources>
