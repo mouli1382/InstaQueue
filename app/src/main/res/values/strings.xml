@@ -20,4 +20,5 @@
     <string name="rejected_permission_read_phonestate">READ_PHONE_STATE permission rejected.</string>
     <string name="use_my_phone_number">Use My Phone Number</string>
     <string name="no_network">Please check your network and try again.</string>
+    <string name="copyright">© 2016, MobiFirst Information Technologies</string>
 </resources>
