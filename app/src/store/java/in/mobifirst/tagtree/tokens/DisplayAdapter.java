@@ -65,16 +65,16 @@ public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.ViewHold
                 holder.mTokenNumber.setText(tokens.get(lastActivatedTokenIndex).getTokenNumber() + "");
                 holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
                 holder.mCardView.setVisibility(View.VISIBLE);
-                holder.recyclerView.setAdapter(new TokensIssueAdapter(mContext, tokens.size() > lastActivatedTokenIndex + 1 ? tokens.subList(lastActivatedTokenIndex + 1, tokens.size()) : new ArrayList<Token>()));
+                holder.recyclerView.setAdapter(new TokensIssueDisplayAdapter(mContext, tokens.size() > lastActivatedTokenIndex + 1 ? tokens.subList(lastActivatedTokenIndex + 1, tokens.size()) : new ArrayList<Token>()));
             } else {
                 holder.mCardView.setVisibility(View.GONE);
-                holder.recyclerView.setAdapter(new TokensIssueAdapter(mContext, tokens));
+                holder.recyclerView.setAdapter(new TokensIssueDisplayAdapter(mContext, tokens));
             }
         } else {
             holder.mCardView.setVisibility(View.GONE);
             holder.snapTextView.setText("Counter " + counter);
             holder.snapTextView.setVisibility(View.VISIBLE);
-            holder.recyclerView.setAdapter(new TokensIssueAdapter(mContext, tokens.size() > 3 ? tokens.subList(0, 3) : tokens));
+            holder.recyclerView.setAdapter(new TokensIssueDisplayAdapter(mContext, tokens.size() > 3 ? tokens.subList(0, 3) : tokens));
         }
     }
 

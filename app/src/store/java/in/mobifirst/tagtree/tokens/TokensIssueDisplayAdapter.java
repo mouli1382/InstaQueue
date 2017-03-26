@@ -11,21 +11,20 @@ import java.util.List;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.model.Token;
-import in.mobifirst.tagtree.util.TimeUtils;
 
 
-public class TokensIssueAdapter extends RecyclerView.Adapter<TokensIssueAdapter.ViewHolder> {
+public class TokensIssueDisplayAdapter extends RecyclerView.Adapter<TokensIssueDisplayAdapter.ViewHolder> {
 
     private List<Token> mTokens;
     private TokensFragment.TokenItemListener mTokenItemListener;
     private Context mContext;
 
-    public TokensIssueAdapter(List<Token> items, TokensFragment.TokenItemListener tokenItemListener) {
+    public TokensIssueDisplayAdapter(List<Token> items, TokensFragment.TokenItemListener tokenItemListener) {
         setList(items);
         mTokenItemListener = tokenItemListener;
     }
 
-    public TokensIssueAdapter(Context context, List<Token> items) {
+    public TokensIssueDisplayAdapter(Context context, List<Token> items) {
         mContext = context;
         setList(items);
     }
@@ -43,7 +42,7 @@ public class TokensIssueAdapter extends RecyclerView.Adapter<TokensIssueAdapter.
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.issue_token, parent, false);
+                .inflate(R.layout.issue_token_display, parent, false);
         return new ViewHolder(view);
     }
 
@@ -53,12 +52,14 @@ public class TokensIssueAdapter extends RecyclerView.Adapter<TokensIssueAdapter.
 
         if (token.isActive()) {
             holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
+//            holder.mView.setBackgroundColor(mContext.getResources().getColor(android.R.color.holo_green_dark));
         } else {
+//            holder.mView.setBackgroundColor(mContext.getResources().getColor(R.color.cardview_light_background));
             holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
         }
         holder.mTokenNumber.setText(token.getTokenNumber() + "");
-        holder.mTime.setText(TimeUtils.getTime(token.getTimestamp()));
-        holder.mDate.setText(TimeUtils.getDate(token.getTimestamp()));
+//        holder.mTime.setText(TimeUtils.getTime(token.getTimestamp()));
+//        holder.mDate.setText(TimeUtils.getDate(token.getTimestamp()));
     }
 
     @Override
@@ -68,14 +69,16 @@ public class TokensIssueAdapter extends RecyclerView.Adapter<TokensIssueAdapter.
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         protected TextView mTokenNumber;
-        protected TextView mTime;
-        protected TextView mDate;
+        //        protected TextView mTime;
+//        protected TextView mDate;
+        protected View mView;
 
         public ViewHolder(View view) {
             super(view);
             mTokenNumber = (TextView) view.findViewById(R.id.token_number);
-            mTime = (TextView) view.findViewById(R.id.time);
-            mDate = (TextView) view.findViewById(R.id.date);
+            mView = view;
+//            mTime = (TextView) view.findViewById(R.id.time);
+//            mDate = (TextView) view.findViewById(R.id.date);
         }
     }
 }

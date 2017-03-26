@@ -15,7 +15,7 @@
         tools:text="Snap center" />
 
     <include
-        layout="@layout/issue_token_display"
+        layout="@layout/current_active_token_display"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="0.5" />
