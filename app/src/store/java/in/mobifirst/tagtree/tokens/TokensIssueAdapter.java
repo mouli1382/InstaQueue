@@ -53,7 +53,9 @@ public class TokensIssueAdapter extends RecyclerView.Adapter<TokensIssueAdapter.
 
         if (token.isActive()) {
             holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
+//            holder.mView.setBackgroundColor(mContext.getResources().getColor(android.R.color.holo_green_dark));
         } else {
+//            holder.mView.setBackgroundColor(mContext.getResources().getColor(R.color.cardview_light_background));
             holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
         }
         holder.mTokenNumber.setText(token.getTokenNumber() + "");
@@ -68,12 +70,14 @@ public class TokensIssueAdapter extends RecyclerView.Adapter<TokensIssueAdapter.
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         protected TextView mTokenNumber;
-        protected TextView mTime;
-        protected TextView mDate;
+//        protected TextView mTime;
+//        protected TextView mDate;
+        protected View mView;
 
         public ViewHolder(View view) {
             super(view);
             mTokenNumber = (TextView) view.findViewById(R.id.token_number);
+            mView = view;
 //            mTime = (TextView) view.findViewById(R.id.time);
 //            mDate = (TextView) view.findViewById(R.id.date);
         }

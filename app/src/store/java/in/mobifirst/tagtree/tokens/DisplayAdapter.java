@@ -17,12 +17,12 @@ import java.util.List;
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.model.Token;
 
-public class SnapAdapter extends RecyclerView.Adapter<SnapAdapter.ViewHolder> {
+public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.ViewHolder> {
 
     private List<Snap> mSnaps;
     private Context mContext;
 
-    public SnapAdapter(Context context) {
+    public DisplayAdapter(Context context) {
         mContext = context;
         mSnaps = new ArrayList<>();
     }
@@ -39,7 +39,7 @@ public class SnapAdapter extends RecyclerView.Adapter<SnapAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.adapter_snap, parent, false);
+                .inflate(R.layout.adapter_snap_display, parent, false);
 
         return new ViewHolder(view);
 
@@ -52,20 +52,13 @@ public class SnapAdapter extends RecyclerView.Adapter<SnapAdapter.ViewHolder> {
         int counter = snap.getCounter();
         List<Token> tokens = new ArrayList<>(snap.getTokenList());
 
-        holder.snapTextView.setText("Counter " + counter);
-
         holder.recyclerView.setLayoutManager(new LinearLayoutManager(holder
                 .recyclerView.getContext(), LinearLayoutManager.HORIZONTAL, false));
         holder.recyclerView.setOnFlingListener(null);
         new LinearSnapHelper().attachToRecyclerView(holder.recyclerView);
 
         if (getItemCount() == 1) {
-//            Token token = tokens.get(0);
-//            if (token.isActive()) {
-//                holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
-//            } else {
-//                holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
-//            }
+            holder.snapTextView.setVisibility(View.INVISIBLE);
             int lastActivatedTokenIndex = getLastActivatedTokenIndex(tokens);
             Log.e("lastActivatedTokenIndex", "INDEX = " + lastActivatedTokenIndex);
             if (lastActivatedTokenIndex != -1) {
@@ -79,6 +72,8 @@ public class SnapAdapter extends RecyclerView.Adapter<SnapAdapter.ViewHolder> {
             }
         } else {
             holder.mCardView.setVisibility(View.GONE);
+            holder.snapTextView.setText("Counter " + counter);
+            holder.snapTextView.setVisibility(View.VISIBLE);
             holder.recyclerView.setAdapter(new TokensIssueAdapter(mContext, tokens.size() > 3 ? tokens.subList(0, 3) : tokens));
         }
     }

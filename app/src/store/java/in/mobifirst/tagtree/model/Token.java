@@ -225,7 +225,7 @@ public class Token implements Parcelable {
         if (!getPhoneNumber().equals(token.getPhoneNumber())) return false;
         if (!getAreaName().equals(token.getAreaName())) return false;
         if (getActivatedTokenTime() != (token.getActivatedTokenTime())) return false;
-        if (!getMappingId().equals(token.getMappingId())) return false;
+//        if (!getMappingId().equals(token.getMappingId())) return false;
         return getTimestamp() != (token.getTimestamp());
 
     }
@@ -241,7 +241,7 @@ public class Token implements Parcelable {
         result = 31 * result + getStatus();
         result = 31 * result + getBuzzCount();
         result = 31 * result + getAreaName().hashCode();
-        result = 31 * result + getMappingId().hashCode();
+//        result = 31 * result + getMappingId().hashCode();
         return result;
     }
 

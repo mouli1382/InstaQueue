@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 
 import com.commonsware.cwac.preso.PresentationService;
 
@@ -18,34 +19,45 @@ import java.util.ArrayList;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
+import in.mobifirst.tagtree.tokens.DisplayAdapter;
 import in.mobifirst.tagtree.tokens.Snap;
-import in.mobifirst.tagtree.tokens.SnapAdapter;
 
 public class TokenDisplayService extends PresentationService implements
         Runnable {
     public static final String SNAP_LIST_INTENT_KEY = "snap_list_intent_key";
     private Handler handler = null;
     private RecyclerView mRecyclerView;
-    private SnapAdapter mSnapAdapter;
+    private DisplayAdapter mDisplayAdapter;
     private boolean flipMe = false;
     private LinearLayoutManager mLinearLayoutManager;
     private GridLayoutManager mGridLayoutManager;
     private View mRootView;
+    private TextView mNoTokensTextView;
 
     private BroadcastReceiver mSnapBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             ArrayList<Snap> snapList = intent.getParcelableArrayListExtra(SNAP_LIST_INTENT_KEY);
             if (snapList != null) {
-                mSnapAdapter.replaceData(snapList);
+                mDisplayAdapter.replaceData(snapList);
+                if (snapList.size() > 0) {
+                    if (mNoTokensTextView != null) {
+                        mNoTokensTextView.setVisibility(View.GONE);
+                    }
+                } else {
+                    if (mNoTokensTextView != null) {
+                        mNoTokensTextView.setVisibility(View.VISIBLE);
+                    }
+                }
             }
         }
     };
 
+
     @Override
     public void onCreate() {
         handler = new Handler(Looper.getMainLooper());
-        mSnapAdapter = new SnapAdapter(this);
+        mDisplayAdapter = new DisplayAdapter(this);
         TTLocalBroadcastManager.registerReceiver(this, mSnapBroadcastReceiver, TTLocalBroadcastManager.TOKEN_CHANGE_INTENT_ACTION);
         super.onCreate();
     }
@@ -59,12 +71,14 @@ public class TokenDisplayService extends PresentationService implements
     protected View buildPresoView(Context context, LayoutInflater inflater) {
         mRootView = inflater.inflate(R.layout.extended_display, null);
         mRecyclerView = (RecyclerView) mRootView.findViewById(R.id.display_recyclerview);
+        mNoTokensTextView = (TextView) mRootView.findViewById(R.id.noTokensTextView);
+        mNoTokensTextView.setVisibility(View.GONE);
         mGridLayoutManager = new GridLayoutManager(context, 2, LinearLayoutManager.VERTICAL, false);
         ItemOffsetDecoration itemDecoration = new ItemOffsetDecoration(context, R.dimen.item_offset);
         mRecyclerView.addItemDecoration(itemDecoration);
 //        mLinearLayoutManager = new LinearLayoutManager(context);
         mRecyclerView.setLayoutManager(mGridLayoutManager);
-        mRecyclerView.setAdapter(mSnapAdapter);
+        mRecyclerView.setAdapter(mDisplayAdapter);
 
         run();
 
@@ -73,15 +87,16 @@ public class TokenDisplayService extends PresentationService implements
 
     @Override
     public void run() {
-        int itemCount = mSnapAdapter.getItemCount();
+        int itemCount = mDisplayAdapter.getItemCount();
         if (itemCount > 0) {
+            mNoTokensTextView.setVisibility(View.GONE);
             int firstVisiblePosition =
                     mGridLayoutManager.findFirstVisibleItemPosition();
             int lastVisiblePosition =
                     mGridLayoutManager.findLastVisibleItemPosition();
             int window = lastVisiblePosition - firstVisiblePosition;
             int scrollBy = lastVisiblePosition + window / 2;
-            Log.e("TokenDisplayService", "scrollBy = "+scrollBy);
+            Log.e("TokenDisplayService", "scrollBy = " + scrollBy);
             if (scrollBy > 0 && scrollBy < itemCount) {
                 mRecyclerView.scrollToPosition(scrollBy);
             } else {
@@ -95,6 +110,8 @@ public class TokenDisplayService extends PresentationService implements
                     flipMe = !flipMe;
                 }
             }
+        } else {
+            mNoTokensTextView.setVisibility(View.VISIBLE);
         }
 //        if (flipMe) {
 //            int lastVisiblePosition =
