@@ -28,4 +28,6 @@ public class ApplicationConstants {
     public static String LANGUAGE_PREFERENCE_KEY = "language_preference_key";
 
     public static final String STORE_UID = "store_uid";
+
+    public static final String LAST_CREATED_TOKEN = "last_created_token";
 }

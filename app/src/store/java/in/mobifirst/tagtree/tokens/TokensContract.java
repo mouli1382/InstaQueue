@@ -1,5 +1,6 @@
 package in.mobifirst.tagtree.tokens;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import java.util.Collection;
@@ -50,7 +51,7 @@ public interface TokensContract {
 
         void showNoCancelledTokens();
 
-        void showSuccessfullySavedMessage();
+        void showSuccessfullySavedMessage(String lastCreatedToken);
 
         boolean isActive();
 
@@ -59,7 +60,7 @@ public interface TokensContract {
 
     interface Presenter extends BasePresenter {
 
-        void result(int requestCode, int resultCode);
+        void result(int requestCode, int resultCode, Intent data);
 
         void loadTokens(boolean forceUpdate);
 

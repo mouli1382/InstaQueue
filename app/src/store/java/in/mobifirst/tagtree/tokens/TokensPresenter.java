@@ -1,6 +1,7 @@
 package in.mobifirst.tagtree.tokens;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -12,6 +13,7 @@ import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
 import in.mobifirst.tagtree.data.token.TokensDataSource;
 import in.mobifirst.tagtree.data.token.TokensRepository;
 import in.mobifirst.tagtree.model.Token;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 import rx.Observer;
 import rx.Subscriber;
 import rx.Subscription;
@@ -69,11 +71,12 @@ final class TokensPresenter implements TokensContract.Presenter {
     }
 
     @Override
-    public void result(int requestCode, int resultCode) {
+    public void result(int requestCode, int resultCode, Intent data) {
         // If a Token was successfully added, show snackbar
         if (AddEditTokenActivity.REQUEST_ADD_TOKEN == requestCode
                 && Activity.RESULT_OK == resultCode) {
-            mTokensView.showSuccessfullySavedMessage();
+            String lastCreatedToken = data.getStringExtra(ApplicationConstants.LAST_CREATED_TOKEN);
+            mTokensView.showSuccessfullySavedMessage(lastCreatedToken);
         }
     }
 

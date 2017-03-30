@@ -24,7 +24,7 @@
     <string name="phone_number_hint">Enter customer Phone Number here.</string>
     <string name="counter_number_hint">Enter Counter Number</string>
     <string name="empty_token_message">Token cannot be empty</string>
-    <string name="successfully_saved_token_message">Token created</string>
+    <string name="successfully_saved_token_message">Token</string>
     <string name="list_title">Token List</string>
     <string name="statistics_title">Statistics</string>
     <string name="statistics_no_tokens">You have no tokens.</string>

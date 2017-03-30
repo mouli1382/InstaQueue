@@ -128,7 +128,7 @@ public class TokensFragment extends BaseFragment implements TokensContract.View 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mPresenter.result(requestCode, resultCode);
+        mPresenter.result(requestCode, resultCode, data);
     }
 
     @Override
@@ -398,7 +398,7 @@ public class TokensFragment extends BaseFragment implements TokensContract.View 
     }
 
     @Override
-    public void showSuccessfullySavedMessage() {
+    public void showSuccessfullySavedMessage(String lastCreated) {
         showMessage(getString(R.string.successfully_saved_token_message));
     }
 

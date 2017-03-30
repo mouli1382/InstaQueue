@@ -12,7 +12,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -124,7 +123,7 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mPresenter.result(requestCode, resultCode);
+        mPresenter.result(requestCode, resultCode, data);
     }
 
     @Override
@@ -384,8 +383,8 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
     }
 
     @Override
-    public void showSuccessfullySavedMessage() {
-        showMessage(getString(R.string.successfully_saved_token_message));
+    public void showSuccessfullySavedMessage(String lastCreated) {
+        showMessage(getString(R.string.successfully_saved_token_message) + " " + lastCreated + " created successfully!");
     }
 
     private void showNoTokensViews(String mainText, int iconRes, boolean showAddView) {

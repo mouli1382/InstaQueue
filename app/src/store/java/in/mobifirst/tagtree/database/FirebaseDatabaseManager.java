@@ -435,7 +435,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                 }
                                             });
 
-                                            subscriber.onNext(null);
+                                            subscriber.onNext(currentToken + "");
                                             subscriber.onCompleted();
                                         }
                                     })
@@ -483,7 +483,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                 }
                             });
 
-                            subscriber.onNext(null);
+                            subscriber.onNext(currentToken + "");
                             subscriber.onCompleted();
                         }
                     } else {

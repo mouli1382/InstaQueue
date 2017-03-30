@@ -195,11 +195,11 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
     }
 
     @Override
-    public void showTokensList() {
+    public void showTokensList(String lastCreated) {
         //todo: Find a better way to avoid crash
         if (getActivity() == null)
             return;
-        getActivity().setResult(Activity.RESULT_OK);
+        getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra(ApplicationConstants.LAST_CREATED_TOKEN, lastCreated));
         getActivity().finish();
     }
 
@@ -208,7 +208,7 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
         if (show) {
             mProgressDialogFragment.show(getActivity().getSupportFragmentManager(), "tokenCreation");
         } else {
-            mProgressDialogFragment.dismiss();
+            mProgressDialogFragment.dismissAllowingStateLoss();
         }
     }
 

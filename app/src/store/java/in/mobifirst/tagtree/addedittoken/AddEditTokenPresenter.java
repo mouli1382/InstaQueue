@@ -69,7 +69,6 @@ public class AddEditTokenPresenter implements AddEditTokenContract.Presenter {
                 @Override
                 public void onCompleted() {
                     mAddTokenView.updateProgress(false);
-                    mAddTokenView.showTokensList();
                 }
 
                 @Override
@@ -82,6 +81,8 @@ public class AddEditTokenPresenter implements AddEditTokenContract.Presenter {
 
                 @Override
                 public void onNext(String result) {
+                    mAddTokenView.updateProgress(false);
+                    mAddTokenView.showTokensList(result);
                 }
             });
         }

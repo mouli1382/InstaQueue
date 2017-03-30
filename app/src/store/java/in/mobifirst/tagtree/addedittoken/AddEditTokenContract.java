@@ -10,7 +10,7 @@ public interface AddEditTokenContract {
 
         void showEmptyTokenError();
 
-        void showTokensList();
+        void showTokensList(String lastCreated);
 
 //        void setTitle(String title);
 
