@@ -59,6 +59,7 @@ public class TokenDisplayService extends PresentationService implements
         handler = new Handler(Looper.getMainLooper());
         mDisplayAdapter = new DisplayAdapter(this);
         TTLocalBroadcastManager.registerReceiver(this, mSnapBroadcastReceiver, TTLocalBroadcastManager.TOKEN_CHANGE_INTENT_ACTION);
+        TTSHelper.getInstance().init(this);
         super.onCreate();
     }
 
@@ -140,6 +141,7 @@ public class TokenDisplayService extends PresentationService implements
         handler.removeCallbacks(this);
         TTLocalBroadcastManager.unRegisterReceiver(this, mSnapBroadcastReceiver);
 
+        TTSHelper.getInstance().destroy();
         super.onDestroy();
     }
 }

@@ -15,12 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.display.TTSHelper;
 import in.mobifirst.tagtree.model.Token;
 
 public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.ViewHolder> {
 
     private List<Snap> mSnaps;
     private Context mContext;
+    private long currentActiveToken;
 
     public DisplayAdapter(Context context) {
         mContext = context;
@@ -62,7 +64,12 @@ public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.ViewHold
             int lastActivatedTokenIndex = getLastActivatedTokenIndex(tokens);
             Log.e("lastActivatedTokenIndex", "INDEX = " + lastActivatedTokenIndex);
             if (lastActivatedTokenIndex != -1) {
-                holder.mTokenNumber.setText(tokens.get(lastActivatedTokenIndex).getTokenNumber() + "");
+                long activeToken = tokens.get(lastActivatedTokenIndex).getTokenNumber();
+                holder.mTokenNumber.setText(activeToken + "");
+                if (Long.valueOf(activeToken).compareTo(currentActiveToken) != 0) {
+                    TTSHelper.getInstance().speak("Token number " + activeToken, mContext);
+                    currentActiveToken = activeToken;
+                }
                 holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
                 holder.mCardView.setVisibility(View.VISIBLE);
                 holder.recyclerView.setAdapter(new TokensIssueDisplayAdapter(mContext, tokens.size() > lastActivatedTokenIndex + 1 ? tokens.subList(lastActivatedTokenIndex + 1, tokens.size()) : new ArrayList<Token>()));

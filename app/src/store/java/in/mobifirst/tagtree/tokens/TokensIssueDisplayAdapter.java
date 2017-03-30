@@ -52,9 +52,9 @@ public class TokensIssueDisplayAdapter extends RecyclerView.Adapter<TokensIssueD
 
         if (token.isActive()) {
             holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
-//            holder.mView.setBackgroundColor(mContext.getResources().getColor(android.R.color.holo_green_dark));
+            //ToDo uncomment this to read out tokens at all the counters.
+//            TTSHelper.getInstance().speak("Token number " + token.getTokenNumber() + " at counter number " + token.getCounter());
         } else {
-//            holder.mView.setBackgroundColor(mContext.getResources().getColor(R.color.cardview_light_background));
             holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
         }
         holder.mTokenNumber.setText(token.getTokenNumber() + "");
