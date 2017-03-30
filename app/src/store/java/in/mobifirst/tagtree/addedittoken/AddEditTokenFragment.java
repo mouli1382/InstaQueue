@@ -32,6 +32,7 @@ import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import in.mobifirst.tagtree.util.NetworkConnectionUtils;
+import in.mobifirst.tagtree.view.ProgressDialogFragment;
 
 
 public class AddEditTokenFragment extends BaseFragment implements AddEditTokenContract.View {
@@ -43,6 +44,9 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
 
     @Inject
     protected NetworkConnectionUtils mNetworkConnectionUtils;
+
+    @Inject
+    protected ProgressDialogFragment mProgressDialogFragment;
 
     private TextInputLayout mPhoneNumberInputLayout;
     private TextInputEditText mPhoneNumberEditText;
@@ -66,6 +70,7 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
             boolean isConnected = intent.getBooleanExtra(TTLocalBroadcastManager.NETWORK_STATUS_KEY, false);
 
             if (!isConnected && getView() != null) {
+                updateProgress(false);
                 showNetworkError(getView());
             }
         }
@@ -107,7 +112,7 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
                     if (validateInput()) {
                         //ToDo hardcoding to IND country code as of now.
                         mPresenter.addNewToken("+91" + mPhoneNumberEditText.getText().toString(),
-                                mNumberOfCounters > 1 ? (mCounterSpinner.getSelectedItemPosition() + 1): 1);
+                                mNumberOfCounters > 1 ? (mCounterSpinner.getSelectedItemPosition() + 1) : 1);
                     }
                 }
             }
@@ -196,6 +201,15 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
             return;
         getActivity().setResult(Activity.RESULT_OK);
         getActivity().finish();
+    }
+
+    @Override
+    public void updateProgress(boolean show) {
+        if (show) {
+            mProgressDialogFragment.show(getActivity().getSupportFragmentManager(), "tokenCreation");
+        } else {
+            mProgressDialogFragment.dismiss();
+        }
     }
 
     @Override

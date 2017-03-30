@@ -126,5 +126,6 @@
     <string name="summary_reset_preference">Reset token counter to issue tokens from 1.</string>
     <string name="title_reset_preference">Reset</string>
     <string name="display_no_tokens">Congratulations! You have served all your Customers.</string>
+    <string name="create_token">Creating Token...</string>
 
 </resources>

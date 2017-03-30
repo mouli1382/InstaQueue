@@ -5,8 +5,8 @@ import android.support.annotation.Nullable;
 
 import javax.inject.Inject;
 
-import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.data.token.TokensRepository;
+import in.mobifirst.tagtree.model.Token;
 import rx.Subscriber;
 import rx.subscriptions.CompositeSubscription;
 
@@ -53,6 +53,7 @@ public class AddEditTokenPresenter implements AddEditTokenContract.Presenter {
 
     @Override
     public void addNewToken(String phoneNumber, int counterNumber) {
+        mAddTokenView.updateProgress(true);
         Token token = new Token();
         token.setPhoneNumber(phoneNumber);
         token.setCounter(counterNumber);
@@ -61,17 +62,20 @@ public class AddEditTokenPresenter implements AddEditTokenContract.Presenter {
 
     private void saveToken(@NonNull Token token) {
         if (token.isEmpty()) {
+            mAddTokenView.updateProgress(false);
             mAddTokenView.showEmptyTokenError();
         } else {
             mTokensRepository.addNewToken(token, new Subscriber<String>() {
                 @Override
                 public void onCompleted() {
+                    mAddTokenView.updateProgress(false);
                     mAddTokenView.showTokensList();
                 }
 
                 @Override
                 public void onError(Throwable e) {
                     if (mAddTokenView.isActive()) {
+                        mAddTokenView.updateProgress(false);
                         mAddTokenView.showEmptyTokenError();
                     }
                 }
@@ -80,7 +84,6 @@ public class AddEditTokenPresenter implements AddEditTokenContract.Presenter {
                 public void onNext(String result) {
                 }
             });
-
         }
     }
 

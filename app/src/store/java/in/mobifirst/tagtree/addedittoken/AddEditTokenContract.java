@@ -16,6 +16,8 @@ public interface AddEditTokenContract {
 
 //        void setDescription(String description);
 
+        void updateProgress(boolean show);
+
         boolean isActive();
     }
 

@@ -6,6 +6,7 @@ import dagger.Module;
 import dagger.Provides;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.util.NetworkConnectionUtils;
+import in.mobifirst.tagtree.view.ProgressDialogFragment;
 
 @Module
 public class ApplicationModule {
@@ -32,5 +33,11 @@ public class ApplicationModule {
     @Singleton
     NetworkConnectionUtils provideNetworkConnectionUtils() {
         return new NetworkConnectionUtils(application);
+    }
+
+    @Provides
+    @Singleton
+    ProgressDialogFragment provideProgressDialogFragment() {
+        return ProgressDialogFragment.newInstance();
     }
 }
