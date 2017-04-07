@@ -350,10 +350,12 @@ public class TokensFragment extends BaseFragment implements TokensContract.View 
 
     @Override
     public void showTokens(List<Token> Tokens) {
-        mTokensAdapter.replaceData(Tokens);
+        if (isActive()) {
+            mTokensAdapter.replaceData(Tokens);
 
-        mTokensView.setVisibility(View.VISIBLE);
-        mNoTokensView.setVisibility(View.GONE);
+            mTokensView.setVisibility(View.VISIBLE);
+            mNoTokensView.setVisibility(View.GONE);
+        }
     }
 
     @Override

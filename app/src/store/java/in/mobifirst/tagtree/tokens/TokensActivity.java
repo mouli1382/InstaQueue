@@ -3,11 +3,16 @@ package in.mobifirst.tagtree.tokens;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -15,8 +20,15 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseDrawerActivity;
 import in.mobifirst.tagtree.activity.CreditsActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.data.token.TokensRepository;
 import in.mobifirst.tagtree.display.TokenDisplayService;
+import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.util.ActivityUtilities;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 public class TokensActivity extends BaseDrawerActivity {
 
@@ -24,6 +36,9 @@ public class TokensActivity extends BaseDrawerActivity {
 
     @Inject
     TokensPresenter mTokensPresenter;
+
+    private TokensRepository mTokensRepository;
+    private CompositeSubscription mSubscriptions;
 
     public static void start(Context caller) {
         Intent intent = new Intent(caller, TokensActivity.class);
@@ -94,6 +109,9 @@ public class TokensActivity extends BaseDrawerActivity {
             mTokensPresenter.setFiltering(currentFiltering);
         }
 
+        mSubscriptions = new CompositeSubscription();
+        mTokensRepository = ((IQStoreApplication) getApplication()).getApplicationComponent().getTokensRepository();
+
         startService(new Intent(this, TokenDisplayService.class));
     }
 
@@ -131,8 +149,56 @@ public class TokensActivity extends BaseDrawerActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        loadSnapsForSecondaryScreen();
+    }
+
+    @Override
     protected void onDestroy() {
+        if(mSubscriptions != null) {
+            mSubscriptions.clear();
+        }
         stopService(new Intent(this, TokenDisplayService.class));
         super.onDestroy();
+    }
+
+    private void loadSnapsForSecondaryScreen() {
+        mSubscriptions.clear();
+        Subscription subscription = mTokensRepository
+                .getSnaps()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Snap>>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+
+                    @Override
+                    public void onNext(List<Snap> snaps) {
+                        processSnaps(snaps);
+                    }
+                });
+        mSubscriptions.add(subscription);
+    }
+
+    private void processSnaps(List<Snap> snaps) {
+        if (snaps == null || snaps.size() == 0) {
+            //Send broadcast to TokenDisplayService here that there are no tokens.
+            Intent intent = new Intent(TTLocalBroadcastManager.TOKEN_CHANGE_INTENT_ACTION);
+            intent.putParcelableArrayListExtra(TokenDisplayService.SNAP_LIST_INTENT_KEY,
+                    new ArrayList<Snap>());
+            LocalBroadcastManager.getInstance(TokensActivity.this).sendBroadcast(intent);
+        } else {
+            //Send broadcast to TokenDisplayService here.
+            Intent intent = new Intent(TTLocalBroadcastManager.TOKEN_CHANGE_INTENT_ACTION);
+            intent.putParcelableArrayListExtra(TokenDisplayService.SNAP_LIST_INTENT_KEY,
+                    (ArrayList<? extends Parcelable>) snaps);
+            LocalBroadcastManager.getInstance(TokensActivity.this).sendBroadcast(intent);
+        }
     }
 }
