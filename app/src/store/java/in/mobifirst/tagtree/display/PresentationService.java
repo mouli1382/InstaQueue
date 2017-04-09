@@ -42,9 +42,11 @@ import java.util.List;
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.data.token.TokensRepository;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.tokens.DisplayAdapter;
 import in.mobifirst.tagtree.tokens.Snap;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -71,6 +73,8 @@ public class PresentationService extends CastRemoteDisplayLocalService implement
 
     // Second screen
     private CastPresentation mPresentation;
+    private IQSharedPreferences mIQSharedPreferences;
+    private int mNumberOfCounters;
 
     private BroadcastReceiver mSnapBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -96,6 +100,7 @@ public class PresentationService extends CastRemoteDisplayLocalService implement
     @Override
     public void onCreate() {
         super.onCreate();
+        mIQSharedPreferences = ((IQStoreApplication) getApplication()).getApplicationComponent().getIQSharedPreferences();
 
         mHandler = new Handler(Looper.getMainLooper());
         TTLocalBroadcastManager.registerReceiver(this, mSnapBroadcastReceiver, TTLocalBroadcastManager.TOKEN_CHANGE_INTENT_ACTION);
@@ -106,7 +111,7 @@ public class PresentationService extends CastRemoteDisplayLocalService implement
     @Override
     public void onDestroy() {
         mHandler.removeCallbacks(this);
-        TTSHelper.getInstance().destroy();
+//        TTSHelper.getInstance().destroy();
         if (mSubscriptions != null) {
             mSubscriptions.clear();
         }
@@ -199,17 +204,23 @@ public class PresentationService extends CastRemoteDisplayLocalService implement
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            TTSHelper.getInstance().init(getContext());
+//            TTSHelper.getInstance().init(getContext());
 
             setContentView(R.layout.extended_display);
             mRecyclerView = (RecyclerView) findViewById(R.id.display_recyclerview);
             mNoTokensTextView = (TextView) findViewById(R.id.noTokensTextView);
             mNoTokensTextView.setVisibility(View.GONE);
-            mLinearLayoutManager = new GridLayoutManager(getContext(), 2, LinearLayoutManager.VERTICAL, false);
+
+            mNumberOfCounters = mIQSharedPreferences.getInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY);
+
+            if (mNumberOfCounters > 1) {
+                mLinearLayoutManager = new GridLayoutManager(getContext(), 2, LinearLayoutManager.VERTICAL, false);
+            } else {
+                mLinearLayoutManager = new LinearLayoutManager(getContext());
+            }
+
             ItemOffsetDecoration itemDecoration = new ItemOffsetDecoration(getContext(), R.dimen.item_offset);
             mRecyclerView.addItemDecoration(itemDecoration);
-//        mLinearLayoutManager = new LinearLayoutManager(context);
-
             mDisplayAdapter = new DisplayAdapter(getContext());
             mRecyclerView.setLayoutManager(mLinearLayoutManager);
             mRecyclerView.setAdapter(mDisplayAdapter);
