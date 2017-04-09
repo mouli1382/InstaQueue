@@ -99,8 +99,6 @@ public class PresentationService extends CastRemoteDisplayLocalService implement
 
         mHandler = new Handler(Looper.getMainLooper());
         TTLocalBroadcastManager.registerReceiver(this, mSnapBroadcastReceiver, TTLocalBroadcastManager.TOKEN_CHANGE_INTENT_ACTION);
-        TTSHelper.getInstance().init(getApplicationContext());
-
         mSubscriptions = new CompositeSubscription();
         mTokensRepository = ((IQStoreApplication) getApplication()).getApplicationComponent().getTokensRepository();
     }
@@ -201,6 +199,8 @@ public class PresentationService extends CastRemoteDisplayLocalService implement
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
+            TTSHelper.getInstance().init(getContext());
+
             setContentView(R.layout.extended_display);
             mRecyclerView = (RecyclerView) findViewById(R.id.display_recyclerview);
             mNoTokensTextView = (TextView) findViewById(R.id.noTokensTextView);
@@ -211,7 +211,6 @@ public class PresentationService extends CastRemoteDisplayLocalService implement
 //        mLinearLayoutManager = new LinearLayoutManager(context);
 
             mDisplayAdapter = new DisplayAdapter(getContext());
-
             mRecyclerView.setLayoutManager(mLinearLayoutManager);
             mRecyclerView.setAdapter(mDisplayAdapter);
 
