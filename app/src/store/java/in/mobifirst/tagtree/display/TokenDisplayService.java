@@ -18,9 +18,12 @@ import com.commonsware.cwac.preso.PresentationService;
 import java.util.ArrayList;
 
 import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.tokens.DisplayAdapter;
 import in.mobifirst.tagtree.tokens.Snap;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 
 public class TokenDisplayService extends PresentationService implements
         Runnable {
@@ -30,9 +33,11 @@ public class TokenDisplayService extends PresentationService implements
     private DisplayAdapter mDisplayAdapter;
     private boolean flipMe = false;
     private LinearLayoutManager mLinearLayoutManager;
-    private GridLayoutManager mGridLayoutManager;
     private View mRootView;
     private TextView mNoTokensTextView;
+
+    private int mNumberOfCounters;
+    private IQSharedPreferences mIQSharedPreferences;
 
     private BroadcastReceiver mSnapBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -56,6 +61,7 @@ public class TokenDisplayService extends PresentationService implements
 
     @Override
     public void onCreate() {
+        mIQSharedPreferences = ((IQStoreApplication) getApplicationContext()).getApplicationComponent().getIQSharedPreferences();
         handler = new Handler(Looper.getMainLooper());
         mDisplayAdapter = new DisplayAdapter(this);
         TTLocalBroadcastManager.registerReceiver(this, mSnapBroadcastReceiver, TTLocalBroadcastManager.TOKEN_CHANGE_INTENT_ACTION);
@@ -74,11 +80,19 @@ public class TokenDisplayService extends PresentationService implements
         mRecyclerView = (RecyclerView) mRootView.findViewById(R.id.display_recyclerview);
         mNoTokensTextView = (TextView) mRootView.findViewById(R.id.noTokensTextView);
         mNoTokensTextView.setVisibility(View.GONE);
-        mGridLayoutManager = new GridLayoutManager(context, 2, LinearLayoutManager.VERTICAL, false);
+
+        mNumberOfCounters = mIQSharedPreferences.getInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY);
+        if (mNumberOfCounters > 1) {
+            mLinearLayoutManager = new GridLayoutManager(context, 2, LinearLayoutManager.VERTICAL, false);
+        } else {
+            mLinearLayoutManager = new LinearLayoutManager(context);
+//            mLinearLayoutManager = new GridLayoutManager(context, 2, LinearLayoutManager.HORIZONTAL, false);
+        }
+
         ItemOffsetDecoration itemDecoration = new ItemOffsetDecoration(context, R.dimen.item_offset);
         mRecyclerView.addItemDecoration(itemDecoration);
-//        mLinearLayoutManager = new LinearLayoutManager(context);
-        mRecyclerView.setLayoutManager(mGridLayoutManager);
+
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mDisplayAdapter);
 
         run();
@@ -92,9 +106,9 @@ public class TokenDisplayService extends PresentationService implements
         if (itemCount > 0) {
             mNoTokensTextView.setVisibility(View.GONE);
             int firstVisiblePosition =
-                    mGridLayoutManager.findFirstVisibleItemPosition();
+                    mLinearLayoutManager.findFirstVisibleItemPosition();
             int lastVisiblePosition =
-                    mGridLayoutManager.findLastVisibleItemPosition();
+                    mLinearLayoutManager.findLastVisibleItemPosition();
             int window = lastVisiblePosition - firstVisiblePosition;
             int scrollBy = lastVisiblePosition + window / 2;
             Log.e("TokenDisplayService", "scrollBy = " + scrollBy);
