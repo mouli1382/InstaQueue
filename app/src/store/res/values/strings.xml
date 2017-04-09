@@ -127,5 +127,7 @@
     <string name="title_reset_preference">Reset</string>
     <string name="display_no_tokens">Congratulations! You have served all your Customers.</string>
     <string name="create_token">Creating Token...</string>
+    <string name="init_error">Error starting the remote display</string>
+    <string name="app_id">2757DDB3</string>
 
 </resources>

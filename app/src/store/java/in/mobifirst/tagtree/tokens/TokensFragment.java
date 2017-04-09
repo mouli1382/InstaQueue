@@ -34,6 +34,7 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.display.MediaRouterButtonView;
 import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
@@ -141,6 +142,9 @@ public class TokensFragment extends BaseFragment implements TokensContract.View 
         fab.setVisibility(View.GONE);
 
         int numberOfCounters = mIQSharedPreferences.getInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY);
+
+        MediaRouterButtonView mediaRouterButtonView = (MediaRouterButtonView) getActivity().findViewById(R.id.media_route_button_view);
+        mediaRouterButtonView.setVisibility(View.GONE);
 
         mCounterSpinner = (Spinner) getActivity().findViewById(R.id.counter_spinner);
         if (numberOfCounters > 1) {

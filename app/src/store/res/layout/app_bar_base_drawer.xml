@@ -48,13 +48,26 @@
                     android:layout_toRightOf="@+id/switchCompat"
                     android:text="@string/serve" />
 
-                <Spinner
-                    android:id="@+id/counter_spinner"
+                <FrameLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
                     android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true" />
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="5dp">
+
+                    <in.mobifirst.tagtree.display.MediaRouterButtonView
+                        android:id="@+id/media_route_button_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"></in.mobifirst.tagtree.display.MediaRouterButtonView>
+
+                    <Spinner
+                        android:id="@+id/counter_spinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </FrameLayout>
+
 
             </RelativeLayout>
         </android.support.v7.widget.Toolbar>
@@ -68,8 +81,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        app:rippleColor="@android:color/white"
         android:layout_margin="@dimen/fab_margin"
+        app:rippleColor="@android:color/white"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
 </android.support.design.widget.CoordinatorLayout>

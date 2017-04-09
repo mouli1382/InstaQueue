@@ -62,7 +62,9 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".display.TokenDisplayService"/>
+        <service android:name=".display.PresentationService"
+            android:exported="false"/>
+        <!--<service android:name=".display.TokenDisplayService"/>-->
     </application>
 
 </manifest>

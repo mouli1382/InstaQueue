@@ -1,18 +1,28 @@
 package in.mobifirst.tagtree.tokens;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.MediaRouteButton;
+import android.support.v7.media.MediaRouteSelector;
+import android.support.v7.media.MediaRouter;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
+import com.google.android.gms.cast.CastDevice;
+import com.google.android.gms.cast.CastMediaControlIntent;
+import com.google.android.gms.cast.CastRemoteDisplayLocalService;
+import com.google.android.gms.common.api.Status;
 
 import javax.inject.Inject;
 
@@ -20,25 +30,27 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseDrawerActivity;
 import in.mobifirst.tagtree.activity.CreditsActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
-import in.mobifirst.tagtree.data.token.TokensRepository;
-import in.mobifirst.tagtree.display.TokenDisplayService;
-import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
+import in.mobifirst.tagtree.display.MediaRouterButtonView;
+import in.mobifirst.tagtree.display.PresentationService;
+import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.util.ActivityUtilities;
-import rx.Subscriber;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 
 public class TokensActivity extends BaseDrawerActivity {
-
+    private static final String TAG = "TokensActivity";
     private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
 
     @Inject
     TokensPresenter mTokensPresenter;
 
-    private TokensRepository mTokensRepository;
-    private CompositeSubscription mSubscriptions;
+    private IQSharedPreferences mIQSharedPreferences;
+
+    private MediaRouteButton mMediaRouteButton;
+    private MediaRouterButtonView mMediaRouterButtonView;
+    private int mRouteCount = 0;
+    private MediaRouter mMediaRouter;
+    private MediaRouteSelector mMediaRouteSelector;
+    private CastDevice mCastDevice;
 
     public static void start(Context caller) {
         Intent intent = new Intent(caller, TokensActivity.class);
@@ -54,6 +66,8 @@ public class TokensActivity extends BaseDrawerActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("");
+
+        mIQSharedPreferences = ((IQStoreApplication) getApplication()).getApplicationComponent().getIQSharedPreferences();
 
         SwitchCompat flow = (SwitchCompat) findViewById(R.id.switchCompat);
         flow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -109,11 +123,157 @@ public class TokensActivity extends BaseDrawerActivity {
             mTokensPresenter.setFiltering(currentFiltering);
         }
 
-        mSubscriptions = new CompositeSubscription();
-        mTokensRepository = ((IQStoreApplication) getApplication()).getApplicationComponent().getTokensRepository();
+        mMediaRouter = android.support.v7.media.MediaRouter.getInstance(getApplicationContext());
+        mMediaRouteSelector = new MediaRouteSelector.Builder()
+                .addControlCategory(
+                        CastMediaControlIntent.categoryForCast(getString(R.string.app_id)))
+                .build();
 
-        startService(new Intent(this, TokenDisplayService.class));
+        mMediaRouterButtonView = (MediaRouterButtonView) findViewById(R.id.media_route_button_view);
+        if (mMediaRouterButtonView != null) {
+            mMediaRouteButton = mMediaRouterButtonView.getMediaRouteButton();
+            mMediaRouteButton.setRouteSelector(mMediaRouteSelector);
+        }
+        mMediaRouteButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mMediaRouteButton.performClick();
+                return false;
+            }
+        });
+
+        if (isRemoteDisplaying()) {
+            // The Activity has been recreated and we have an active remote display session,
+            // so we need to set the selected device instance
+            CastDevice castDevice = CastDevice
+                    .getFromBundle(mMediaRouter.getSelectedRoute().getExtras());
+            mCastDevice = castDevice;
+
+            if (mMediaRouterButtonView != null) {
+                mMediaRouterButtonView.setVisibility(View.VISIBLE);
+            }
+        }
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mMediaRouter.addCallback(mMediaRouteSelector, mMediaRouterCallback,
+                MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mMediaRouter.removeCallback(mMediaRouterCallback);
+    }
+
+    private boolean isRemoteDisplaying() {
+        return CastRemoteDisplayLocalService.getInstance() != null;
+    }
+
+    private void initError() {
+        Toast toast = Toast.makeText(
+                getApplicationContext(), R.string.init_error, Toast.LENGTH_SHORT);
+        mMediaRouter.selectRoute(mMediaRouter.getDefaultRoute());
+        toast.show();
+    }
+
+    private final MediaRouter.Callback mMediaRouterCallback =
+            new MediaRouter.Callback() {
+                @Override
+                public void onRouteAdded(MediaRouter router, MediaRouter.RouteInfo route) {
+                    if (++mRouteCount == 1) {
+                        // Show the button when a device is discovered.
+                        if (mMediaRouterButtonView != null) {
+                            mMediaRouterButtonView.setVisibility(View.VISIBLE);
+                            introduceCast(mMediaRouteButton);
+                        }
+                    }
+                }
+
+                @Override
+                public void onRouteRemoved(MediaRouter router, MediaRouter.RouteInfo route) {
+                    if (--mRouteCount == 0) {
+                        // Hide the button if there are no devices discovered.
+                        if (mMediaRouterButtonView != null) {
+                            mMediaRouterButtonView.setVisibility(View.GONE);
+                        }
+                    }
+                }
+
+                @Override
+                public void onRouteSelected(MediaRouter router, MediaRouter.RouteInfo info) {
+                    // Should not happen since this activity will be closed if there
+                    // is no selected route
+
+                    CastDevice castDevice = CastDevice.getFromBundle(info.getExtras());
+                    mCastDevice = castDevice;
+
+                    startCastService(mCastDevice);
+                }
+
+                @Override
+                public void onRouteUnselected(MediaRouter router, MediaRouter.RouteInfo info) {
+                    if (isRemoteDisplaying()) {
+                        CastRemoteDisplayLocalService.stopService();
+                    }
+                    mCastDevice = null;
+                }
+            };
+
+    private void startCastService(CastDevice castDevice) {
+        Intent intent = new Intent(TokensActivity.this,
+                TokensActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent notificationPendingIntent = PendingIntent.getActivity(
+                TokensActivity.this, 0, intent, 0);
+
+        CastRemoteDisplayLocalService.NotificationSettings settings =
+                new CastRemoteDisplayLocalService.NotificationSettings.Builder()
+                        .setNotificationPendingIntent(notificationPendingIntent).build();
+
+        CastRemoteDisplayLocalService.startService(TokensActivity.this,
+                PresentationService.class, getString(R.string.app_id),
+                castDevice, settings,
+                new CastRemoteDisplayLocalService.Callbacks() {
+                    @Override
+                    public void onServiceCreated(
+                            CastRemoteDisplayLocalService service) {
+                        Log.e(TAG, "onServiceCreated");
+                    }
+
+                    @Override
+                    public void onRemoteDisplaySessionStarted(
+                            CastRemoteDisplayLocalService service) {
+                        Log.e(TAG, "onServiceStarted");
+                    }
+
+                    @Override
+                    public void onRemoteDisplaySessionError(Status errorReason) {
+                        Log.e(TAG, "onServiceError: " + errorReason.getStatusCode());
+                        initError();
+
+                        mCastDevice = null;
+//                        TokensActivity.this.finish();
+                    }
+                });
+    }
+
+    private void introduceCast(View view) {
+        if (!mIQSharedPreferences.getBoolean(ApplicationConstants.INTRODUCE_CAST)) {
+            new ShowcaseView.Builder(this)
+                    .withMaterialShowcase()
+                    .setStyle(R.style.CustomShowcaseTheme2)
+                    .setTarget(new ViewTarget(view))
+                    .setContentTitle("TagTree Cast")
+                    .setContentText("Tap to cast Queue status to TV")
+                    .hideOnTouchOutside()
+                    .build();
+            mIQSharedPreferences.putBoolean(ApplicationConstants.INTRODUCE_CAST, true);
+        }
+    }
+
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -146,59 +306,5 @@ public class TokensActivity extends BaseDrawerActivity {
             outState.putSerializable(CURRENT_FILTERING_KEY, mTokensPresenter.getFiltering());
 
         super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        loadSnapsForSecondaryScreen();
-    }
-
-    @Override
-    protected void onDestroy() {
-        if(mSubscriptions != null) {
-            mSubscriptions.clear();
-        }
-        stopService(new Intent(this, TokenDisplayService.class));
-        super.onDestroy();
-    }
-
-    private void loadSnapsForSecondaryScreen() {
-        mSubscriptions.clear();
-        Subscription subscription = mTokensRepository
-                .getSnaps()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Snap>>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                    }
-
-                    @Override
-                    public void onNext(List<Snap> snaps) {
-                        processSnaps(snaps);
-                    }
-                });
-        mSubscriptions.add(subscription);
-    }
-
-    private void processSnaps(List<Snap> snaps) {
-        if (snaps == null || snaps.size() == 0) {
-            //Send broadcast to TokenDisplayService here that there are no tokens.
-            Intent intent = new Intent(TTLocalBroadcastManager.TOKEN_CHANGE_INTENT_ACTION);
-            intent.putParcelableArrayListExtra(TokenDisplayService.SNAP_LIST_INTENT_KEY,
-                    new ArrayList<Snap>());
-            LocalBroadcastManager.getInstance(TokensActivity.this).sendBroadcast(intent);
-        } else {
-            //Send broadcast to TokenDisplayService here.
-            Intent intent = new Intent(TTLocalBroadcastManager.TOKEN_CHANGE_INTENT_ACTION);
-            intent.putParcelableArrayListExtra(TokenDisplayService.SNAP_LIST_INTENT_KEY,
-                    (ArrayList<? extends Parcelable>) snaps);
-            LocalBroadcastManager.getInstance(TokensActivity.this).sendBroadcast(intent);
-        }
     }
 }

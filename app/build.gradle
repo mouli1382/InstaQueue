@@ -19,9 +19,9 @@ repositories {
         url 'https://maven.fabric.io/public'
     }
 
-    maven {
-        url "https://s3.amazonaws.com/repo.commonsware.com"
-    }
+//    maven {
+//        url "https://s3.amazonaws.com/repo.commonsware.com"
+//    }
 }
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -126,6 +126,8 @@ dependencies {
     compile "com.google.firebase:firebase-crash:$rootProject.firebaseVersion"
 
     compile "com.google.android.gms:play-services-auth:$rootProject.firebaseVersion"
+    compile "com.google.android.gms:play-services-cast:$rootProject.firebaseVersion"
+    compile 'com.github.amlcurran.showcaseview:library:5.4.3'
 
     compile "com.android.support:cardview-v7:$rootProject.supportLibraryVersion"
     compile "com.android.support:design:$rootProject.supportLibraryVersion"
@@ -148,8 +150,8 @@ dependencies {
 
     compile 'com.firebaseui:firebase-ui-database:0.4.0'
     compile 'com.razorpay:checkout:1.0.2'
-    compile 'com.commonsware.cwac:presentation:0.4.6'
-    compile 'com.android.support:support-v4:25.1.0'
+//    compile 'com.commonsware.cwac:presentation:0.4.6'
+//    compile 'com.android.support:support-v4:25.1.0'
     testCompile 'junit:junit:4.12'
 }
 
