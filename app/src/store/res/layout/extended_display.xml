@@ -9,10 +9,21 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin">
 
+    <TextView
+        android:id="@+id/welcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textSize="12sp"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:text="@string/welcome_text" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/display_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/welcome"
         android:layout_above="@+id/poweredBy" />
 
     <TextView
@@ -35,6 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/copyright"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
         android:orientation="horizontal">
 
         <TextView

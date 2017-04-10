@@ -129,5 +129,6 @@
     <string name="create_token">Creating Token...</string>
     <string name="init_error">Error starting the remote display</string>
     <string name="app_id">2757DDB3</string>
+    <string name="welcome_text">Welcome to \n Sri Praveen kumar I.A.S \n District Collector and Magistrate</string>
 
 </resources>
