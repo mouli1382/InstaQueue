@@ -127,5 +127,6 @@
     <string name="title_reset_preference">Reset</string>
     <string name="display_no_tokens">Congratulations! You have served all your Customers.</string>
     <string name="create_token">Creating Token...</string>
+    <string name="welcome_text">కింగ్ జార్జి ఆసుపత్రి \n విశాఖపట్టణం</string>
 
 </resources>

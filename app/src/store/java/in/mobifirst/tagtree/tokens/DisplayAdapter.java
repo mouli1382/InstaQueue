@@ -2,6 +2,7 @@ package in.mobifirst.tagtree.tokens;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
@@ -70,8 +71,15 @@ public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.ViewHold
                     TTSHelper.getInstance().speak("Token number " + activeToken, mContext);
                     currentActiveToken = activeToken;
                 }
-                holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
+                holder.mCardView.setBackgroundColor(Color.parseColor("#FFD600"));
+                holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
+//                holder.mTokenNumber.setTextColor(Color.GREEN);
                 holder.mCardView.setVisibility(View.VISIBLE);
+                if (tokens.size() > lastActivatedTokenIndex + 1) {
+                    holder.mNextInLineTextView.setVisibility(View.VISIBLE);
+                } else {
+                    holder.mNextInLineTextView.setVisibility(View.GONE);
+                }
                 holder.recyclerView.setAdapter(new TokensIssueDisplayAdapter(mContext, tokens.size() > lastActivatedTokenIndex + 1 ? tokens.subList(lastActivatedTokenIndex + 1, tokens.size()) : new ArrayList<Token>()));
             } else {
                 holder.mCardView.setVisibility(View.GONE);
@@ -79,6 +87,7 @@ public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.ViewHold
             }
         } else {
             holder.mCardView.setVisibility(View.GONE);
+            holder.mNextInLineTextView.setVisibility(View.GONE);
             holder.snapTextView.setText("Counter " + counter);
             holder.snapTextView.setVisibility(View.VISIBLE);
             holder.recyclerView.setAdapter(new TokensIssueDisplayAdapter(mContext, tokens.size() > 3 ? tokens.subList(0, 3) : tokens));
@@ -111,6 +120,7 @@ public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.ViewHold
         public RecyclerView recyclerView;
         protected TextView mTokenNumber;
         protected View mCardView;
+        protected TextView mNextInLineTextView;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -118,6 +128,7 @@ public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.ViewHold
             recyclerView = (RecyclerView) itemView.findViewById(R.id.recyclerView);
             mTokenNumber = (TextView) itemView.findViewById(R.id.token_number);
             mCardView = itemView.findViewById(R.id.issueTokenCard);
+            mNextInLineTextView = (TextView) itemView.findViewById(R.id.nextInLine);
         }
 
     }

@@ -1,6 +1,7 @@
 package in.mobifirst.tagtree.tokens;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,8 @@ public class TokensIssueDisplayAdapter extends RecyclerView.Adapter<TokensIssueD
     private List<Token> mTokens;
     private TokensFragment.TokenItemListener mTokenItemListener;
     private Context mContext;
+
+    private int[] colorArray = {Color.parseColor("#1B5E20"), Color.RED, Color.BLUE};
 
     public TokensIssueDisplayAdapter(List<Token> items, TokensFragment.TokenItemListener tokenItemListener) {
         setList(items);
@@ -49,13 +52,17 @@ public class TokensIssueDisplayAdapter extends RecyclerView.Adapter<TokensIssueD
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Token token = mTokens.get(position);
-
+        int color = colorArray[token.getCounter() % 3];
         if (token.isActive()) {
-            holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
+            holder.mView.setBackgroundColor(Color.parseColor("#FFD600"));
+            holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
+
+//            holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
             //ToDo uncomment this to read out tokens at all the counters.
 //            TTSHelper.getInstance().speak("Token number " + token.getTokenNumber() + " at counter number " + token.getCounter());
         } else {
-            holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
+            holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_default));
+            holder.mView.setBackgroundColor(color);
         }
         holder.mTokenNumber.setText(token.getTokenNumber() + "");
 //        holder.mTime.setText(TimeUtils.getTime(token.getTimestamp()));

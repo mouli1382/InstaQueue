@@ -961,9 +961,13 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     private void incrementTokenCounter(Token token, @NonNull Transaction.Handler handler) {
+
         DatabaseReference tokenCounterRef = mDatabaseReference
-                .child("store")
+                .child("/")
+                .child(STORE_CHILD)
                 .child(token.getStoreId())
+                .child(COUNTERS_CHILD)
+                .child("" + token.getCounter())
                 .child("tokenCounter");
         tokenCounterRef.runTransaction(handler);
 

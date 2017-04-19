@@ -1,7 +1,7 @@
 def versionMajor = 1
 def versionMinor = 0
 def versionPatch = 0
-def versionBuild = 15 // bump for dogfood builds, public betas, etc.
+def versionBuild = 17 // bump for dogfood builds, public betas, etc.
 
 def gitSha = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim()
 def gitBranchName = 'git rev-parse --abbrev-ref HEAD'.execute([], project.rootDir).text.trim()
@@ -149,7 +149,6 @@ dependencies {
     compile 'com.firebaseui:firebase-ui-database:0.4.0'
     compile 'com.razorpay:checkout:1.0.2'
     compile 'com.commonsware.cwac:presentation:0.4.6'
-    compile 'com.android.support:support-v4:25.1.0'
     testCompile 'junit:junit:4.12'
 }
 
