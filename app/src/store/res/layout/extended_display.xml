@@ -10,7 +10,7 @@
     android:paddingTop="@dimen/activity_vertical_margin">
 
     <TextView
-        android:id="@+id/welcome"
+        android:id="@+id/storeName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -19,13 +19,24 @@
         android:textStyle="bold"
         android:layout_alignParentTop="true"
         android:gravity="center"
-        android:text="@string/welcome_text" />
+        tools:text="@string/store_name" />
+
+    <TextView
+        android:id="@+id/storeArea"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textColor="#B71C1C"
+        android:textStyle="bold"
+        android:layout_below="@+id/storeName"
+        android:gravity="center"
+        tools:text="@string/store_area_name" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/display_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/welcome"
+        android:layout_below="@+id/storeArea"
         android:layout_above="@+id/poweredBy" />
 
     <TextView

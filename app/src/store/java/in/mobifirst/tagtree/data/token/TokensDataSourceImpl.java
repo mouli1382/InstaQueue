@@ -24,13 +24,13 @@ public class TokensDataSourceImpl implements TokensDataSource {
     }
 
     @Override
-    public Observable<List<Snap>> getSnaps() {
-        return mFirebaseDatabaseManager.getAllSnaps(mFirebaseAuth.getCurrentUser().getUid());
+    public Observable<List<Token>> getTokens(int currentCounter) {
+        return mFirebaseDatabaseManager.getAllTokens(mFirebaseAuth.getCurrentUser().getUid(), currentCounter);
     }
 
     @Override
-    public Observable<List<Token>> getTokens(int currentCounter) {
-        return mFirebaseDatabaseManager.getAllTokens(mFirebaseAuth.getCurrentUser().getUid(), currentCounter);
+    public Observable<List<Snap>> getSnaps(long date) {
+        return mFirebaseDatabaseManager.getAllSnaps(mFirebaseAuth.getCurrentUser().getUid(), date);
     }
 
     @Override

@@ -32,6 +32,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -51,6 +52,7 @@ import in.mobifirst.tagtree.model.User;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.tokens.Snap;
 import in.mobifirst.tagtree.util.ApplicationConstants;
+import in.mobifirst.tagtree.util.TimeUtils;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
@@ -123,7 +125,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     //ToDo limit by date and status.
-    public Observable<List<Snap>> getAllSnaps(final String uId) {
+    public Observable<List<Snap>> getAllSnaps(final String uId, final long date) {
         return rx.Observable.create(new Observable.OnSubscribe<List<Snap>>() {
             @Override
             public void call(final Subscriber<? super List<Snap>> subscriber) {
@@ -147,6 +149,13 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                 @Override
                                                 public Observable<Token> call(List<Token> tokens) {
                                                     return Observable.from(tokens);
+                                                }
+                                            })
+                                            .filter(new Func1<Token, Boolean>() {
+                                                @Override
+                                                public Boolean call(Token token) {
+                                                    return TimeUtils.getDate(token.getDate())
+                                                            .equalsIgnoreCase(TimeUtils.getDate(date));
                                                 }
                                             })
                                             .toSortedList(new Func2<Token, Token, Integer>() {
@@ -240,6 +249,13 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                 @Override
                                                 public Observable<Token> call(List<Token> tokens) {
                                                     return Observable.from(tokens);
+                                                }
+                                            })
+                                            .filter(new Func1<Token, Boolean>() {
+                                                @Override
+                                                public Boolean call(Token token) {
+                                                    return TimeUtils.getDate(token.getDate())
+                                                            .equalsIgnoreCase(TimeUtils.getDate(Calendar.getInstance().getTimeInMillis()));
                                                 }
                                             })
                                             .toSortedList(new Func2<Token, Token, Integer>() {
@@ -418,7 +434,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                                 mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY),
                                                                 token.getCounter(),
                                                                 areaName,
-                                                                token.getMappingId());
+                                                                token.getMappingId(), token.getDate());
 
                                                         mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
                                                         addTokenUnderStoreCounter(newToken);
@@ -466,7 +482,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                 mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY),
                                                 token.getCounter(),
                                                 areaName,
-                                                token.getMappingId());
+                                                token.getMappingId(), token.getDate());
 
                                         mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
                                         addTokenUnderStoreCounter(newToken);
@@ -968,6 +984,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
                 .child("" + token.getCounter())
+                .child(TimeUtils.getDate(token.getDate()))
                 .child("tokenCounter");
         tokenCounterRef.runTransaction(handler);
 

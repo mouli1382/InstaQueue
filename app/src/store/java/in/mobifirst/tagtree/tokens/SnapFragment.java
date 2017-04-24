@@ -4,13 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -22,12 +20,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -35,7 +33,6 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
-import in.mobifirst.tagtree.display.TokenDisplayService;
 import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
@@ -131,6 +128,12 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        Spinner spinner = (Spinner) getActivity().findViewById(R.id.counter_spinner);
+        spinner.setVisibility(View.GONE);
+
+        Button dateButton = (Button) getActivity().findViewById(R.id.dateTextView);
+        dateButton.setVisibility(View.VISIBLE);
+
         // Set up floating action button
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab);
@@ -143,10 +146,6 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
             }
         });
         fab.setVisibility(View.VISIBLE);
-
-
-        Spinner spinner = (Spinner) getActivity().findViewById(R.id.counter_spinner);
-        spinner.setVisibility(View.GONE);
     }
 
     @Nullable

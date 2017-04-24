@@ -1,6 +1,8 @@
 package in.mobifirst.tagtree.addedittoken;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +13,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.DialogFragment;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.KeyEvent;
@@ -20,8 +23,12 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import java.util.Calendar;
 
 import javax.inject.Inject;
 
@@ -32,6 +39,7 @@ import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import in.mobifirst.tagtree.util.NetworkConnectionUtils;
+import in.mobifirst.tagtree.util.TimeUtils;
 import in.mobifirst.tagtree.view.ProgressDialogFragment;
 
 
@@ -52,6 +60,10 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
     private TextInputEditText mPhoneNumberEditText;
     private Spinner mCounterSpinner;
     private int mNumberOfCounters;
+
+    private Button mDateButton;
+    private String mDateString;
+    private long mDate;
 
     public static AddEditTokenFragment newInstance() {
         return new AddEditTokenFragment();
@@ -112,7 +124,7 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
                     if (validateInput()) {
                         //ToDo hardcoding to IND country code as of now.
                         mPresenter.addNewToken("+91" + mPhoneNumberEditText.getText().toString(),
-                                mNumberOfCounters > 1 ? (mCounterSpinner.getSelectedItemPosition() + 1) : 1);
+                                (mNumberOfCounters > 1 ? (mCounterSpinner.getSelectedItemPosition() + 1) : 1), mDate);
                     }
                 }
             }
@@ -141,6 +153,14 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
                     }
                 }
                 return true;
+            }
+        });
+
+        mDateButton = (Button) root.findViewById(R.id.date);
+        mDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(v);
             }
         });
 
@@ -177,6 +197,49 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
         return root;
     }
 
+    private void showDatePickerDialog(final View v) {
+        DatePickerDialogFragment datePickerDialogFragment = new DatePickerDialogFragment();
+        datePickerDialogFragment.setiDatePickerCallback(new DatePickerDialogFragment.IDatePickerCallback() {
+            @Override
+            public void onDatePicked(int year, int month, int day) {
+                final Calendar c = Calendar.getInstance();
+                c.set(year, month, day);
+                mDate = c.getTimeInMillis();
+                mDateString = TimeUtils.getDate(mDate);
+                ((Button) v).setText(mDateString);
+            }
+        });
+        datePickerDialogFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
+    }
+
+    public static class DatePickerDialogFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+        private IDatePickerCallback iDatePickerCallback;
+
+        interface IDatePickerCallback {
+            void onDatePicked(int year, int month, int day);
+        }
+
+        public void setiDatePickerCallback(IDatePickerCallback iDatePickerCallback) {
+            this.iDatePickerCallback = iDatePickerCallback;
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            iDatePickerCallback.onDatePicked(year, month, day);
+        }
+    }
+
     private boolean validateInput() {
         CharSequence phone = mPhoneNumberEditText.getText();
         if (TextUtils.isEmpty(phone) || phone.toString().length() != 10) {
@@ -184,6 +247,11 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
             return false;
         } else {
             mPhoneNumberInputLayout.setError("");
+        }
+
+        if (TextUtils.isEmpty(mDateString)) {
+            Snackbar.make(getView(), getString(R.string.invalid_date), Snackbar.LENGTH_LONG).show();
+            return false;
         }
 
         return true;

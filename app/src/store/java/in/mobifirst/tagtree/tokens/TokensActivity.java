@@ -1,17 +1,24 @@
 package in.mobifirst.tagtree.tokens;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -24,6 +31,7 @@ import in.mobifirst.tagtree.data.token.TokensRepository;
 import in.mobifirst.tagtree.display.TokenDisplayService;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.util.ActivityUtilities;
+import in.mobifirst.tagtree.util.TimeUtils;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -40,6 +48,10 @@ public class TokensActivity extends BaseDrawerActivity {
     private TokensRepository mTokensRepository;
     private CompositeSubscription mSubscriptions;
 
+    private Button mDateButton;
+    private String mDateString;
+    private long mDate;
+
     public static void start(Context caller) {
         Intent intent = new Intent(caller, TokensActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -50,10 +62,21 @@ public class TokensActivity extends BaseDrawerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mDate = Calendar.getInstance().getTimeInMillis();
+        mDateString = TimeUtils.getDate(mDate);
+
         // Set up the toolbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitle("");
+
+        mDateButton = (Button) findViewById(R.id.dateTextView);
+        mDateButton.setText(mDateString);
+        mDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(v);
+            }
+        });
 
         SwitchCompat flow = (SwitchCompat) findViewById(R.id.switchCompat);
         flow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -70,7 +93,7 @@ public class TokensActivity extends BaseDrawerActivity {
                         // Create the presenter
                         DaggerTokensComponent.builder()
                                 .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
-                                .tokensPresenterModule(new TokensPresenterModule(snapFragment)).build()
+                                .tokensPresenterModule(new TokensPresenterModule(snapFragment, mDate)).build()
                                 .inject(TokensActivity.this);
                     } else {
                         FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
@@ -82,7 +105,7 @@ public class TokensActivity extends BaseDrawerActivity {
                         // Create the presenter
                         DaggerTokensComponent.builder()
                                 .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
-                                .tokensPresenterModule(new TokensPresenterModule(tokensFragment)).build()
+                                .tokensPresenterModule(new TokensPresenterModule(tokensFragment, mDate)).build()
                                 .inject(TokensActivity.this);
                     }
                 }
@@ -98,7 +121,7 @@ public class TokensActivity extends BaseDrawerActivity {
             // Create the presenter
             DaggerTokensComponent.builder()
                     .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
-                    .tokensPresenterModule(new TokensPresenterModule(snapFragment)).build()
+                    .tokensPresenterModule(new TokensPresenterModule(snapFragment, mDate)).build()
                     .inject(TokensActivity.this);
         }
 
@@ -113,6 +136,61 @@ public class TokensActivity extends BaseDrawerActivity {
         mTokensRepository = ((IQStoreApplication) getApplication()).getApplicationComponent().getTokensRepository();
 
         startService(new Intent(this, TokenDisplayService.class));
+    }
+
+    public void showDatePickerDialog(final View v) {
+        DatePickerDialogFragment datePickerDialogFragment = new DatePickerDialogFragment();
+        datePickerDialogFragment.setiDatePickerCallback(new DatePickerDialogFragment.IDatePickerCallback() {
+            @Override
+            public void onDatePicked(int year, int month, int day) {
+                final Calendar c = Calendar.getInstance();
+                c.set(year, month, day);
+                mDate = c.getTimeInMillis();
+                mDateString = TimeUtils.getDate(mDate);
+                mDateButton.setText(mDateString);
+
+                FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
+                frameLayout.removeAllViewsInLayout();
+                SnapFragment snapFragment = SnapFragment.newInstance();
+                ActivityUtilities.replaceFragmentToActivity(
+                        getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
+
+                // Create the presenter
+                DaggerTokensComponent.builder()
+                        .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
+                        .tokensPresenterModule(new TokensPresenterModule(snapFragment, mDate)).build()
+                        .inject(TokensActivity.this);
+            }
+        });
+        datePickerDialogFragment.show(getSupportFragmentManager(), "datePicker");
+    }
+
+    public static class DatePickerDialogFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+        private IDatePickerCallback iDatePickerCallback;
+
+        interface IDatePickerCallback {
+            void onDatePicked(int year, int month, int day);
+        }
+
+        public void setiDatePickerCallback(IDatePickerCallback iDatePickerCallback) {
+            this.iDatePickerCallback = iDatePickerCallback;
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            iDatePickerCallback.onDatePicked(year, month, day);
+        }
     }
 
     @Override
@@ -156,7 +234,7 @@ public class TokensActivity extends BaseDrawerActivity {
 
     @Override
     protected void onDestroy() {
-        if(mSubscriptions != null) {
+        if (mSubscriptions != null) {
             mSubscriptions.clear();
         }
         stopService(new Intent(this, TokenDisplayService.class));
@@ -165,8 +243,9 @@ public class TokensActivity extends BaseDrawerActivity {
 
     private void loadSnapsForSecondaryScreen() {
         mSubscriptions.clear();
+        //Always show the today's tokens on the secondary display.
         Subscription subscription = mTokensRepository
-                .getSnaps()
+                .getSnaps(Calendar.getInstance().getTimeInMillis())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Snap>>() {

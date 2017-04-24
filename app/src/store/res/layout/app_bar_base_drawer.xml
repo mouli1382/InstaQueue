@@ -48,13 +48,28 @@
                     android:layout_toRightOf="@+id/switchCompat"
                     android:text="@string/serve" />
 
-                <Spinner
-                    android:id="@+id/counter_spinner"
+                <FrameLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
                     android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true" />
+                    android:layout_margin="5dp">
+
+                    <Button
+                        android:id="@+id/dateTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/tw__login_btn_light"
+                        android:textColor="@color/common_google_signin_btn_text_dark_default"
+                        tools:text="Today's Date"
+                        android:visibility="gone"/>
+
+                    <Spinner
+                        android:id="@+id/counter_spinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:visibility="gone"/>
+                </FrameLayout>
 
             </RelativeLayout>
         </android.support.v7.widget.Toolbar>
@@ -68,8 +83,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        app:rippleColor="@android:color/white"
         android:layout_margin="@dimen/fab_margin"
+        app:rippleColor="@android:color/white"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
 </android.support.design.widget.CoordinatorLayout>

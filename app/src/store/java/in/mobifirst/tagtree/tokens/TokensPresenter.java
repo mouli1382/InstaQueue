@@ -3,6 +3,7 @@ package in.mobifirst.tagtree.tokens;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.util.List;
@@ -37,9 +38,13 @@ final class TokensPresenter implements TokensContract.Presenter {
 
     private CompositeSubscription mSubscriptions;
 
+    @Nullable
+    private long mDate;
+
     @Inject
-    TokensPresenter(TokensRepository tokensRepository, TokensContract.View tokensView) {
+    TokensPresenter(@Nullable long date, TokensRepository tokensRepository, TokensContract.View tokensView) {
         Log.e(TAG, "constructor");
+        mDate = date;
         mTokensRepository = tokensRepository;
         mTokensView = tokensView;
         mSubscriptions = new CompositeSubscription();
@@ -167,7 +172,7 @@ final class TokensPresenter implements TokensContract.Presenter {
 
         mSubscriptions.clear();
         Subscription subscription = mTokensRepository
-                .getSnaps()
+                .getSnaps(mDate)
 //                .flatMap(new Func1<List<Token>, Observable<Token>>() {
 //                    @Override
 //                    public Observable<Token> call(List<Token> tokens) {
