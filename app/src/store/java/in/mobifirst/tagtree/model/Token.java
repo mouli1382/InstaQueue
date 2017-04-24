@@ -28,6 +28,8 @@ public class Token implements Parcelable {
     private String userName;
     private String mappingId;
 
+    private long date;
+
     public enum Status {
         ISSUED, READY, CANCELLED, COMPLETED
     }
@@ -38,7 +40,7 @@ public class Token implements Parcelable {
         // Default constructor required for calls to DataSnapshot.getValue(Token.class)
     }
 
-    public Token(String uId, String storeId, String phoneNumber, long tokenNumber, String senderPic, String senderName, int counter, String areaName, String mappingId) {
+    public Token(String uId, String storeId, String phoneNumber, long tokenNumber, String senderPic, String senderName, int counter, String areaName, String mappingId, long date) {
         this.uId = uId;
         this.storeId = storeId;
         this.phoneNumber = phoneNumber;
@@ -50,6 +52,7 @@ public class Token implements Parcelable {
         this.areaName = areaName;
         this.counter = counter;
         this.mappingId = mappingId;
+        this.date = date;
     }
 
     public boolean needsBuzz() {
@@ -57,6 +60,14 @@ public class Token implements Parcelable {
             return true;
         }
         return false;
+    }
+
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
     }
 
     public int getCounter() {
@@ -171,8 +182,13 @@ public class Token implements Parcelable {
         this.userName = userName;
     }
 
-    public String getMappingId()  { return mappingId; }
-    public void setMappingId(String mappingId) {this.mappingId = mappingId; }
+    public String getMappingId() {
+        return mappingId;
+    }
+
+    public void setMappingId(String mappingId) {
+        this.mappingId = mappingId;
+    }
 
     @Exclude
     public boolean isCompleted() {
@@ -207,6 +223,7 @@ public class Token implements Parcelable {
         result.put("activatedTokenTime", activatedTokenTime);
         result.put("tokenFinishTime", tokenFinishTime);
         result.put("mappingId", mappingId);
+        result.put("date", date);
         return result;
     }
 
@@ -218,15 +235,25 @@ public class Token implements Parcelable {
         Token token = (Token) o;
 
         if (getTokenNumber() != token.getTokenNumber()) return false;
+        if (getTimestamp() != token.getTimestamp()) return false;
         if (getStatus() != token.getStatus()) return false;
         if (getBuzzCount() != token.getBuzzCount()) return false;
+        if (getCounter() != token.getCounter()) return false;
+        if (getActivatedTokenTime() != token.getActivatedTokenTime()) return false;
+        if (getTokenFinishTime() != token.getTokenFinishTime()) return false;
+        if (getDate() != token.getDate()) return false;
         if (!getuId().equals(token.getuId())) return false;
         if (!getStoreId().equals(token.getStoreId())) return false;
         if (!getPhoneNumber().equals(token.getPhoneNumber())) return false;
-        if (!getAreaName().equals(token.getAreaName())) return false;
-        if (getActivatedTokenTime() != (token.getActivatedTokenTime())) return false;
-//        if (!getMappingId().equals(token.getMappingId())) return false;
-        return getTimestamp() != (token.getTimestamp());
+        if (getSenderPic() != null ? !getSenderPic().equals(token.getSenderPic()) : token.getSenderPic() != null)
+            return false;
+        if (getSenderName() != null ? !getSenderName().equals(token.getSenderName()) : token.getSenderName() != null)
+            return false;
+        if (getAreaName() != null ? !getAreaName().equals(token.getAreaName()) : token.getAreaName() != null)
+            return false;
+        if (getUserName() != null ? !getUserName().equals(token.getUserName()) : token.getUserName() != null)
+            return false;
+        return getMappingId() != null ? getMappingId().equals(token.getMappingId()) : token.getMappingId() == null;
 
     }
 
@@ -237,11 +264,17 @@ public class Token implements Parcelable {
         result = 31 * result + getPhoneNumber().hashCode();
         result = 31 * result + (int) (getTokenNumber() ^ (getTokenNumber() >>> 32));
         result = 31 * result + (int) (getTimestamp() ^ (getTimestamp() >>> 32));
-        result = 31 * result + (int) (getActivatedTokenTime() ^ (getActivatedTokenTime() >>> 32));
         result = 31 * result + getStatus();
         result = 31 * result + getBuzzCount();
-        result = 31 * result + getAreaName().hashCode();
-//        result = 31 * result + getMappingId().hashCode();
+        result = 31 * result + (getSenderPic() != null ? getSenderPic().hashCode() : 0);
+        result = 31 * result + (getSenderName() != null ? getSenderName().hashCode() : 0);
+        result = 31 * result + (getAreaName() != null ? getAreaName().hashCode() : 0);
+        result = 31 * result + getCounter();
+        result = 31 * result + (int) (getActivatedTokenTime() ^ (getActivatedTokenTime() >>> 32));
+        result = 31 * result + (int) (getTokenFinishTime() ^ (getTokenFinishTime() >>> 32));
+        result = 31 * result + (getUserName() != null ? getUserName().hashCode() : 0);
+        result = 31 * result + (getMappingId() != null ? getMappingId().hashCode() : 0);
+        result = 31 * result + (int) (getDate() ^ (getDate() >>> 32));
         return result;
     }
 
@@ -266,6 +299,7 @@ public class Token implements Parcelable {
         parcel.writeLong(activatedTokenTime);
         parcel.writeLong(tokenFinishTime);
         parcel.writeString(userName);
+        parcel.writeLong(date);
     }
 
     protected Token(Parcel in) {
@@ -283,6 +317,7 @@ public class Token implements Parcelable {
         activatedTokenTime = in.readLong();
         tokenFinishTime = in.readLong();
         userName = in.readString();
+        date = in.readLong();
     }
 
     public static final Creator<Token> CREATOR = new Creator<Token>() {

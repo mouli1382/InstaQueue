@@ -4,14 +4,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
-import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -23,7 +28,13 @@ import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.data.token.TokensRepository;
 import in.mobifirst.tagtree.display.TokenDisplayService;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
-import in.mobifirst.tagtree.util.ActivityUtilities;
+import in.mobifirst.tagtree.util.TimeUtils;
+import pl.rspective.pagerdatepicker.PagerDatePickerDateFormat;
+import pl.rspective.pagerdatepicker.adapter.DatePagerFragmentAdapter;
+import pl.rspective.pagerdatepicker.adapter.DefaultDateAdapter;
+import pl.rspective.pagerdatepicker.model.DateItem;
+import pl.rspective.pagerdatepicker.view.DateRecyclerView;
+import pl.rspective.pagerdatepicker.view.RecyclerViewInsetDecoration;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -40,10 +51,153 @@ public class TokensActivity extends BaseDrawerActivity {
     private TokensRepository mTokensRepository;
     private CompositeSubscription mSubscriptions;
 
+    private DateRecyclerView dateList;
+    private ViewPager pager;
+    private long mDate;
+
     public static void start(Context caller) {
         Intent intent = new Intent(caller, TokensActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         caller.startActivity(intent);
+    }
+
+    private void prepareDatePager(boolean issueFlow) {
+        if (issueFlow) {
+            Date start = null;
+            Date end = null;
+            Date defaultDate = null;
+
+            Calendar cal = Calendar.getInstance();
+            String today = TimeUtils.getDate(cal.getTimeInMillis());
+
+            //Add 5 days to the current time as we want to show only 5 days to book.
+            cal.add(Calendar.DAY_OF_MONTH, 5);
+            String endDay = TimeUtils.getDate(cal.getTimeInMillis());
+
+            try {
+                start = PagerDatePickerDateFormat.DATE_PICKER_DD_MM_YYYY_FORMAT.parse(today);
+                end = PagerDatePickerDateFormat.DATE_PICKER_DD_MM_YYYY_FORMAT.parse(endDay);
+
+                defaultDate = PagerDatePickerDateFormat.DATE_PICKER_DD_MM_YYYY_FORMAT.parse(today);
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            dateList.setAdapter(new DefaultDateAdapter(start, end, defaultDate));
+            dateList.setDatePickerListener(new DateRecyclerView.DatePickerListener() {
+                @Override
+                public void onDatePickerItemClick(DateItem dateItem, int position) {
+//                mDate = dateItem.getDate().getTime();
+
+
+                }
+
+                @Override
+                public void onDatePickerPageSelected(int position) {
+
+                }
+
+                @Override
+                public void onDatePickerPageStateChanged(int state) {
+
+                }
+
+                @Override
+                public void onDatePickerPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+                }
+            });
+
+            DatePagerFragmentAdapter fragmentAdapter = new DatePagerFragmentAdapter(getSupportFragmentManager(), dateList.getDateAdapter()) {
+                @Override
+                protected Fragment getFragment(int position, long date) {
+                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.content_base_drawer);
+                    relativeLayout.removeAllViewsInLayout();
+                    SnapFragment snapFragment = SnapFragment.newInstance();
+//                ActivityUtilities.replaceFragmentToActivity(
+//                        getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
+
+//                    // Create the presenter
+//                    DaggerTokensComponent.builder()
+//                            .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
+//                            .tokensPresenterModule(new TokensPresenterModule(snapFragment, date)).build()
+//                            .inject(TokensActivity.this);
+                    return snapFragment;
+                }
+            };
+
+            pager.setAdapter(fragmentAdapter);
+            dateList.setPager(pager);
+
+        } else {
+            Date start = null;
+            Date end = null;
+            Date defaultDate = null;
+
+            Calendar cal = Calendar.getInstance();
+            String today = TimeUtils.getDate(cal.getTimeInMillis());
+
+            //Add 5 days to the current time as we want to show only 5 days to book.
+            cal.add(Calendar.DAY_OF_MONTH, 5);
+            String endDay = TimeUtils.getDate(cal.getTimeInMillis());
+
+            try {
+                start = PagerDatePickerDateFormat.DATE_PICKER_DD_MM_YYYY_FORMAT.parse(today);
+                end = PagerDatePickerDateFormat.DATE_PICKER_DD_MM_YYYY_FORMAT.parse(today);
+
+                defaultDate = PagerDatePickerDateFormat.DATE_PICKER_DD_MM_YYYY_FORMAT.parse(today);
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            dateList.setAdapter(new DefaultDateAdapter(start, end, defaultDate));
+            dateList.setDatePickerListener(new DateRecyclerView.DatePickerListener() {
+                @Override
+                public void onDatePickerItemClick(DateItem dateItem, int position) {
+//                mDate = dateItem.getDate().getTime();
+
+
+                }
+
+                @Override
+                public void onDatePickerPageSelected(int position) {
+
+                }
+
+                @Override
+                public void onDatePickerPageStateChanged(int state) {
+
+                }
+
+                @Override
+                public void onDatePickerPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+                }
+            });
+
+            DatePagerFragmentAdapter fragmentAdapter = new DatePagerFragmentAdapter(getSupportFragmentManager(), dateList.getDateAdapter()) {
+                @Override
+                protected Fragment getFragment(int position, long date) {
+                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.content_base_drawer);
+                    relativeLayout.removeAllViewsInLayout();
+                    TokensFragment tokensFragment = TokensFragment.newInstance();
+//                ActivityUtilities.replaceFragmentToActivity(
+//                        getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
+
+//                    // Create the presenter
+//                    DaggerTokensComponent.builder()
+//                            .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
+//                            .tokensPresenterModule(new TokensPresenterModule(tokensFragment, date)).build()
+//                            .inject(TokensActivity.this);
+                    return tokensFragment;
+                }
+            };
+
+            pager.setAdapter(fragmentAdapter);
+            dateList.setPager(pager);
+        }
     }
 
     @Override
@@ -55,52 +209,67 @@ public class TokensActivity extends BaseDrawerActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle("");
 
+        dateList = (DateRecyclerView) findViewById(R.id.date_list);
+        dateList.addItemDecoration(new RecyclerViewInsetDecoration(this, R.dimen.date_card_insets));
+
+        pager = (ViewPager) findViewById(R.id.pager);
+
         SwitchCompat flow = (SwitchCompat) findViewById(R.id.switchCompat);
         flow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean issueFlow) {
                 if (compoundButton.getId() == R.id.switchCompat) {
-                    if (!issueFlow) {
-                        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
-                        frameLayout.removeAllViewsInLayout();
-                        SnapFragment snapFragment = SnapFragment.newInstance();
-                        ActivityUtilities.replaceFragmentToActivity(
-                                getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
+                    prepareDatePager(issueFlow);
 
-                        // Create the presenter
-                        DaggerTokensComponent.builder()
-                                .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
-                                .tokensPresenterModule(new TokensPresenterModule(snapFragment)).build()
-                                .inject(TokensActivity.this);
-                    } else {
-                        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
-                        frameLayout.removeAllViewsInLayout();
-                        TokensFragment tokensFragment = TokensFragment.newInstance();
-                        ActivityUtilities.replaceFragmentToActivity(
-                                getSupportFragmentManager(), tokensFragment, R.id.content_base_drawer);
-
-                        // Create the presenter
-                        DaggerTokensComponent.builder()
-                                .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
-                                .tokensPresenterModule(new TokensPresenterModule(tokensFragment)).build()
-                                .inject(TokensActivity.this);
-                    }
+//                    if (!issueFlow) {
+//                        dateList.setVisibility(View.VISIBLE);
+//
+//                        RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.content_base_drawer);
+//                        relativeLayout.removeAllViewsInLayout();
+//                        SnapFragment snapFragment = SnapFragment.newInstance();
+//                        ActivityUtilities.replaceFragmentToActivity(
+//                                getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
+//
+//                        // Create the presenter
+//                        DaggerTokensComponent.builder()
+//                                .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
+//                                .tokensPresenterModule(new TokensPresenterModule(snapFragment, mDate)).build()
+//                                .inject(TokensActivity.this);
+//                    } else {
+//                        dateList.setVisibility(View.GONE);
+//
+//                        RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.content_base_drawer);
+//                        relativeLayout.removeAllViewsInLayout();
+//                        TokensFragment tokensFragment = TokensFragment.newInstance();
+//                        ActivityUtilities.replaceFragmentToActivity(
+//                                getSupportFragmentManager(), tokensFragment, R.id.content_base_drawer);
+//
+//                        // Create the presenter
+//                        DaggerTokensComponent.builder()
+//                                .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
+//                                .tokensPresenterModule(new TokensPresenterModule(tokensFragment, mDate)).build()
+//                                .inject(TokensActivity.this);
+//                    }
                 }
             }
         });
-        if (!flow.isChecked()) {
-            FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
-            frameLayout.removeAllViewsInLayout();
-            SnapFragment snapFragment = SnapFragment.newInstance();
-            ActivityUtilities.replaceFragmentToActivity(
-                    getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
 
-            // Create the presenter
-            DaggerTokensComponent.builder()
-                    .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
-                    .tokensPresenterModule(new TokensPresenterModule(snapFragment)).build()
-                    .inject(TokensActivity.this);
-        }
+        prepareDatePager(!flow.isChecked());
+//        if (!flow.isChecked()) {
+//            dateList.setVisibility(View.VISIBLE);
+//
+//            RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.content_base_drawer);
+//            relativeLayout.removeAllViewsInLayout();
+//            SnapFragment snapFragment = SnapFragment.newInstance();
+//            ActivityUtilities.replaceFragmentToActivity(
+//                    getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
+//
+//            // Create the presenter
+//            DaggerTokensComponent.builder()
+//                    .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
+//                    .tokensPresenterModule(new TokensPresenterModule(snapFragment, mDate)).build()
+//                    .inject(TokensActivity.this);
+//        }
 
         // Load previously saved state, if available.
         if (savedInstanceState != null) {
@@ -156,7 +325,7 @@ public class TokensActivity extends BaseDrawerActivity {
 
     @Override
     protected void onDestroy() {
-        if(mSubscriptions != null) {
+        if (mSubscriptions != null) {
             mSubscriptions.clear();
         }
         stopService(new Intent(this, TokenDisplayService.class));
@@ -165,8 +334,10 @@ public class TokensActivity extends BaseDrawerActivity {
 
     private void loadSnapsForSecondaryScreen() {
         mSubscriptions.clear();
+
+        //Load always today's tokens for the secondary display.
         Subscription subscription = mTokensRepository
-                .getSnaps()
+                .getSnaps(Calendar.getInstance().getTimeInMillis())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Snap>>() {

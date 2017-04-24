@@ -27,7 +27,9 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -40,6 +42,10 @@ import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.util.NetworkConnectionUtils;
+import pl.rspective.pagerdatepicker.PagerDatePickerDateFormat;
+import pl.rspective.pagerdatepicker.adapter.DefaultDateAdapter;
+import pl.rspective.pagerdatepicker.view.DateRecyclerView;
+import pl.rspective.pagerdatepicker.view.RecyclerViewInsetDecoration;
 
 public class SnapFragment extends BaseFragment implements TokensContract.View {
 
