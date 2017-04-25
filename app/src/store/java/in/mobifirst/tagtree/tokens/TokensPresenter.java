@@ -172,7 +172,7 @@ final class TokensPresenter implements TokensContract.Presenter {
 
         mSubscriptions.clear();
         Subscription subscription = mTokensRepository
-                .getSnaps(mDate)
+                .getSnaps(mDate, false)
 //                .flatMap(new Func1<List<Token>, Observable<Token>>() {
 //                    @Override
 //                    public Observable<Token> call(List<Token> tokens) {

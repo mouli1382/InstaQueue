@@ -88,7 +88,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     //ToDo limit by date and status.
-    public Observable<List<Snap>> getAllSnaps(final String uId, final long date) {
+    public Observable<List<Snap>> getAllSnaps(final String uId, final long date, final boolean ascending) {
         return rx.Observable.create(new Observable.OnSubscribe<List<Snap>>() {
             @Override
             public void call(final Subscriber<? super List<Snap>> subscriber) {
@@ -124,7 +124,11 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                             .toSortedList(new Func2<Token, Token, Integer>() {
                                                 @Override
                                                 public Integer call(Token token, Token token2) {
-                                                    return new Long(token.getTokenNumber()).compareTo(token2.getTokenNumber());
+                                                    if (ascending) {
+                                                        return new Long(token.getTokenNumber()).compareTo(token2.getTokenNumber());
+                                                    } else {
+                                                        return new Long(token2.getTokenNumber()).compareTo(token.getTokenNumber());
+                                                    }
                                                 }
                                             })
                                             .flatMap(new Func1<List<Token>, Observable<Token>>() {
@@ -364,18 +368,18 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                     @Override
                     public Task<Long> then(@NonNull Task<Long> task) throws Exception {
                         final Long currentToken = task.getResult();
-                        if (currentToken > 2) {
-                            return positionInQueue(token.getStoreId(), token.getCounter())
-                                    .continueWithTask(new Continuation<Integer, Task<Long>>() {
-                                        @Override
-                                        public Task<Long> then(@NonNull Task<Integer> task) throws Exception {
-                                            return addNewToken(token, currentToken, task.getResult());
-                                        }
-                                    });
-
-                        } else {
-                            return addNewToken(token, currentToken, -1);
-                        }
+//                        if (currentToken > 2) {
+//                            return positionInQueue(token.getStoreId(), token.getCounter())
+//                                    .continueWithTask(new Continuation<Integer, Task<Long>>() {
+//                                        @Override
+//                                        public Task<Long> then(@NonNull Task<Integer> task) throws Exception {
+//                                            return addNewToken(token, currentToken, task.getResult());
+//                                        }
+//                                    });
+//
+//                        } else {
+                        return addNewToken(token, currentToken, -1);
+//                        }
                     }
                 })
                 .addOnSuccessListener(new OnSuccessListener<Long>() {
@@ -619,12 +623,16 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                     switch (languagePrefValue) {
                         case 0: //English
                         default:
-                            message = "Your token=" + (token.getTokenNumber()) + " from " + token.getSenderName().trim() + " "
-                                    + token.getAreaName().trim() + (position != -1 ? positionEnglish : "") + ". To avoid standing in Q, download TagTree app or click on the link." + CLIENT_APP_PLAYSTORE_URL + " and save your time and energy";
+                            message = "Your token=" + (token.getTokenNumber()) + " from " + token.getSenderName().trim() + ","
+                                    + token.getAreaName().trim() + ","
+                                    + "Counter #" + token.getCounter()
+                                    + (position != -1 ? positionEnglish : "") + ". To avoid standing in Q, download TagTree app or click on the link." + CLIENT_APP_PLAYSTORE_URL + " and save your time and energy";
                             break;
                         case 1: //Telugu
-                            message = "మీ టోకెన్=" + (token.getTokenNumber()) + "," + token.getSenderName().trim() + " "
-                                    + token.getAreaName().trim() + "." + (position != -1 ? positionTelugu : "") +
+                            message = "మీ టోకెన్=" + (token.getTokenNumber()) + "," + token.getSenderName().trim() + ","
+                                    + token.getAreaName().trim() + ","
+                                    + "కౌంటర్ #" + token.getCounter() + "."
+                                    + (position != -1 ? positionTelugu : "") +
                                     "Q లో  నిలబడటం నివారించేందుకు, ఇప్పుడే  క్రింద లింక్ క్లిక్ చేయండి."
                                     + CLIENT_APP_PLAYSTORE_URL
                                     + "." + " TagTree app ద్వారా మీరు మీ సమయం, డబ్బు ఆదా చేయవచ్చు";

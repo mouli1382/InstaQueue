@@ -13,7 +13,7 @@ public interface TokensDataSource {
 
     Observable<List<Token>> getTokens(int mCurrentCounter);
 
-    Observable<List<Snap>> getSnaps(long mDate);
+    Observable<List<Snap>> getSnaps(long mDate, boolean ascending);
 
     Observable<Token> getToken(@NonNull String tokenId);
 

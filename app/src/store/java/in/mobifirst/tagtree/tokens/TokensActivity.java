@@ -245,7 +245,7 @@ public class TokensActivity extends BaseDrawerActivity {
         mSubscriptions.clear();
         //Always show the today's tokens on the secondary display.
         Subscription subscription = mTokensRepository
-                .getSnaps(Calendar.getInstance().getTimeInMillis())
+                .getSnaps(Calendar.getInstance().getTimeInMillis(), true)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Snap>>() {

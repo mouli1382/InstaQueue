@@ -28,8 +28,8 @@ public class TokensRepository implements TokensDataSource {
     }
 
     @Override
-    public Observable<List<Snap>> getSnaps(long date) {
-        return mTokensDataSource.getSnaps(date);
+    public Observable<List<Snap>> getSnaps(long date, boolean ascending) {
+        return mTokensDataSource.getSnaps(date, ascending);
     }
 
     @Override
