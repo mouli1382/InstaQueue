@@ -3,8 +3,12 @@ package in.mobifirst.tagtree.model;
 import android.text.TextUtils;
 
 import com.google.firebase.database.Exclude;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
@@ -23,12 +27,15 @@ public class Store {
     private long globaltokenCounter;
     private long smsCounter;
 
+    private List<Counter> counterList;
+
     public Store(String name, String area, String website, String logoUrl, int numberOfCounters) {
         this.name = name;
         this.area = area;
         this.website = website;
         this.logoUrl = logoUrl;
         this.numberOfCounters = numberOfCounters;
+        counterList = new ArrayList<>(numberOfCounters);
     }
 
     public Store() {
@@ -63,7 +70,9 @@ public class Store {
         return tokenCounter;
     }
 
-    public long getSmsCounter() { return smsCounter; }
+    public long getSmsCounter() {
+        return smsCounter;
+    }
 
     public long getCredits() {
         return credits;
@@ -117,6 +126,10 @@ public class Store {
         sharedPreferences.putString(ApplicationConstants.WEBSITE_KEY, website);
         sharedPreferences.putString(ApplicationConstants.WEBSITE_LOGO_URL_KEY, logoUrl);
         sharedPreferences.putInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY, numberOfCounters);
+
+        Type type = new TypeToken<List<Counter>>() {
+        }.getType();
+        sharedPreferences.putList(ApplicationConstants.COUNTER_LIST, getCounterList(), type);
 //        sharedPreferences.putLong(ApplicationConstants.CREDITS_KEY, credits);
     }
 
@@ -127,6 +140,15 @@ public class Store {
         sharedPreferences.remove(ApplicationConstants.WEBSITE_KEY);
         sharedPreferences.remove(ApplicationConstants.WEBSITE_LOGO_URL_KEY);
         sharedPreferences.remove(ApplicationConstants.NUMBER_OF_COUNTERS_KEY);
+        sharedPreferences.remove(ApplicationConstants.COUNTER_LIST);
 //        sharedPreferences.putLong(ApplicationConstants.CREDITS_KEY, credits);
+    }
+
+    public List<Counter> getCounterList() {
+        return counterList;
+    }
+
+    public void setCounterList(List<Counter> counterList) {
+        this.counterList = counterList;
     }
 }

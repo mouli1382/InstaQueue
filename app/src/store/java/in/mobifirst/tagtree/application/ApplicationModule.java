@@ -1,5 +1,7 @@
 package in.mobifirst.tagtree.application;
 
+import com.google.gson.Gson;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -26,7 +28,7 @@ public class ApplicationModule {
     @Provides
     @Singleton
     public IQSharedPreferences provideIQSharedPreferences() {
-        return new IQSharedPreferences(application);
+        return new IQSharedPreferences(application, new Gson());
     }
 
     @Provides

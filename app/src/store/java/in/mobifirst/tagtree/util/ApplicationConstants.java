@@ -30,4 +30,6 @@ public class ApplicationConstants {
     public static final String STORE_UID = "store_uid";
 
     public static final String LAST_CREATED_TOKEN = "last_created_token";
+
+    public static String COUNTER_LIST = "counter_configuration";
 }

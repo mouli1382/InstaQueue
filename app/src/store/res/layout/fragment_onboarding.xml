@@ -82,6 +82,7 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/uploadLayout"
             android:layout_below="@+id/storeCountersInputLayout">
 
             <RelativeLayout
@@ -110,6 +111,61 @@
                 android:layout_centerInParent="true"
                 android:enabled="false"
                 android:text="@string/upload" />
+
+        </RelativeLayout>
+
+        <Spinner
+            android:layout_below="@+id/uploadLayout"
+            android:id="@+id/counterSpinner"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></Spinner>
+
+        <RelativeLayout
+            android:id="@+id/counterConfigLayout"
+            android:layout_below="@+id/counterSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/counterNameInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/counterName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/counter_name"
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:maxLines="@integer/maxLines" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/maxTokensInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/counterNameInputLayout">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/counterMaxTokens"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/counter_max_tokens"
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:maxLines="@integer/maxLines" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <Button
+                android:id="@+id/counterAddButton"
+                android:layout_below="@+id/maxTokensInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="UPDATE"/>
 
         </RelativeLayout>
     </RelativeLayout>

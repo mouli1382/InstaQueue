@@ -20,9 +20,12 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestListener;
@@ -30,6 +33,8 @@ import com.bumptech.glide.request.target.Target;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -37,6 +42,7 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.fragment.BaseFragment;
+import in.mobifirst.tagtree.model.Counter;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
@@ -67,6 +73,17 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     private TextInputLayout mStoreAreaTextInputLayout;
     private TextInputLayout mStoreWebsiteTextInputLayout;
     private TextInputLayout mStoreCountersTextInputLayout;
+
+    private Spinner mCounterSpinner;
+    private int mNumberOfCounters = -1;
+    private int mCounterPosition = -1;
+    private View mCounterConfigLayout;
+    private Button mCounterAddButton;
+    private TextInputEditText mCounterNameEditText;
+    private TextInputEditText mCounterCapacityEditText;
+    private TextInputLayout mCounterNameTextInputLayout;
+    private TextInputLayout mCounterCapacityTextInputLayout;
+    private List<Counter> mCounterList;
 
     private byte[] bitmapData;
 
@@ -254,6 +271,8 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
                     int counterValue = Integer.parseInt(charSequence.toString());
                     if (counterValue > 0 && counterValue < 100) {
                         mStoreCountersTextInputLayout.setErrorEnabled(false);
+                        mNumberOfCounters = counterValue;
+                        loadSpinner();
                     } else {
                         mStoreCountersTextInputLayout.setError(getString(R.string.invalid_store_counters));
                         mStoreCountersTextInputLayout.setErrorEnabled(true);
@@ -287,15 +306,137 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
             }
         });
 
+
+        mCounterConfigLayout = root.findViewById(R.id.counterConfigLayout);
+        mCounterAddButton = (Button) root.findViewById(R.id.counterAddButton);
+        mCounterAddButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addCounterValues();
+            }
+        });
+
+        mCounterSpinner = (Spinner) root.findViewById(R.id.counterSpinner);
+
+        mCounterNameEditText = (TextInputEditText) root.findViewById(R.id.counterName);
+        mCounterNameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (TextUtils.isEmpty(charSequence)) {
+                    mCounterNameTextInputLayout.setError(getString(R.string.empty_store_name));
+                    mCounterNameTextInputLayout.setErrorEnabled(true);
+                } else {
+                    mCounterNameTextInputLayout.setErrorEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        mCounterCapacityEditText = (TextInputEditText) root.findViewById(R.id.counterMaxTokens);
+        mCounterCapacityEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (TextUtils.isEmpty(charSequence)) {
+                    mCounterCapacityTextInputLayout.setError(getString(R.string.empty_store_name));
+                    mCounterCapacityTextInputLayout.setErrorEnabled(true);
+                } else {
+                    mCounterCapacityTextInputLayout.setErrorEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
         setRetainInstance(true);
         return root;
+    }
+
+    private void loadSpinner() {
+        if (mNumberOfCounters > 1) {
+            mCounterList = new ArrayList<>(mNumberOfCounters);
+            // Create an ArrayAdapter using the string array and a default spinner layout
+            String[] items = new String[mNumberOfCounters];
+            for (int i = 0; i < mNumberOfCounters; i++) {
+                items[i] = "Counter-" + (i + 1);
+            }
+            final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
+            // Specify the layout to use when the list of choices appears
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            // Apply the adapter to the spinner
+            mCounterSpinner.setAdapter(adapter);
+            mCounterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//                    String counter = adapter.getItem(i);
+                    if (addCounterValues()) {
+                        mCounterSpinner.setSelection(mCounterPosition);
+                    } else {
+                        mCounterPosition = i;
+                        refreshCounterViews(i);
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                }
+            });
+        } else {
+            mCounterSpinner.setVisibility(View.GONE);
+//                    mCounterConfigLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void refreshCounterViews(int position) {
+        if (position != -1 && mCounterList != null) {
+            Counter counter = mCounterList.get(position);
+            if (counter != null) {
+                mCounterNameEditText.setText(counter.getCounterName());
+                mCounterCapacityEditText.setText(counter.getCounterCapacity());
+            } else {
+                mCounterNameEditText.setText("");
+                mCounterCapacityEditText.setText("");
+            }
+        }
+    }
+
+    private boolean addCounterValues() {
+        if (mCounterPosition != -1) {
+            if (validateCounterValues()) {
+                mCounterList.add(mCounterPosition,
+                        new Counter(mCounterPosition,
+                                mCounterNameEditText.getText().toString(),
+                                Integer.parseInt(mCounterCapacityEditText.getText().toString())));
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
     }
 
     private void getLogoUriUsingClearbit() {
         mProfilePicUri = mIQSharedPreferences.getSting(ApplicationConstants.WEBSITE_LOGO_URL_KEY);
 
         CharSequence website = mWebsiteEditText.getText();
-        if(TextUtils.isEmpty(website))
+        if (TextUtils.isEmpty(website))
             return;
 
         String url = website.toString();
@@ -421,6 +562,29 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
         }
     }
 
+    private boolean validateCounterValues() {
+        boolean result = false;
+        CharSequence counterName = mCounterNameEditText.getText();
+        if (TextUtils.isEmpty(counterName)) {
+            mCounterNameTextInputLayout.setError(getString(R.string.empty_counter_name));
+            mCounterNameTextInputLayout.setErrorEnabled(true);
+            return result;
+        }
+
+        CharSequence counterCapacity = mCounterCapacityEditText.getText();
+        if (TextUtils.isEmpty(counterCapacity)) {
+            mCounterCapacityTextInputLayout.setError(getString(R.string.empty_counter_capacity));
+            mCounterCapacityTextInputLayout.setErrorEnabled(true);
+            return result;
+        }
+
+
+        mCounterNameTextInputLayout.setErrorEnabled(false);
+        mCounterCapacityTextInputLayout.setErrorEnabled(false);
+
+        return true;
+    }
+
 
     private boolean validateInput() {
         boolean result = false;
@@ -459,20 +623,37 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
             }
         }
 
-        if(!TextUtils.isEmpty(website) && TextUtils.isEmpty(mProfilePicUri)) {
+        if (!TextUtils.isEmpty(website) && TextUtils.isEmpty(mProfilePicUri)) {
             Snackbar.make(getView(), getString(R.string.website_not_exist), Snackbar.LENGTH_LONG).show();
             return result;
         }
 
-        if(bitmapData == null || bitmapData.length == 0) {
+        if (bitmapData == null || bitmapData.length == 0) {
             Snackbar.make(getView(), getString(R.string.upload_store_pic), Snackbar.LENGTH_LONG).show();
             return result;
         }
 
-        if(TextUtils.isEmpty(mProfilePicUri)) {
+        if (TextUtils.isEmpty(mProfilePicUri)) {
             Snackbar.make(getView(), getString(R.string.upload_store_pic), Snackbar.LENGTH_LONG).show();
             return result;
         }
+
+        CharSequence counterName = mCounterNameEditText.getText();
+        if (TextUtils.isEmpty(counterName)) {
+            mCounterNameTextInputLayout.setError(getString(R.string.empty_counter_name));
+            mCounterNameTextInputLayout.setErrorEnabled(true);
+            return result;
+        }
+
+        CharSequence counterCapacity = mCounterCapacityEditText.getText();
+        if (TextUtils.isEmpty(counterCapacity)) {
+            mCounterCapacityTextInputLayout.setError(getString(R.string.empty_counter_capacity));
+            mCounterCapacityTextInputLayout.setErrorEnabled(true);
+            return result;
+        }
+
+        mCounterNameTextInputLayout.setErrorEnabled(false);
+        mCounterCapacityTextInputLayout.setErrorEnabled(false);
 
         mStoreNameTextInputLayout.setErrorEnabled(false);
         mStoreAreaTextInputLayout.setErrorEnabled(false);

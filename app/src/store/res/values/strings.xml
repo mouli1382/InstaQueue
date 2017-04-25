@@ -132,4 +132,9 @@
     <string name="date">Date</string>
     <string name="invalid_date">Please select the date</string>
 
+    <string name="counter_name">Counter Name</string>
+    <string name="counter_max_tokens">MAX tokens per day</string>
+    <string name="empty_counter_name">Empty Counter Name</string>
+    <string name="empty_counter_capacity">Empty Counter Capacity</string>
+
 </resources>
