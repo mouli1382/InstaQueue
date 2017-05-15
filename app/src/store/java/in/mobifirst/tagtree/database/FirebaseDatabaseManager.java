@@ -3,6 +3,7 @@ package in.mobifirst.tagtree.database;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.tasks.Continuation;
@@ -619,17 +620,32 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 String positionTelugu = "మీ వంతు " + position + " మంది తరువాత ఉంది" + ".";
                 String positionEnglish = ". There are " + position + " members before you";
 
+                //Calculate the appointment time from start-time and send it in SMS.
+                String appointmentEnglish = "";
+                String appointmentTelugu = "";
+                if (!TimeUtils.getDate(Calendar.getInstance().getTimeInMillis()).equalsIgnoreCase(TimeUtils.getDate(token.getDate()))) {
+                    long startTime = 28800; //8AM
+                    long step = 10; // 10 min
+                    long estimatedTime = /*startTime +*/ step * ((int) token.getTokenNumber() - 1);
+                    String appointmentTime = TimeUtils.getDurationInHrsAndMin((int) estimatedTime);
+                    Log.e(TAG, "Your appointment is scheduled at " + appointmentTime + " on " + TimeUtils.getDate(token.getDate()));
+                    appointmentEnglish = "Your appointment is scheduled at " + appointmentTime + " on " + TimeUtils.getDate(token.getDate());
+                    appointmentTelugu = "మీ అపాయింట్మెంట్ సమయం " + appointmentTime + " తేదీ " + TimeUtils.getDate(token.getDate()) + ",";
+                }
+                appointmentEnglish = TextUtils.isEmpty(appointmentEnglish) ? "Your " : appointmentEnglish + " with ";
+                appointmentTelugu = TextUtils.isEmpty(appointmentTelugu) ? "మీ " : appointmentTelugu;
+
                 if (status == false) {
                     switch (languagePrefValue) {
                         case 0: //English
                         default:
-                            message = "Your token=" + (token.getTokenNumber()) + " from " + token.getSenderName().trim() + ","
+                            message = appointmentEnglish + "token=" + (token.getTokenNumber()) + " from " + token.getSenderName().trim() + ","
                                     + token.getAreaName().trim() + ","
                                     + "Counter #" + token.getCounter()
                                     + (position != -1 ? positionEnglish : "") + ". To avoid standing in Q, download TagTree app or click on the link." + CLIENT_APP_PLAYSTORE_URL + " and save your time and energy";
                             break;
                         case 1: //Telugu
-                            message = "మీ టోకెన్=" + (token.getTokenNumber()) + "," + token.getSenderName().trim() + ","
+                            message = appointmentTelugu + "టోకెన్=" + (token.getTokenNumber()) + "," + token.getSenderName().trim() + ","
                                     + token.getAreaName().trim() + ","
                                     + "కౌంటర్ #" + token.getCounter() + "."
                                     + (position != -1 ? positionTelugu : "") +

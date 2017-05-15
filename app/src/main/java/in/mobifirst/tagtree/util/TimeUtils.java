@@ -1,6 +1,7 @@
 package in.mobifirst.tagtree.util;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class TimeUtils {
@@ -28,5 +29,16 @@ public class TimeUtils {
         String hours = String.format(format, timestamp / 3600);
         String time = hours + ":" + minutes + ":" + seconds;
         return time;
+    }
+
+    public static String getDurationInHrsAndMin(int timeDuration) {
+        SimpleDateFormat sfd = new SimpleDateFormat("HH:mm a");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 8);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        calendar.add(Calendar.MINUTE, timeDuration);
+        return sfd.format(calendar.getTime());
     }
 }
