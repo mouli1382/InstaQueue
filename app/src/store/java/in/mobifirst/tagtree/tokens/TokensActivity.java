@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,6 +33,11 @@ import in.mobifirst.tagtree.display.TokenDisplayService;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.util.ActivityUtilities;
 import in.mobifirst.tagtree.util.TimeUtils;
+import io.flic.lib.FlicAppNotInstalledException;
+import io.flic.lib.FlicBroadcastReceiverFlags;
+import io.flic.lib.FlicButton;
+import io.flic.lib.FlicManager;
+import io.flic.lib.FlicManagerInitializedCallback;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -136,6 +142,37 @@ public class TokensActivity extends BaseDrawerActivity {
         mTokensRepository = ((IQStoreApplication) getApplication()).getApplicationComponent().getTokensRepository();
 
         startService(new Intent(this, TokenDisplayService.class));
+
+        grabFlicButton();
+    }
+
+    private void grabFlicButton() {
+        try {
+            FlicManager.getInstance(this, new FlicManagerInitializedCallback() {
+                @Override
+                public void onInitialized(FlicManager manager) {
+                    manager.initiateGrabButton(TokensActivity.this);
+                }
+            });
+        } catch (FlicAppNotInstalledException err) {
+            Toast.makeText(this, "Flic App is not installed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        FlicManager.getInstance(this, new FlicManagerInitializedCallback() {
+            @Override
+            public void onInitialized(FlicManager manager) {
+                FlicButton button = manager.completeGrabButton(requestCode, resultCode, data);
+                if (button != null) {
+                    button.registerListenForBroadcast(FlicBroadcastReceiverFlags.UP_OR_DOWN | FlicBroadcastReceiverFlags.REMOVED);
+                    Toast.makeText(TokensActivity.this, "Grabbed a button", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(TokensActivity.this, "Did not grab any button", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     public void showDatePickerDialog(final View v) {

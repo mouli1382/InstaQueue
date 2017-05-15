@@ -51,10 +51,12 @@ import in.mobifirst.tagtree.tokens.Snap;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import in.mobifirst.tagtree.util.TimeUtils;
 import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.schedulers.Schedulers;
 
 public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String TAG = "FirebaseDatabaseManager";
@@ -309,6 +311,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
                 .child("" + token.getCounter())
+                .child(TimeUtils.getDate(token.getDate()))
                 .child(TOKENS_CHILD)
                 .child(token.getuId())
                 .setValue(token.getTokenNumber());
@@ -323,6 +326,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .child(storeId)
                 .child(COUNTERS_CHILD)
                 .child("" + counter)
+                .child(TimeUtils.getDate(Calendar.getInstance().getTimeInMillis()))
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -1022,9 +1026,99 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
                 .child("" + token.getCounter())
+                .child(TimeUtils.getDate(token.getDate()))
                 .child(TOKENS_CHILD)
                 .child(token.getuId())
                 .removeValue();
+    }
+
+    private Task<Token> getInactiveToken(String storeId) {
+        Log.e(TAG, "getInactiveToken START.... ");
+
+        final TaskCompletionSource<Token> completionSource = new TaskCompletionSource<>();
+
+        //ToDo Configure flic button per counter then we can pass appropriate counter number when flic button is clicked.
+        getAllTokens(storeId, 1)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Observer<List<Token>>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (!completionSource.getTask().isComplete()) {
+                            completionSource.setException(new Exception(e));
+                        }
+                    }
+
+                    @Override
+                    public void onNext(List<Token> tokenList) {
+                        Token token = null;
+                        if (tokenList != null) {
+                            for (int i = 0; i < tokenList.size(); ++i) {
+                                token = tokenList.get(i);
+                                if (token.isIssued()) {
+                                    // Found the inactive token.
+                                    break;
+                                }
+                            }
+                            Log.e(TAG, "getInactiveToken found the inactive token to activate....");
+                        }
+                        if (!completionSource.getTask().isComplete()) {
+                            completionSource.setResult(token != null && token.isIssued() ? token : null);
+                        }
+                    }
+                });
+
+        return completionSource.getTask();
+    }
+
+    public Task<Boolean> activate(String storeId) {
+        Log.e(TAG, "activateOrComplete START.... ");
+
+        // Complete the one we got kicked for in a separate async piece
+        // ToDo replace tokenFromUid with tokenFromCardNumber
+//        Task<Boolean> completeTask = tokenFromCardNumber(rationShopItem.getCardNumber())
+//                .continueWithTask(new Continuation<Token, Task<Boolean>>() {
+//                    @Override
+//                    public Task<Boolean> then(@NonNull Task<Token> task) throws Exception {
+//                        Log.e(TAG, "activateOrComplete complete token.... ");
+//                        if (task.getResult() == null) {
+//                            throw new Exception("No token to complete.");
+//                        } else {
+//                            return completeCurrentToken(task.getResult());
+//                        }
+//                    }
+//                });
+
+        // Activate the next inactive token in another async piece
+        return getInactiveToken(storeId)
+                .continueWithTask(new Continuation<Token, Task<Boolean>>() {
+                    @Override
+                    public Task<Boolean> then(@NonNull Task<Token> task) throws Exception {
+                        Log.e(TAG, "activateOrComplete activate token.... ");
+                        if (task.getResult() == null) {
+                            throw new Exception("No token to activate");
+                        } else {
+                            return activateNextToken(task.getResult());
+                        }
+                    }
+                });
+    }
+
+//    private Task<Boolean> completeCurrentToken(Token token) {
+//        //Bingo - Mark it COMPLETED
+//        token.setStatus(Token.Status.COMPLETED.ordinal());
+//        return updateToken(token);
+//    }
+
+    private Task<Boolean> activateNextToken(Token token) {
+        //Bingo - Mark it READY
+        token.setStatus(Token.Status.READY.ordinal());
+        token.setBuzzCount(token.getBuzzCount() + 1);
+        return updateToken(token);
     }
 
     public Task<Boolean> updateToken(final Token token) {
@@ -1307,6 +1401,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
                 .child("" + token.getCounter())
+                .child(TimeUtils.getDate(token.getDate()))
                 .child(COUNTERS_USERS)
                 .runTransaction(handler);
         return handler.getTask();
@@ -1325,6 +1420,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
                 .child("" + token.getCounter())
+                .child(TimeUtils.getDate(token.getDate()))
                 .child(COUNTERS_AVG_TAT_CHILD)
                 .runTransaction(new Transaction.Handler() {
                     @Override
@@ -1370,6 +1466,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
                 .child("" + token.getCounter())
+                .child(TimeUtils.getDate(token.getDate()))
                 .child(COUNTERS_AVG_BURST_CHILD)
                 .runTransaction(new Transaction.Handler() {
                     @Override

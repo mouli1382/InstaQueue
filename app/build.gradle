@@ -150,6 +150,8 @@ dependencies {
     compile 'com.razorpay:checkout:1.0.2'
     compile 'com.commonsware.cwac:presentation:0.4.6'
     testCompile 'junit:junit:4.12'
+
+    compile project(':fliclib')
 }
 
 apply plugin: 'com.google.gms.google-services'

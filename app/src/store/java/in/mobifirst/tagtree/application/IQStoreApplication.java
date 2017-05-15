@@ -5,6 +5,7 @@ import in.mobifirst.tagtree.database.DatabaseModule;
 import in.mobifirst.tagtree.authentication.AuthenticationModule;
 import in.mobifirst.tagtree.data.token.TokensRepositoryModule;
 import in.mobifirst.tagtree.storage.StorageModule;
+import io.flic.lib.FlicManager;
 
 public class IQStoreApplication extends IQApplication {
     private ApplicationComponent applicationComponent;
@@ -13,6 +14,8 @@ public class IQStoreApplication extends IQApplication {
     public void onCreate() {
         super.onCreate();
         setupObjectGraph();
+
+        FlicManager.setAppCredentials("5ba577b5-ad43-4c40-b90a-c4686304a246", "a7e2e585-8f17-4180-a737-860e822905c7", "TagTree");
     }
 
     private void setupObjectGraph() {

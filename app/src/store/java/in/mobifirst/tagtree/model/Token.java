@@ -191,6 +191,11 @@ public class Token implements Parcelable {
     }
 
     @Exclude
+    public boolean isIssued() {
+        return status == Status.ISSUED.ordinal();
+    }
+
+    @Exclude
     public boolean isCompleted() {
         return status == Status.COMPLETED.ordinal();
     }
