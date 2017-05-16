@@ -156,7 +156,12 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
             }
         });
 
+        //Set today by default.
+        Calendar c = Calendar.getInstance();
+        mDate = c.getTimeInMillis();
+        mDateString = TimeUtils.getDate(mDate);
         mDateButton = (Button) root.findViewById(R.id.date);
+        mDateButton.setText(mDateString);
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
