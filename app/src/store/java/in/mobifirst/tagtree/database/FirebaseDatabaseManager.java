@@ -629,11 +629,15 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                     long estimatedTime = /*startTime +*/ step * ((int) token.getTokenNumber() - 1);
                     String appointmentTime = TimeUtils.getDurationInHrsAndMin((int) estimatedTime);
                     Log.e(TAG, "Your appointment is scheduled at " + appointmentTime + " on " + TimeUtils.getDate(token.getDate()));
-                    appointmentEnglish = "Your appointment is scheduled at " + appointmentTime + " on " + TimeUtils.getDate(token.getDate());
+                    appointmentEnglish = "Your appointment is scheduled at " + appointmentTime + " on " + TimeUtils.getDate(token.getDate()) + " with ";
                     appointmentTelugu = "మీ అపాయింట్మెంట్ సమయం " + appointmentTime + " తేదీ " + TimeUtils.getDate(token.getDate()) + ",";
                 }
-                appointmentEnglish = TextUtils.isEmpty(appointmentEnglish) ? "Your " : appointmentEnglish + " with ";
-                appointmentTelugu = TextUtils.isEmpty(appointmentTelugu) ? "మీ " : appointmentTelugu;
+                appointmentEnglish = TextUtils.isEmpty(appointmentEnglish)
+                        ? "Your appointment is scheduled on " + TimeUtils.getDate(token.getDate()) + " with "
+                        : appointmentEnglish;
+                appointmentTelugu = TextUtils.isEmpty(appointmentTelugu)
+                        ? "మీ అపాయింట్మెంట్ తేదీ " + TimeUtils.getDate(token.getDate()) + ","
+                        : appointmentTelugu;
 
                 if (status == false) {
                     switch (languagePrefValue) {
