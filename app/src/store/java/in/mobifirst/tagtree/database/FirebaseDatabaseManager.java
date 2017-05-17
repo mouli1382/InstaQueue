@@ -629,7 +629,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 String appointmentTelugu = "";
                 if (!TimeUtils.getDate(Calendar.getInstance().getTimeInMillis()).equalsIgnoreCase(TimeUtils.getDate(token.getDate()))) {
                     long startTime = 28800; //8AM
-                    long step = 10; // 10 min
+                    long step = 3; // 3 min
                     long estimatedTime = /*startTime +*/ step * ((int) token.getTokenNumber() - 1);
                     String appointmentTime = TimeUtils.getDurationInHrsAndMin((int) estimatedTime);
                     Log.e(TAG, "Your appointment is scheduled at " + appointmentTime + " on " + TimeUtils.getDate(token.getDate()));
@@ -1352,6 +1352,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
                 .child("" + token.getCounter())
+                .child(TimeUtils.getDate(token.getDate()))
                 .child(COUNTERS_LAST_ACTIVE_TOKEN)
                 .setValue(token.getTokenNumber());
     }

@@ -1,6 +1,7 @@
 package in.mobifirst.tagtree.database;
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
@@ -14,6 +15,7 @@ import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,6 +26,7 @@ import in.mobifirst.tagtree.model.StoreCounter;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.util.ApplicationConstants;
+import in.mobifirst.tagtree.util.TimeUtils;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
@@ -132,11 +135,17 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     public void getCounterStatus(final Token token, final Subscriber<StoreCounter> subscriber) {
         Log.e(TAG, "Passed-In token = " + token.getuId());
+        long tokenTime = token.getDate();
+        if(tokenTime <= 0) {
+            tokenTime = token.getTimestamp();
+        }
+        String appointmentDate = TimeUtils.getDate(tokenTime);
         mDatabaseReference
                 .child(STORE_CHILD)
                 .child(token.getStoreId())
                 .child(COUNTERS_CHILD)
                 .child("" + token.getCounter())
+                .child(TextUtils.isEmpty(appointmentDate) ? TimeUtils.getDate(Calendar.getInstance().getTimeInMillis()) : appointmentDate)
 //                .child(COUNTERS_LAST_ACTIVE_TOKEN)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
@@ -242,7 +251,9 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                     store.getLogoUrl(),
                                     store.getName(),
                                     1, //ToDo populate counters from the store and select from there.
-                                    store.getArea());
+                                    store.getArea(),
+                                    "",
+                                    Calendar.getInstance().getTimeInMillis());
 
                             mDatabaseReference.child(TOKENS_CHILD).child(key).setValue(newToken.toMap());
                             addTokenUnderStoreCounter(newToken);
