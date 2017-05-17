@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -163,7 +164,13 @@ public class LandingFragment extends BaseFragment {
                         .centerCrop().placeholder(R.drawable.ic_account_circle_black_36dp).crossFade()
                         .into(holder.mImageView);
 
-                holder.mDate.setText(TimeUtils.getDate(token.getTimestamp()));
+                long tokenTime = token.getDate();
+                if(tokenTime <= 0) {
+                    tokenTime = token.getTimestamp();
+                }
+                String appointmentDate = TimeUtils.getDate(tokenTime);
+
+                holder.mDate.setText(appointmentDate);
                 holder.mTime.setText(TimeUtils.getTime(token.getTimestamp()));
                 holder.mCounterNumber.setText("" + token.getCounter());
                 holder.mArea.setText(token.getAreaName());
