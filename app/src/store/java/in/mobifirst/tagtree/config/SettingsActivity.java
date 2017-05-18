@@ -9,10 +9,10 @@ import android.support.v7.widget.Toolbar;
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseActivity;
 
-public class PrefsActivity extends BaseActivity {
+public class SettingsActivity extends BaseActivity {
 
     public static void start(Context caller) {
-        Intent intent = new Intent(caller, PrefsActivity.class);
+        Intent intent = new Intent(caller, SettingsActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         caller.startActivity(intent);
     }
@@ -31,11 +31,11 @@ public class PrefsActivity extends BaseActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
 
-        PrefsFragment prefsFragment =
-                (PrefsFragment) getFragmentManager().findFragmentById(R.id.contentFrame);
+        SettingsFragment prefsFragment =
+                (SettingsFragment) getFragmentManager().findFragmentById(R.id.contentFrame);
 
         if (prefsFragment == null) {
-            prefsFragment = PrefsFragment.newInstance();
+            prefsFragment = SettingsFragment.newInstance();
 
             // Display the fragment as the main content.
             getFragmentManager().beginTransaction()

@@ -29,11 +29,11 @@
                 android:value=".tokens.TokensActivity" />
         </activity>
         <activity
-            android:name=".ftu.SettingsActivity"
+            android:name=".addeditstore.AddEditStoreActivity"
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".config.PrefsActivity"
+            android:name=".config.SettingsActivity"
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait" />
         <activity
@@ -44,7 +44,7 @@
         <activity
             android:name="com.razorpay.CheckoutActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
-        <activity android:name=".ftu.SettingsFetcherActivity"
+        <activity android:name=".addeditstore.StoreDetailsFetcherActivity"
             android:screenOrientation="portrait" />
         <activity android:name=".activity.RazorPayActivity"
             android:screenOrientation="portrait" />

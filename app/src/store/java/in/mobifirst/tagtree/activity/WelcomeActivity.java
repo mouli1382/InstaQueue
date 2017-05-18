@@ -19,7 +19,7 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
-import in.mobifirst.tagtree.ftu.SettingsFetcherActivity;
+import in.mobifirst.tagtree.addeditstore.StoreDetailsFetcherActivity;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import io.fabric.sdk.android.Fabric;
 
@@ -72,7 +72,7 @@ public class WelcomeActivity extends BaseActivity {
     }
 
     private void loadGoogleSignInActivity() {
-//        SettingsActivity.start(WelcomeActivity.this);
+//        AddEditServiceActivity.start(WelcomeActivity.this);
         GoogleSignInActivity.start(WelcomeActivity.this);
         finish();
     }
@@ -91,7 +91,7 @@ public class WelcomeActivity extends BaseActivity {
 //            if (mIQSharedPreferences.getBoolean(ApplicationConstants.FTU_COMPLETED_KEY)) {
 //                intent = new Intent(this, TokensActivity.class);
 //            } else {
-            intent = new Intent(this, SettingsFetcherActivity.class);
+            intent = new Intent(this, StoreDetailsFetcherActivity.class);
 //            }
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);

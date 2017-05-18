@@ -1,4 +1,4 @@
-package in.mobifirst.tagtree.ftu;
+package in.mobifirst.tagtree.addeditstore;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -12,7 +12,7 @@ import in.mobifirst.tagtree.storage.FirebaseStorageManager;
 import rx.Subscriber;
 import rx.subscriptions.CompositeSubscription;
 
-public class SettingsPresenter implements SettingsContract.Presenter {
+public class AddEditStorePresenter implements AddEditStoreContract.Presenter {
 
     @NonNull
     private final FirebaseDatabaseManager mFirebaseDatabaseManager;
@@ -24,14 +24,14 @@ public class SettingsPresenter implements SettingsContract.Presenter {
     private final FirebaseAuthenticationManager mFirebaseAuthenticationManager;
 
     @NonNull
-    private final SettingsContract.View mSettingsView;
+    private final AddEditStoreContract.View mSettingsView;
 
     @NonNull
     private CompositeSubscription mSubscriptions;
 
     @Inject
-    SettingsPresenter(FirebaseStorageManager firebaseStorageManager, FirebaseDatabaseManager firebaseDatabaseManager,
-                      FirebaseAuthenticationManager firebaseAuthenticationManager, SettingsContract.View settingsView) {
+    AddEditStorePresenter(FirebaseStorageManager firebaseStorageManager, FirebaseDatabaseManager firebaseDatabaseManager,
+                          FirebaseAuthenticationManager firebaseAuthenticationManager, AddEditStoreContract.View settingsView) {
         mFirebaseStorageManager = firebaseStorageManager;
         mFirebaseDatabaseManager = firebaseDatabaseManager;
         mFirebaseAuthenticationManager = firebaseAuthenticationManager;

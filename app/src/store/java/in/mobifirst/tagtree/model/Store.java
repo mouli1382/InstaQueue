@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.google.firebase.database.Exclude;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
@@ -22,6 +23,29 @@ public class Store {
     private long tokenCounter;
     private long globaltokenCounter;
     private long smsCounter;
+
+    private String businessType;
+    private List<String> services;
+
+    public Store(String storeId, String name, String area, String website, String logoUrl, int numberOfCounters, String businessType, List<String> services) {
+        this.storeId = storeId;
+        this.name = name;
+        this.area = area;
+        this.website = website;
+        this.logoUrl = logoUrl;
+        this.numberOfCounters = numberOfCounters;
+        this.businessType = businessType;
+        this.services = services;
+    }
+
+    public Store(String storeId, String name, String area, String website, String logoUrl, String businessType) {
+        this.storeId = storeId;
+        this.name = name;
+        this.area = area;
+        this.website = website;
+        this.logoUrl = logoUrl;
+        this.businessType = businessType;
+    }
 
     public Store(String name, String area, String website, String logoUrl, int numberOfCounters) {
         this.name = name;
@@ -63,7 +87,9 @@ public class Store {
         return tokenCounter;
     }
 
-    public long getSmsCounter() { return smsCounter; }
+    public long getSmsCounter() {
+        return smsCounter;
+    }
 
     public long getCredits() {
         return credits;
@@ -98,6 +124,22 @@ public class Store {
         this.numberOfCounters = numberOfCounters;
     }
 
+    public String getBusinessType() {
+        return businessType;
+    }
+
+    public void setBusinessType(String businessType) {
+        this.businessType = businessType;
+    }
+
+    public List<String> getServices() {
+        return services;
+    }
+
+    public void setServices(List<String> services) {
+        this.services = services;
+    }
+
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
@@ -106,7 +148,7 @@ public class Store {
         result.put("area", area);
         result.put("website", website);
         result.put("logoUrl", logoUrl);
-        result.put("numberOfCounters", numberOfCounters);
+        result.put("businessType", businessType);
         return result;
     }
 

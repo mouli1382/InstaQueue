@@ -15,9 +15,8 @@ import in.mobifirst.tagtree.data.token.TokensRepository;
 import in.mobifirst.tagtree.data.token.TokensRepositoryModule;
 import in.mobifirst.tagtree.database.DatabaseModule;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
-import in.mobifirst.tagtree.ftu.SettingsActivity;
-import in.mobifirst.tagtree.ftu.SettingsFetcherActivity;
-import in.mobifirst.tagtree.ftu.SettingsFragment;
+import in.mobifirst.tagtree.addeditstore.StoreDetailsFetcherActivity;
+import in.mobifirst.tagtree.addeditstore.AddEditStoreFragment;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.sms.SmsReceiver;
 import in.mobifirst.tagtree.storage.FirebaseStorageManager;
@@ -41,9 +40,9 @@ public interface ApplicationComponent {
 
     void inject(GoogleSignInActivity googleSignInActivity);
 
-    void inject(SettingsFetcherActivity settingsFetcherActivity);
+    void inject(StoreDetailsFetcherActivity settingsFetcherActivity);
 
-    void inject(SettingsFragment settingsFragment);
+    void inject(AddEditStoreFragment settingsFragment);
 
     void inject(TokensFragment tokensFragment);
 

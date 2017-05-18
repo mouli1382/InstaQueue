@@ -10,12 +10,12 @@ import android.text.TextUtils;
 
 import in.mobifirst.tagtree.R;
 
-public class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private SharedPreferences mSharedPreferences;
 
-    public static PrefsFragment newInstance() {
-        return new PrefsFragment();
+    public static SettingsFragment newInstance() {
+        return new SettingsFragment();
     }
 
 //    @Override

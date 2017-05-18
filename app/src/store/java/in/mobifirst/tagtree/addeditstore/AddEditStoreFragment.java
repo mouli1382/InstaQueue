@@ -1,4 +1,4 @@
-package in.mobifirst.tagtree.ftu;
+package in.mobifirst.tagtree.addeditstore;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -47,11 +47,11 @@ import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 import static android.app.Activity.RESULT_OK;
 
 
-public class SettingsFragment extends BaseFragment implements SettingsContract.View {
+public class AddEditStoreFragment extends BaseFragment implements AddEditStoreContract.View {
 
     private static final int PICK_IMAGE_REQUEST = 9002;
 
-    private SettingsContract.Presenter mPresenter;
+    private AddEditStoreContract.Presenter mPresenter;
 
     private String mProfilePicUri;
 
@@ -79,8 +79,8 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     @Inject
     protected NetworkConnectionUtils mNetworkConnectionUtils;
 
-    public static SettingsFragment newInstance() {
-        return new SettingsFragment();
+    public static AddEditStoreFragment newInstance() {
+        return new AddEditStoreFragment();
     }
 
     private BroadcastReceiver mNetworkBroadcastReceiver = new BroadcastReceiver() {
@@ -112,7 +112,7 @@ public class SettingsFragment extends BaseFragment implements SettingsContract.V
     }
 
     @Override
-    public void setPresenter(@NonNull SettingsContract.Presenter presenter) {
+    public void setPresenter(@NonNull AddEditStoreContract.Presenter presenter) {
         mPresenter = presenter;
     }
 

@@ -17,8 +17,8 @@ import javax.inject.Inject;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQStoreApplication;
-import in.mobifirst.tagtree.config.PrefsActivity;
-import in.mobifirst.tagtree.ftu.SettingsActivity;
+import in.mobifirst.tagtree.config.SettingsActivity;
+import in.mobifirst.tagtree.addeditstore.AddEditStoreActivity;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 
@@ -99,10 +99,10 @@ public class BaseDrawerActivity extends BaseActivity
 
         if (id == R.id.nav_account) {
             //Launch Account screen
-            SettingsActivity.start(BaseDrawerActivity.this);
+            AddEditStoreActivity.start(BaseDrawerActivity.this);
         } else if (id == R.id.nav_settings) {
             //Launch local config screen
-            PrefsActivity.start(BaseDrawerActivity.this);
+            SettingsActivity.start(BaseDrawerActivity.this);
         } else if (id == R.id.nav_help) {
             //ToDo Handle Help here.
         }

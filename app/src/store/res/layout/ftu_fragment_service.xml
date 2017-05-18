@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <in.mobifirst.tagtree.view.LinearLayoutWithMaxWidth
+            android:id="@+id/weekGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_constraintLeft_creator="1">
+
+            <in.mobifirst.tagtree.view.WeekButton
+                style="@style/RecurrenceDayOfWeekStyle"
+                android:textOff="M"
+                android:textOn="M" />
+
+            <in.mobifirst.tagtree.view.WeekButton
+                style="@style/RecurrenceDayOfWeekStyle"
+                android:textOff="T"
+                android:textOn="T" />
+
+            <in.mobifirst.tagtree.view.WeekButton
+                style="@style/RecurrenceDayOfWeekStyle"
+                android:textOff="W"
+                android:textOn="W" />
+
+            <in.mobifirst.tagtree.view.WeekButton
+                style="@style/RecurrenceDayOfWeekStyle"
+                android:textOff="T"
+                android:textOn="T" />
+
+            <in.mobifirst.tagtree.view.WeekButton
+                style="@style/RecurrenceDayOfWeekStyle"
+                android:textOff="F"
+                android:textOn="F" />
+
+            <in.mobifirst.tagtree.view.WeekButton
+                style="@style/RecurrenceDayOfWeekStyle"
+                android:textOff="S"
+                android:textOn="S" />
+
+            <in.mobifirst.tagtree.view.WeekButton
+                style="@style/RecurrenceDayOfWeekStyle"
+                android:textOff="S"
+                android:textOn="S" />
+        </in.mobifirst.tagtree.view.LinearLayoutWithMaxWidth>
+
+        <Button
+            android:id="@+id/submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="SUBMIT"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/weekGroup"
+            tools:layout_constraintLeft_creator="1"
+            tools:layout_constraintRight_creator="1" />
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/submit"
+            tools:layout_constraintLeft_creator="1"
+            tools:layout_constraintRight_creator="1" />
+
+        <LinearLayout
+            android:id="@+id/seekbar_placeholder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:orientation="vertical"
+            android:padding="5dp"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinner"
+            tools:layout_constraintLeft_creator="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="EARLY MORNING" />
+
+            <org.florescu.android.rangeseekbar.RangeSeekBar
+                android:id="@+id/earlymorning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:absoluteMaxValue="6.0"
+                app:absoluteMinValue="0.0"
+                app:step="0.5"
+                app:textAboveThumbsColor="@android:color/holo_purple" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="MORNING" />
+
+            <org.florescu.android.rangeseekbar.RangeSeekBar
+                android:id="@+id/morning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:absoluteMaxValue="12.0"
+                app:absoluteMinValue="6.0"
+                app:step="0.5"
+                app:textAboveThumbsColor="@android:color/holo_purple" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="AFTERNOON" />
+
+            <org.florescu.android.rangeseekbar.RangeSeekBar
+                android:id="@+id/afternoon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:absoluteMaxValue="18.0"
+                app:absoluteMinValue="12.0"
+                app:step="0.5"
+                app:textAboveThumbsColor="@android:color/holo_purple" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="EVENING" />
+
+            <org.florescu.android.rangeseekbar.RangeSeekBar
+                android:id="@+id/evening"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:absoluteMaxValue="24.0"
+                app:absoluteMinValue="18.0"
+                app:step="0.5"
+                app:textAboveThumbsColor="@android:color/holo_purple" />
+
+        </LinearLayout>
+
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:text="Same for all DAYS"
+            app:layout_constraintBottom_toBottomOf="@+id/update"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/seekbar_placeholder" />
+
+        <Button
+            android:id="@+id/update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="16dp"
+            android:text="UPDATE"
+            android:visibility="visible"
+            app:layout_constraintLeft_toRightOf="@+id/switch1"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/seekbar_placeholder" />
+
+
+    </android.support.constraint.ConstraintLayout>
+</ScrollView>

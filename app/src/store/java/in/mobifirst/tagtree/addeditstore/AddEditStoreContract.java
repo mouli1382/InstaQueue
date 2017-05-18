@@ -1,4 +1,4 @@
-package in.mobifirst.tagtree.ftu;
+package in.mobifirst.tagtree.addeditstore;
 
 
 import android.net.Uri;
@@ -7,7 +7,7 @@ import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.mvp.BasePresenter;
 import in.mobifirst.tagtree.mvp.BaseView;
 
-public interface SettingsContract {
+public interface AddEditStoreContract {
 
     interface View extends BaseView<Presenter> {
 

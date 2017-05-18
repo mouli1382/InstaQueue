@@ -1,4 +1,4 @@
-package in.mobifirst.tagtree.ftu;
+package in.mobifirst.tagtree.addeditservice;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,12 +18,11 @@ import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
-import in.mobifirst.tagtree.tokens.TokensActivity;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 import rx.Subscriber;
 
-public class SettingsFetcherActivity extends BaseActivity {
+public class ServiceDetailsFetcherActivity extends BaseActivity {
 
     @Inject
     FirebaseAuthenticationManager mAuthenticationManager;
@@ -40,7 +39,7 @@ public class SettingsFetcherActivity extends BaseActivity {
     private ProgressBar mProgressBar;
 
     public static void start(Context caller) {
-        Intent intent = new Intent(caller, SettingsFetcherActivity.class);
+        Intent intent = new Intent(caller, ServiceDetailsFetcherActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         caller.startActivity(intent);
     }
@@ -83,13 +82,13 @@ public class SettingsFetcherActivity extends BaseActivity {
         if (!mNetworkConnectionUtils.isConnected()) {
             showNetworkError(mProgressBar);
         }
-        TTLocalBroadcastManager.registerReceiver(SettingsFetcherActivity.this, mNetworkBroadcastReceiver, TTLocalBroadcastManager.NETWORK_INTENT_ACTION);
+        TTLocalBroadcastManager.registerReceiver(ServiceDetailsFetcherActivity.this, mNetworkBroadcastReceiver, TTLocalBroadcastManager.NETWORK_INTENT_ACTION);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        TTLocalBroadcastManager.unRegisterReceiver(SettingsFetcherActivity.this, mNetworkBroadcastReceiver);
+        TTLocalBroadcastManager.unRegisterReceiver(ServiceDetailsFetcherActivity.this, mNetworkBroadcastReceiver);
     }
 
     private void fetchStore() {
@@ -125,12 +124,12 @@ public class SettingsFetcherActivity extends BaseActivity {
 
     private void persistStore(Store store) {
         if (store == null) {
-            SettingsActivity.start(SettingsFetcherActivity.this);
+            AddEditServiceActivity.start(ServiceDetailsFetcherActivity.this);
         } else {
             store.persistStore(mIQSharedPreferences);
             mIQSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
             mIQSharedPreferences.putString(ApplicationConstants.STORE_UID, mAuthenticationManager.getAuthInstance().getCurrentUser().getUid());
-            RequestPermissionsActivity.start(SettingsFetcherActivity.this);
+            RequestPermissionsActivity.start(ServiceDetailsFetcherActivity.this);
         }
         finish();
     }

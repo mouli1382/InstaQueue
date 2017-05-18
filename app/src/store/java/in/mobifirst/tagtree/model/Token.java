@@ -29,6 +29,7 @@ public class Token implements Parcelable {
     private String mappingId;
 
     private long date;
+    private long appointmentTime;
 
     public enum Status {
         ISSUED, READY, CANCELLED, COMPLETED

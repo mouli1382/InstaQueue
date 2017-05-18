@@ -1,4 +1,4 @@
-package in.mobifirst.tagtree.ftu;
+package in.mobifirst.tagtree.addeditservice;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,15 +15,15 @@ import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.util.ActivityUtilities;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 
-public class SettingsActivity extends BaseActivity {
+public class AddEditServiceActivity extends BaseActivity {
 
     @Inject
-    SettingsPresenter mSettingsPresenter;
+    AddEditServicePresenter mSettingsPresenter;
 
     IQSharedPreferences mIQSharedPreferences;
 
     public static void start(Context caller) {
-        Intent intent = new Intent(caller, SettingsActivity.class);
+        Intent intent = new Intent(caller, AddEditServiceActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         caller.startActivity(intent);
     }
@@ -48,19 +48,19 @@ public class SettingsActivity extends BaseActivity {
             actionBar.hide();
         }
 
-        SettingsFragment settingsFragment =
-                (SettingsFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        AddEditServiceFragment settingsFragment =
+                (AddEditServiceFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
 
         if (settingsFragment == null) {
-            settingsFragment = SettingsFragment.newInstance();
+            settingsFragment = AddEditServiceFragment.newInstance();
 
             ActivityUtilities.addFragmentToActivity(getSupportFragmentManager(),
                     settingsFragment, R.id.contentFrame);
         }
 
-        DaggerSettingsComponent.builder()
+        DaggerAddEditStoreComponent.builder()
                 .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
-                .settingsPresenterModule(new SettingsPresenterModule(settingsFragment))
+                .addEditStorePresenterModule(new AddEditServicePresenterModule(settingsFragment))
                 .build()
                 .inject(this);
     }
