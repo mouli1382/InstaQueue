@@ -1,6 +1,7 @@
 package in.mobifirst.tagtree.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ public class Service {
     private String storeId;
     private String name;
     private String description;
+    private int daysOfOperation;
 
     // key = day:dayMask ; value = slot object
     private Map<String, Slot> slots;
@@ -19,11 +21,20 @@ public class Service {
     // Holds date wise operational metrics.
     private Map<String, ServiceDateWiseData> dateWise;
 
-    public Service(String id, String storeId, String name, String description, Map<String, Slot> slots, int duration) {
+    public Service(String storeId, String name, String description, int daysOfOperation, int duration) {
+        this.storeId = storeId;
+        this.name = name;
+        this.description = description;
+        this.daysOfOperation = daysOfOperation;
+        this.duration = duration;
+    }
+
+    public Service(String id, String storeId, String name, String description, int daysOfOperation, Map<String, Slot> slots, int duration) {
         this.id = id;
         this.storeId = storeId;
         this.name = name;
         this.description = description;
+        this.daysOfOperation = daysOfOperation;
         this.slots = slots;
         this.duration = duration;
     }
@@ -60,6 +71,14 @@ public class Service {
         this.description = description;
     }
 
+    public int getDaysOfOperation() {
+        return daysOfOperation;
+    }
+
+    public void setDaysOfOperation(int daysOfOperation) {
+        this.daysOfOperation = daysOfOperation;
+    }
+
     public List<Slot> getSlots() {
         if (slots != null && slots.size() > 0) {
             return new ArrayList<>(slots.values());
@@ -67,8 +86,13 @@ public class Service {
         return new ArrayList<>();
     }
 
-    public void setSlots(Map<String, Slot> slots) {
-        this.slots = slots;
+    public void setSlots(List<Slot> slots) {
+        Map<String, Slot> map = new HashMap<>();
+        if (slots != null && slots.size() > 0) {
+            for (Slot slot : slots)
+                map.put(slot.getDay() + ":" + slot.getDaysMask(), slot);
+        }
+        this.slots = map;
     }
 
     public int getDuration() {

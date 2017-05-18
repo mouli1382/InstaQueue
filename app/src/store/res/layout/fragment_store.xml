@@ -62,27 +62,18 @@
 
         </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/storeCountersInputLayout"
+        <Spinner
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:id="@+id/business_types"
+            android:layout_below="@+id/storeWebsiteInputLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/storeWebsiteInputLayout">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/counters"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/counters"
-                android:imeOptions="actionDone"
-                android:inputType="numberDecimal"
-                android:maxLines="@integer/maxLines" />
-
-        </android.support.design.widget.TextInputLayout>
+            android:layout_height="wrap_content"></Spinner>
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/storeCountersInputLayout">
+            android:layout_below="@+id/business_types">
 
             <RelativeLayout
                 android:id="@+id/pic_layout"

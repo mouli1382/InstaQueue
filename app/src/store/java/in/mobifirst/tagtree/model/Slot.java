@@ -2,24 +2,14 @@ package in.mobifirst.tagtree.model;
 
 public class Slot {
 
-    private String id;
     private String day;
     private int daysMask;
     private String timeSlots;
 
-    public Slot(String id, String day, int daysMask, String timeSlots) {
-        this.id = id;
+    public Slot(String day, int daysMask, String timeSlots) {
         this.day = day;
         this.daysMask = daysMask;
         this.timeSlots = timeSlots;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getDay() {

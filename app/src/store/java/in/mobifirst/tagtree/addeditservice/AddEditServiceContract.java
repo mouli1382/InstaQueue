@@ -1,9 +1,7 @@
 package in.mobifirst.tagtree.addeditservice;
 
 
-import android.net.Uri;
-
-import in.mobifirst.tagtree.model.Store;
+import in.mobifirst.tagtree.model.Service;
 import in.mobifirst.tagtree.mvp.BasePresenter;
 import in.mobifirst.tagtree.mvp.BaseView;
 
@@ -11,26 +9,20 @@ public interface AddEditServiceContract {
 
     interface View extends BaseView<Presenter> {
 
-        void showUploadFailedError();
+        void showEmptyServiceError();
 
-        void onFileUploadFinished(Uri uri);
+        void showAddServiceFailedError();
 
-        void showEmptyStoreError();
-
-        void showAddStoreFailedError();
-
-        void showTokensList(Store store);
+        void showTokensList(Service service);
 
         boolean isActive();
 
-        void populateStore(Store store);
+        void populateService(Service service);
     }
 
     interface Presenter extends BasePresenter {
-        void uploadFile(byte[] bitmapData);
+        void addServiceDetails(Service service);
 
-        void addStoreDetails(Store store);
-
-        void getStoreDetails();
+        void getServiceDetails();
     }
 }

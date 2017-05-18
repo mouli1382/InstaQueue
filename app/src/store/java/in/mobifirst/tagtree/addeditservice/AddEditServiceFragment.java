@@ -3,33 +3,28 @@ package in.mobifirst.tagtree.addeditservice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputEditText;
-import android.support.design.widget.TextInputLayout;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.Switch;
+import android.widget.TextView;
+import android.widget.ToggleButton;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
+import org.florescu.android.rangeseekbar.RangeSeekBar;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -37,38 +32,38 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.fragment.BaseFragment;
-import in.mobifirst.tagtree.model.Store;
+import in.mobifirst.tagtree.model.Service;
+import in.mobifirst.tagtree.model.Slot;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.tokens.TokensActivity;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 
-import static android.app.Activity.RESULT_OK;
-
 
 public class AddEditServiceFragment extends BaseFragment implements AddEditServiceContract.View {
 
-    private static final int PICK_IMAGE_REQUEST = 9002;
-
     private AddEditServiceContract.Presenter mPresenter;
 
-    private String mProfilePicUri;
+    private LinearLayout mDaysGroup;
 
-    private ImageView mStoreImageView;
-    private ProgressBar mProgressBar;
-    private Button mUploadButton;
+    //Monday = 0
+    private ToggleButton[] mDays = new ToggleButton[7];
+
     private FloatingActionButton fab;
-    private TextInputEditText mStoreNameEditText;
-    private TextInputEditText mStoreAreaEditText;
-    private TextInputEditText mWebsiteEditText;
-    private TextInputEditText mCountersEditText;
-    private TextInputLayout mStoreNameTextInputLayout;
-    private TextInputLayout mStoreAreaTextInputLayout;
-    private TextInputLayout mStoreWebsiteTextInputLayout;
-    private TextInputLayout mStoreCountersTextInputLayout;
+    private Spinner mDaysSpinner;
+    private CustomAdapter mAdapter;
+    private RangeSeekBar earlymorning;
+    private RangeSeekBar morning;
+    private RangeSeekBar afternoon;
+    private RangeSeekBar evening;
+    private LinearLayout mSeekbarLayout;
+    private Button mUpdateButton;
+    private Switch mSwitch;
 
-    private byte[] bitmapData;
+    private int daysOfOperation = -1;
+    private String storeUid;
+    private String[] timeSlots;
 
     @Inject
     IQSharedPreferences mIQSharedPreferences;
@@ -143,264 +138,295 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
             public void onClick(View v) {
                 if (mNetworkConnectionUtils.isConnected()) {
                     if (validateInput()) {
-                        mIQSharedPreferences.putString(ApplicationConstants.WEBSITE_LOGO_URL_KEY, mProfilePicUri);
-                        Store store = new Store(mStoreNameEditText.getText().toString(),
-                                mStoreAreaEditText.getText().toString(),
-                                mWebsiteEditText.getText() != null ? mWebsiteEditText.getText().toString() : "",
-                                mProfilePicUri, Integer.parseInt(mCountersEditText.getText().toString()));
-                        mPresenter.addStoreDetails(store);
+                        Service service = new Service(storeUid, "Chandra", "An Engineer", daysOfOperation, 5);
+                        service.setSlots(mAdapter.getmItems());
+                        mPresenter.addServiceDetails(service);
                     }
                 }
             }
         });
-
-        //Get and load the gmail  profile pic
-        mProfilePicUri = mIQSharedPreferences.getSting(ApplicationConstants.WEBSITE_LOGO_URL_KEY);
-        loadLogo();
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_onboarding, container, false);
+        View root = inflater.inflate(R.layout.fragment_service, container, false);
 
-        mStoreNameTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeNameInputLayout);
-        mStoreAreaTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeAreaInputLayout);
-        mStoreWebsiteTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeWebsiteInputLayout);
-        mStoreCountersTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeCountersInputLayout);
+        Bundle bundle = getArguments();
+        storeUid = bundle.getString(ApplicationConstants.STORE_UID);
 
-        mStoreNameEditText = (TextInputEditText) root.findViewById(R.id.storeName);
-        mStoreNameEditText.addTextChangedListener(new TextWatcher() {
+        timeSlots = new String[4];
+        mDaysGroup = (LinearLayout) root.findViewById(R.id.weekGroup);
+        mDaysSpinner = (Spinner) root.findViewById(R.id.spinner);
+        earlymorning = (RangeSeekBar) root.findViewById(R.id.earlymorning);
+        earlymorning.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (TextUtils.isEmpty(charSequence)) {
-                    mStoreNameTextInputLayout.setError(getString(R.string.empty_store_name));
-                    mStoreNameTextInputLayout.setErrorEnabled(true);
-                } else {
-                    mStoreNameTextInputLayout.setErrorEnabled(false);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
+            public void onRangeSeekBarValuesChanged(RangeSeekBar bar, Number minValue, Number maxValue) {
+                timeSlots[0] = earlymorning.getSelectedMinValue() + ":" + earlymorning.getSelectedMaxValue();
             }
         });
-        mStoreAreaEditText = (TextInputEditText) root.findViewById(R.id.areaName);
-        mStoreAreaEditText.addTextChangedListener(new TextWatcher() {
+        morning = (RangeSeekBar) root.findViewById(R.id.morning);
+        morning.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (TextUtils.isEmpty(charSequence)) {
-                    mStoreAreaTextInputLayout.setError(getString(R.string.empty_store_area));
-                    mStoreAreaTextInputLayout.setErrorEnabled(true);
-                } else {
-                    mStoreAreaTextInputLayout.setErrorEnabled(false);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
+            public void onRangeSeekBarValuesChanged(RangeSeekBar bar, Number minValue, Number maxValue) {
+                timeSlots[1] = morning.getSelectedMinValue() + ":" + morning.getSelectedMaxValue();
             }
         });
-        mWebsiteEditText = (TextInputEditText) root.findViewById(R.id.website);
-        mWebsiteEditText.addTextChangedListener(new TextWatcher() {
+        afternoon = (RangeSeekBar) root.findViewById(R.id.afternoon);
+        afternoon.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (!TextUtils.isEmpty(charSequence) && !Patterns.WEB_URL.matcher(charSequence).matches()) {
-                    mStoreWebsiteTextInputLayout.setError(getString(R.string.invalid_store_website));
-                    mStoreWebsiteTextInputLayout.setErrorEnabled(true);
-                } else {
-                    mStoreWebsiteTextInputLayout.setErrorEnabled(false);
-                    getLogoUriUsingClearbit();
-                    loadLogo();
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
+            public void onRangeSeekBarValuesChanged(RangeSeekBar bar, Number minValue, Number maxValue) {
+                timeSlots[2] = afternoon.getSelectedMinValue() + ":" + afternoon.getSelectedMaxValue();
             }
         });
-        mCountersEditText = (TextInputEditText) root.findViewById(R.id.counters);
-        mCountersEditText.addTextChangedListener(new TextWatcher() {
+        evening = (RangeSeekBar) root.findViewById(R.id.evening);
+        evening.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+            public void onRangeSeekBarValuesChanged(RangeSeekBar bar, Number minValue, Number maxValue) {
+                timeSlots[3] = evening.getSelectedMinValue() + ":" + evening.getSelectedMaxValue();
             }
+        });
+        mSeekbarLayout = (LinearLayout) root.findViewById(R.id.seekbar_placeholder);
+        mSwitch = (Switch) root.findViewById(R.id.switch1);
 
+        for (int i = 0; i < 7; ++i) {
+            mDays[i] = (ToggleButton) mDaysGroup.getChildAt(i);
+        }
+
+        if (-1 != daysOfOperation) {
+            for (int i = 0; i < 7; ++i) {
+                mDays[i].setChecked((daysOfOperation & (1 << i)) != 0);
+            }
+        }
+
+        Button submit = (Button) root.findViewById(R.id.submit);
+        submit.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (TextUtils.isEmpty(charSequence)) {
-                    mStoreCountersTextInputLayout.setError(getString(R.string.empty_store_counters));
-                    mStoreCountersTextInputLayout.setErrorEnabled(true);
-                } else {
-                    int counterValue = Integer.parseInt(charSequence.toString());
-                    if (counterValue > 0 && counterValue < 100) {
-                        mStoreCountersTextInputLayout.setErrorEnabled(false);
-                    } else {
-                        mStoreCountersTextInputLayout.setError(getString(R.string.invalid_store_counters));
-                        mStoreCountersTextInputLayout.setErrorEnabled(true);
+            public void onClick(View v) {
+                int daysMask = 0; //0111 1111 -> days mask.
+                for (int i = 0; i < 7; ++i) {
+                    if (mDays[i].isChecked()) {
+                        daysMask |= 1 << i;
                     }
                 }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
+                loadSpinner(daysMask);
             }
         });
-        mProgressBar = (ProgressBar) root.findViewById(R.id.logoProgress);
-        mStoreImageView = (ImageView) root.findViewById(R.id.storeProfilePic);
-        mUploadButton = (Button) root.findViewById(R.id.uploadButton);
-        mUploadButton.setOnClickListener(new View.OnClickListener() {
+
+        mUpdateButton = (Button) root.findViewById(R.id.update);
+        mUpdateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mProgressBar.setVisibility(View.VISIBLE);
-                mPresenter.uploadFile(bitmapData);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(
+                        (TextUtils.isEmpty(timeSlots[0]) ? "" : timeSlots[0]) + ";"
+                                + (TextUtils.isEmpty(timeSlots[1]) ? "" : timeSlots[1]) + ";"
+                                + (TextUtils.isEmpty(timeSlots[2]) ? "" : timeSlots[2]) + ";"
+                                + (TextUtils.isEmpty(timeSlots[3]) ? "" : timeSlots[3])
+                );
+
+                if (mSwitch.isChecked()) {
+                    List<Slot> items = mAdapter.getmItems();
+                    for (Slot slot : items) {
+                        slot.setTimeSlots(stringBuilder.toString());
+                    }
+                } else {
+                    Slot slot = mAdapter.getItem(mDaysSpinner.getSelectedItemPosition());
+                    slot.setTimeSlots(stringBuilder.toString());
+                }
             }
         });
 
-        mStoreImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
-            }
-        });
+        if (-1 != daysOfOperation) {
+            loadSpinner(daysOfOperation);
+        }
 
-        setRetainInstance(true);
         return root;
     }
 
-    private void getLogoUriUsingClearbit() {
-        mProfilePicUri = mIQSharedPreferences.getSting(ApplicationConstants.WEBSITE_LOGO_URL_KEY);
+    private void loadSpinner(int daysOfOperation) {
+        if (daysOfOperation > 0) {
+            mDaysSpinner.setVisibility(View.VISIBLE);
+            List<Slot> items = new ArrayList<>();
+            for (int i = 0; i < 7; ++i) {
+                if (mDays[i].isChecked()) {
+                    items.add(new Slot(mDays[i].getText().toString(), 1 << i, ""));
+                }
+            }
 
-        CharSequence website = mWebsiteEditText.getText();
-        if(TextUtils.isEmpty(website))
-            return;
+            mAdapter = new CustomAdapter(getActivity(), items);
+            mDaysSpinner.setAdapter(mAdapter);
+            mDaysSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    addTimeRangeSelectors(mAdapter.getItem(i));
+                }
 
-        String url = website.toString();
-        if (url != null && !url.startsWith("http") && !url.startsWith("https")) {
-            url = "http://" + url;
-        }
-        String domain = Uri.parse(url).getHost();
-        if (!TextUtils.isEmpty(domain)) {
-            mProfilePicUri = String.format("https://logo.clearbit.com/%1$s", domain.startsWith("www.") ? domain.substring(4) : domain);
-        }
-    }
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
 
-    private void loadLogo() {
-        if (!TextUtils.isEmpty(mProfilePicUri)) {
-            mStoreImageView.setEnabled(false);
-            fab.setEnabled(false);
-            Glide.with(getActivity())
-                    .load(mProfilePicUri)
-                    .asBitmap()
-                    .listener(new RequestListener<String, Bitmap>() {
-                        @Override
-                        public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
-                            mProgressBar.setVisibility(View.GONE);
-                            mStoreImageView.setEnabled(true);
-                            mProfilePicUri = null;
-                            fab.setEnabled(true);
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                            mProgressBar.setVisibility(View.GONE);
-                            mStoreImageView.setEnabled(true);
-
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            resource.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                            bitmapData = baos.toByteArray();
-
-                            mUploadButton.setEnabled(true);
-                            fab.setEnabled(true);
-                            return false;
-                        }
-                    })
-                    .placeholder(R.mipmap.ic_launcher)
-                    .into(mStoreImageView);
+                }
+            });
         } else {
-            mProgressBar.setVisibility(View.GONE);
+            mDaysSpinner.setVisibility(View.GONE);
+            mSeekbarLayout.setVisibility(View.GONE);
+            mUpdateButton.setVisibility(View.GONE);
+            mSwitch.setVisibility(View.GONE);
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    private void loadSpinner(int daysOfOperation, List<Slot> slots) {
+        if (daysOfOperation > 0) {
+            mDaysSpinner.setVisibility(View.VISIBLE);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            mAdapter = new CustomAdapter(getActivity(), slots);
+            mDaysSpinner.setAdapter(mAdapter);
+            mDaysSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    addTimeRangeSelectors(mAdapter.getItem(i));
+                }
 
-            Uri uri = data.getData();
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
 
-                mStoreImageView.setImageBitmap(bitmap);
-                mStoreImageView.setDrawingCacheEnabled(true);
-                mStoreImageView.buildDrawingCache();
-                mStoreImageView.getDrawingCache();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                bitmapData = baos.toByteArray();
+                }
+            });
+        } else {
+            mDaysSpinner.setVisibility(View.GONE);
+            mSeekbarLayout.setVisibility(View.GONE);
+            mUpdateButton.setVisibility(View.GONE);
+            mSwitch.setVisibility(View.GONE);
+        }
+    }
 
-                mUploadButton.setEnabled(true);
-            } catch (IOException e) {
-                e.printStackTrace();
+    private void addTimeRangeSelectors(Slot slot) {
+        mSeekbarLayout.setVisibility(View.VISIBLE);
+        String dayHours = slot.getTimeSlots();
+        if (TextUtils.isEmpty(dayHours)) {
+            timeSlots = new String[4];
+            earlymorning.resetSelectedValues();
+            morning.resetSelectedValues();
+            afternoon.resetSelectedValues();
+            evening.resetSelectedValues();
+        } else {
+            String[] tokens = dayHours.split(";");
+            if (tokens != null && tokens.length > 0) {
+                String[] values;
+                double min;
+                double max;
+                if (!TextUtils.isEmpty(tokens[0])) {
+                    values = tokens[0].split(":");
+                    min = Double.valueOf(values[0]);
+                    max = Double.valueOf(values[1]);
+                    earlymorning.setSelectedMinValue(min);
+                    earlymorning.setSelectedMaxValue(max);
+                    timeSlots[0] = min + ":" + max;
+                } else {
+                    timeSlots[0] = "";
+                    earlymorning.resetSelectedValues();
+                }
+
+                if (!TextUtils.isEmpty(tokens[1])) {
+                    values = tokens[1].split(":");
+                    min = Double.valueOf(values[0]);
+                    max = Double.valueOf(values[1]);
+                    morning.setSelectedMinValue(min);
+                    morning.setSelectedMaxValue(max);
+                    timeSlots[1] = min + ":" + max;
+                } else {
+                    timeSlots[1] = "";
+                    morning.resetSelectedValues();
+                }
+
+                if (!TextUtils.isEmpty(tokens[2])) {
+                    values = tokens[2].split(":");
+                    min = Double.valueOf(values[0]);
+                    max = Double.valueOf(values[1]);
+                    afternoon.setSelectedMinValue(Double.valueOf(values[0]));
+                    afternoon.setSelectedMaxValue(Double.valueOf(values[1]));
+                    timeSlots[2] = min + ":" + max;
+                } else {
+                    timeSlots[2] = "";
+                    afternoon.resetSelectedValues();
+                }
+
+                if (!TextUtils.isEmpty(tokens[3])) {
+                    values = tokens[3].split(":");
+                    min = Double.valueOf(values[0]);
+                    max = Double.valueOf(values[1]);
+                    evening.setSelectedMinValue(Double.valueOf(values[0]));
+                    evening.setSelectedMaxValue(Double.valueOf(values[1]));
+                    timeSlots[3] = min + ":" + max;
+                } else {
+                    timeSlots[3] = "";
+                    evening.resetSelectedValues();
+                }
             }
         }
+        mSwitch.setVisibility(View.VISIBLE);
+        mUpdateButton.setVisibility(View.VISIBLE);
+    }
+
+    private static class CustomAdapter extends BaseAdapter {
+        private List<Slot> mItems;
+        private Context mContext;
+
+        public CustomAdapter(Context context, List<Slot> items) {
+            mItems = items;
+            mContext = context;
+        }
+
+        public List<Slot> getmItems() {
+            return mItems;
+        }
+
+        @Override
+        public int getCount() {
+            return mItems.size();
+        }
+
+        @Override
+        public Slot getItem(int position) {
+            return mItems.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = LayoutInflater.from(mContext).inflate(android.R.layout.simple_spinner_dropdown_item, null);
+
+            }
+            ((TextView) convertView).setText(mItems.get(position).getDay());
+            return convertView;
+        }
     }
 
     @Override
-    public void showUploadFailedError() {
-        Snackbar.make(getView(), getString(R.string.upload_failed_error), Snackbar.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onFileUploadFinished(Uri uri) {
-        mProgressBar.setVisibility(View.GONE);
-        mProfilePicUri = uri.toString();
-        mUploadButton.setEnabled(false);
-    }
-
-    @Override
-    public void showEmptyStoreError() {
+    public void showEmptyServiceError() {
         Snackbar.make(getView(), getString(R.string.empty_store_details), Snackbar.LENGTH_LONG).show();
     }
 
     @Override
-    public void showAddStoreFailedError() {
+    public void showAddServiceFailedError() {
         Snackbar.make(getView(), getString(R.string.add_store_failed), Snackbar.LENGTH_LONG).show();
     }
 
     @Override
-    public void showTokensList(Store store) {
+    public void showTokensList(Service service) {
         //todo: Find a better way to avoid crash
         if (getActivity() == null)
             return;
 
         mIQSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
         mIQSharedPreferences.putString(ApplicationConstants.STORE_UID, mFirebaseAuth.getAuthInstance().getCurrentUser().getUid());
-        store.persistStore(mIQSharedPreferences);
+//        store.persistStore(mIQSharedPreferences);
 
         TokensActivity.start(getActivity());
         getActivity().finish();
@@ -412,73 +438,34 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
     }
 
     @Override
-    public void populateStore(Store store) {
-        if (isAdded() && store != null) {
-            mStoreNameEditText.setText(store.getName());
-            mStoreAreaEditText.setText(store.getArea());
-            mWebsiteEditText.setText(store.getWebsite());
-            mCountersEditText.setText(store.getNumberOfCounters() + "");
+    public void populateService(Service service) {
+        if (isAdded() && service != null) {
+
+            daysOfOperation = service.getDaysOfOperation();
+            if (-1 != daysOfOperation) {
+                for (int i = 0; i < 7; ++i) {
+                    mDays[i].setChecked((daysOfOperation & (1 << i)) != 0);
+                }
+            }
+
+            loadSpinner(daysOfOperation, service.getSlots());
         }
     }
 
 
     private boolean validateInput() {
         boolean result = false;
-        CharSequence storeName = mStoreNameEditText.getText();
-        if (TextUtils.isEmpty(storeName)) {
-            mStoreNameTextInputLayout.setError(getString(R.string.empty_store_name));
-            mStoreNameTextInputLayout.setErrorEnabled(true);
+
+        if (daysOfOperation == -1) {
+            showMessage(getView(), "Select working Days.");
             return result;
         }
 
-        CharSequence storeArea = mStoreAreaEditText.getText();
-        if (TextUtils.isEmpty(storeArea)) {
-            mStoreAreaTextInputLayout.setError(getString(R.string.empty_store_area));
-            mStoreAreaTextInputLayout.setErrorEnabled(true);
+        List<Slot> slots = mAdapter.getmItems();
+        if (slots == null || slots.size() == 0) {
+            showMessage(getView(), "Select working Hours.");
             return result;
         }
-
-        CharSequence website = mWebsiteEditText.getText();
-        if (!TextUtils.isEmpty(website) && !Patterns.WEB_URL.matcher(website).matches()) {
-            mStoreWebsiteTextInputLayout.setError(getString(R.string.invalid_store_website));
-            mStoreWebsiteTextInputLayout.setErrorEnabled(true);
-            return result;
-        }
-
-        CharSequence counters = mCountersEditText.getText();
-        if (TextUtils.isEmpty(counters)) {
-            mStoreCountersTextInputLayout.setError(getString(R.string.empty_store_counters));
-            mStoreCountersTextInputLayout.setErrorEnabled(true);
-            return result;
-        } else {
-            int counterValue = Integer.parseInt(counters.toString());
-            if (counterValue < 1 || counterValue > 100) {
-                mStoreCountersTextInputLayout.setError(getString(R.string.invalid_store_counters));
-                mStoreCountersTextInputLayout.setErrorEnabled(true);
-                return result;
-            }
-        }
-
-        if(!TextUtils.isEmpty(website) && TextUtils.isEmpty(mProfilePicUri)) {
-            Snackbar.make(getView(), getString(R.string.website_not_exist), Snackbar.LENGTH_LONG).show();
-            return result;
-        }
-
-        if(bitmapData == null || bitmapData.length == 0) {
-            Snackbar.make(getView(), getString(R.string.upload_store_pic), Snackbar.LENGTH_LONG).show();
-            return result;
-        }
-
-        if(TextUtils.isEmpty(mProfilePicUri)) {
-            Snackbar.make(getView(), getString(R.string.upload_store_pic), Snackbar.LENGTH_LONG).show();
-            return result;
-        }
-
-        mStoreNameTextInputLayout.setErrorEnabled(false);
-        mStoreAreaTextInputLayout.setErrorEnabled(false);
-        mStoreWebsiteTextInputLayout.setErrorEnabled(false);
-        mStoreCountersTextInputLayout.setErrorEnabled(false);
-
         return true;
     }
 }

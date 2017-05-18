@@ -89,7 +89,7 @@ public class AddEditStorePresenter implements AddEditStoreContract.Presenter {
                     .getAuthInstance().getCurrentUser().getUid(), store, new Subscriber<String>() {
                 @Override
                 public void onCompleted() {
-                    mSettingsView.showTokensList(store);
+                    mSettingsView.showAddService(store);
                 }
 
                 @Override

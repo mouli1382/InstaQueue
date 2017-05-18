@@ -20,9 +20,12 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestListener;
@@ -34,6 +37,7 @@ import java.io.IOException;
 import javax.inject.Inject;
 
 import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.addeditservice.AddEditServiceActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.fragment.BaseFragment;
@@ -62,13 +66,12 @@ public class AddEditStoreFragment extends BaseFragment implements AddEditStoreCo
     private TextInputEditText mStoreNameEditText;
     private TextInputEditText mStoreAreaEditText;
     private TextInputEditText mWebsiteEditText;
-    private TextInputEditText mCountersEditText;
     private TextInputLayout mStoreNameTextInputLayout;
     private TextInputLayout mStoreAreaTextInputLayout;
     private TextInputLayout mStoreWebsiteTextInputLayout;
-    private TextInputLayout mStoreCountersTextInputLayout;
 
     private byte[] bitmapData;
+    private String businessType;
 
     @Inject
     IQSharedPreferences mIQSharedPreferences;
@@ -147,7 +150,7 @@ public class AddEditStoreFragment extends BaseFragment implements AddEditStoreCo
                         Store store = new Store(mStoreNameEditText.getText().toString(),
                                 mStoreAreaEditText.getText().toString(),
                                 mWebsiteEditText.getText() != null ? mWebsiteEditText.getText().toString() : "",
-                                mProfilePicUri, Integer.parseInt(mCountersEditText.getText().toString()));
+                                mProfilePicUri, businessType);
                         mPresenter.addStoreDetails(store);
                     }
                 }
@@ -163,12 +166,11 @@ public class AddEditStoreFragment extends BaseFragment implements AddEditStoreCo
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_onboarding, container, false);
+        View root = inflater.inflate(R.layout.fragment_store, container, false);
 
         mStoreNameTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeNameInputLayout);
         mStoreAreaTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeAreaInputLayout);
         mStoreWebsiteTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeWebsiteInputLayout);
-        mStoreCountersTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeCountersInputLayout);
 
         mStoreNameEditText = (TextInputEditText) root.findViewById(R.id.storeName);
         mStoreNameEditText.addTextChangedListener(new TextWatcher() {
@@ -238,34 +240,24 @@ public class AddEditStoreFragment extends BaseFragment implements AddEditStoreCo
 
             }
         });
-        mCountersEditText = (TextInputEditText) root.findViewById(R.id.counters);
-        mCountersEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+        Spinner spinner = (Spinner) root.findViewById(R.id.business_types);
+        final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.business_types, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                businessType = adapter.getItem(position).toString();
             }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (TextUtils.isEmpty(charSequence)) {
-                    mStoreCountersTextInputLayout.setError(getString(R.string.empty_store_counters));
-                    mStoreCountersTextInputLayout.setErrorEnabled(true);
-                } else {
-                    int counterValue = Integer.parseInt(charSequence.toString());
-                    if (counterValue > 0 && counterValue < 100) {
-                        mStoreCountersTextInputLayout.setErrorEnabled(false);
-                    } else {
-                        mStoreCountersTextInputLayout.setError(getString(R.string.invalid_store_counters));
-                        mStoreCountersTextInputLayout.setErrorEnabled(true);
-                    }
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+
+
         mProgressBar = (ProgressBar) root.findViewById(R.id.logoProgress);
         mStoreImageView = (ImageView) root.findViewById(R.id.storeProfilePic);
         mUploadButton = (Button) root.findViewById(R.id.uploadButton);
@@ -295,7 +287,7 @@ public class AddEditStoreFragment extends BaseFragment implements AddEditStoreCo
         mProfilePicUri = mIQSharedPreferences.getSting(ApplicationConstants.WEBSITE_LOGO_URL_KEY);
 
         CharSequence website = mWebsiteEditText.getText();
-        if(TextUtils.isEmpty(website))
+        if (TextUtils.isEmpty(website))
             return;
 
         String url = website.toString();
@@ -393,7 +385,7 @@ public class AddEditStoreFragment extends BaseFragment implements AddEditStoreCo
     }
 
     @Override
-    public void showTokensList(Store store) {
+    public void showAddService(Store store) {
         //todo: Find a better way to avoid crash
         if (getActivity() == null)
             return;
@@ -402,7 +394,7 @@ public class AddEditStoreFragment extends BaseFragment implements AddEditStoreCo
         mIQSharedPreferences.putString(ApplicationConstants.STORE_UID, mFirebaseAuth.getAuthInstance().getCurrentUser().getUid());
         store.persistStore(mIQSharedPreferences);
 
-        TokensActivity.start(getActivity());
+        AddEditServiceActivity.start(getActivity(), store.getStoreId());
         getActivity().finish();
     }
 
@@ -417,7 +409,6 @@ public class AddEditStoreFragment extends BaseFragment implements AddEditStoreCo
             mStoreNameEditText.setText(store.getName());
             mStoreAreaEditText.setText(store.getArea());
             mWebsiteEditText.setText(store.getWebsite());
-            mCountersEditText.setText(store.getNumberOfCounters() + "");
         }
     }
 
@@ -445,31 +436,21 @@ public class AddEditStoreFragment extends BaseFragment implements AddEditStoreCo
             return result;
         }
 
-        CharSequence counters = mCountersEditText.getText();
-        if (TextUtils.isEmpty(counters)) {
-            mStoreCountersTextInputLayout.setError(getString(R.string.empty_store_counters));
-            mStoreCountersTextInputLayout.setErrorEnabled(true);
+        if (TextUtils.isEmpty(businessType)) {
             return result;
-        } else {
-            int counterValue = Integer.parseInt(counters.toString());
-            if (counterValue < 1 || counterValue > 100) {
-                mStoreCountersTextInputLayout.setError(getString(R.string.invalid_store_counters));
-                mStoreCountersTextInputLayout.setErrorEnabled(true);
-                return result;
-            }
         }
 
-        if(!TextUtils.isEmpty(website) && TextUtils.isEmpty(mProfilePicUri)) {
+        if (!TextUtils.isEmpty(website) && TextUtils.isEmpty(mProfilePicUri)) {
             Snackbar.make(getView(), getString(R.string.website_not_exist), Snackbar.LENGTH_LONG).show();
             return result;
         }
 
-        if(bitmapData == null || bitmapData.length == 0) {
+        if (bitmapData == null || bitmapData.length == 0) {
             Snackbar.make(getView(), getString(R.string.upload_store_pic), Snackbar.LENGTH_LONG).show();
             return result;
         }
 
-        if(TextUtils.isEmpty(mProfilePicUri)) {
+        if (TextUtils.isEmpty(mProfilePicUri)) {
             Snackbar.make(getView(), getString(R.string.upload_store_pic), Snackbar.LENGTH_LONG).show();
             return result;
         }
@@ -477,7 +458,6 @@ public class AddEditStoreFragment extends BaseFragment implements AddEditStoreCo
         mStoreNameTextInputLayout.setErrorEnabled(false);
         mStoreAreaTextInputLayout.setErrorEnabled(false);
         mStoreWebsiteTextInputLayout.setErrorEnabled(false);
-        mStoreCountersTextInputLayout.setErrorEnabled(false);
 
         return true;
     }

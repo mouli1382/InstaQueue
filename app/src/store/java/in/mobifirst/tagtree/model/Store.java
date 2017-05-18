@@ -38,21 +38,12 @@ public class Store {
         this.services = services;
     }
 
-    public Store(String storeId, String name, String area, String website, String logoUrl, String businessType) {
-        this.storeId = storeId;
+    public Store(String name, String area, String website, String logoUrl, String businessType) {
         this.name = name;
         this.area = area;
         this.website = website;
         this.logoUrl = logoUrl;
         this.businessType = businessType;
-    }
-
-    public Store(String name, String area, String website, String logoUrl, int numberOfCounters) {
-        this.name = name;
-        this.area = area;
-        this.website = website;
-        this.logoUrl = logoUrl;
-        this.numberOfCounters = numberOfCounters;
     }
 
     public Store() {

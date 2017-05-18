@@ -19,7 +19,7 @@ public interface AddEditStoreContract {
 
         void showAddStoreFailedError();
 
-        void showTokensList(Store store);
+        void showAddService(Store store);
 
         boolean isActive();
 

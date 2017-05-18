@@ -47,7 +47,7 @@ public class StoreDetailsFetcherActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings_fetcher);
+        setContentView(R.layout.activity_store_fetcher);
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mProgressBar.setVisibility(View.VISIBLE);

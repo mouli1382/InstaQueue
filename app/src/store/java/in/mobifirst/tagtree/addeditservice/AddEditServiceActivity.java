@@ -22,16 +22,17 @@ public class AddEditServiceActivity extends BaseActivity {
 
     IQSharedPreferences mIQSharedPreferences;
 
-    public static void start(Context caller) {
+    public static void start(Context caller, String storeId) {
         Intent intent = new Intent(caller, AddEditServiceActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra(ApplicationConstants.STORE_UID, storeId);
         caller.startActivity(intent);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.activity_store);
 
         // Set up the toolbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -48,19 +49,23 @@ public class AddEditServiceActivity extends BaseActivity {
             actionBar.hide();
         }
 
-        AddEditServiceFragment settingsFragment =
+        AddEditServiceFragment addEditServiceFragment =
                 (AddEditServiceFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
 
-        if (settingsFragment == null) {
-            settingsFragment = AddEditServiceFragment.newInstance();
+        if (addEditServiceFragment == null) {
+            addEditServiceFragment = AddEditServiceFragment.newInstance();
+
+            Bundle bundle = new Bundle();
+            bundle.putString(ApplicationConstants.STORE_UID, getIntent().getStringExtra(ApplicationConstants.STORE_UID));
+            addEditServiceFragment.setArguments(bundle);
 
             ActivityUtilities.addFragmentToActivity(getSupportFragmentManager(),
-                    settingsFragment, R.id.contentFrame);
+                    addEditServiceFragment, R.id.contentFrame);
         }
 
-        DaggerAddEditStoreComponent.builder()
+        DaggerAddEditServiceComponent.builder()
                 .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
-                .addEditStorePresenterModule(new AddEditServicePresenterModule(settingsFragment))
+                .addEditServicePresenterModule(new AddEditServicePresenterModule(addEditServiceFragment))
                 .build()
                 .inject(this);
     }
