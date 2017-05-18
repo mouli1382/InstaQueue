@@ -1,4 +1,4 @@
-package in.mobifirst.tagtree.addeditservice;
+package in.mobifirst.tagtree.services;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,59 +15,53 @@ import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.util.ActivityUtilities;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 
-public class AddEditServiceActivity extends BaseActivity {
+public class ServicesActivity extends BaseActivity {
 
-    public static final int REQUEST_ADD_SERVICE = 1;
+    private IQSharedPreferences mIQSharedPreferences;
 
     @Inject
-    AddEditServicePresenter mSettingsPresenter;
-
-    IQSharedPreferences mIQSharedPreferences;
+    ServicesPresenter mServicesPresenter;
 
     public static void start(Context caller, String storeId) {
-        Intent intent = new Intent(caller, AddEditServiceActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        Intent intent = new Intent(caller, ServicesActivity.class);
         intent.putExtra(ApplicationConstants.STORE_UID, storeId);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         caller.startActivity(intent);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_store);
+        setContentView(R.layout.activity_service);
 
         // Set up the toolbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
 
-        //ToDo inject it - avoid cyclic dependency.
+        String storeId = getIntent().getStringExtra(ApplicationConstants.STORE_UID);
         mIQSharedPreferences = ((IQStoreApplication) getApplicationContext()).getApplicationComponent().getIQSharedPreferences();
         if (mIQSharedPreferences.getBoolean(ApplicationConstants.FTU_COMPLETED_KEY)) {
-            actionBar.setTitle(R.string.my_account);
+            actionBar.setTitle(R.string.my_service);
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         } else {
             actionBar.hide();
         }
 
-        AddEditServiceFragment addEditServiceFragment =
-                (AddEditServiceFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        ServicesFragment servicesFragment =
+                (ServicesFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
 
-        if (addEditServiceFragment == null) {
-            addEditServiceFragment = AddEditServiceFragment.newInstance();
-
-            Bundle bundle = new Bundle();
-            bundle.putString(ApplicationConstants.STORE_UID, getIntent().getStringExtra(ApplicationConstants.STORE_UID));
-            addEditServiceFragment.setArguments(bundle);
+        if (servicesFragment == null) {
+            servicesFragment = ServicesFragment.newInstance();
 
             ActivityUtilities.addFragmentToActivity(getSupportFragmentManager(),
-                    addEditServiceFragment, R.id.contentFrame);
+                    servicesFragment, R.id.contentFrame);
         }
 
-        DaggerAddEditServiceComponent.builder()
+        DaggerServicesComponent.builder()
                 .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
-                .addEditServicePresenterModule(new AddEditServicePresenterModule(addEditServiceFragment))
+                .servicesPresenterModule(new ServicesPresenterModule(servicesFragment, storeId))
                 .build()
                 .inject(this);
     }

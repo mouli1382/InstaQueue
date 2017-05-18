@@ -20,6 +20,7 @@ import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.addeditstore.StoreDetailsFetcherActivity;
 import in.mobifirst.tagtree.addeditstore.AddEditStoreFragment;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
+import in.mobifirst.tagtree.services.ServicesFragment;
 import in.mobifirst.tagtree.sms.SmsReceiver;
 import in.mobifirst.tagtree.storage.FirebaseStorageManager;
 import in.mobifirst.tagtree.storage.StorageModule;
@@ -47,6 +48,8 @@ public interface ApplicationComponent {
     void inject(ServiceDetailsFetcherActivity serviceDetailsFetcherActivity);
 
     void inject(AddEditStoreFragment settingsFragment);
+
+    void inject(ServicesFragment servicesFragment);
 
     void inject(AddEditServiceFragment serviceFragment);
 

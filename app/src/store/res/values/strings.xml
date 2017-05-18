@@ -132,4 +132,10 @@
     <string name="date">Date</string>
     <string name="invalid_date">Please select the date</string>
 
+    <string name="my_service">My Services</string>
+    <string name="no_services_all">You have no Services</string>
+    <string name="no_Services_add">Add a Service +</string>
+    <string name="loading_services_error">Error while loading Services</string>
+    <string name="successfully_saved_service_message">Service added</string>
+
 </resources>

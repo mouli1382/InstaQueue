@@ -89,7 +89,7 @@ public class WelcomeActivity extends BaseActivity {
         if (mFirebaseAuth.getAuthInstance().getCurrentUser() != null) {
             Intent intent;
 //            if (mIQSharedPreferences.getBoolean(ApplicationConstants.FTU_COMPLETED_KEY)) {
-//                intent = new Intent(this, TokensActivity.class);
+//                intent = new Intent(this, ServicesActivity.class);
 //            } else {
             intent = new Intent(this, StoreDetailsFetcherActivity.class);
 //            }

@@ -73,7 +73,7 @@ public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.ViewHold
                 }
                 holder.mCardView.setBackgroundColor(Color.parseColor("#FFD600"));
                 holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
-//                holder.mTokenNumber.setTextColor(Color.GREEN);
+//                holder.name.setTextColor(Color.GREEN);
                 holder.mCardView.setVisibility(View.VISIBLE);
                 if (tokens.size() > lastActivatedTokenIndex + 1) {
                     holder.mNextInLineTextView.setVisibility(View.VISIBLE);

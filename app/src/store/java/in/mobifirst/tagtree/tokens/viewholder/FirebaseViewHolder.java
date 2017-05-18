@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 public class FirebaseViewHolder extends RecyclerView.ViewHolder {
-//    public TextView mTokenNumber;
+//    public TextView name;
 //    public TextView mStoreName;
 //    public ImageView mImageView;
 //    public TextView mDate;
@@ -14,7 +14,7 @@ public class FirebaseViewHolder extends RecyclerView.ViewHolder {
 
     public FirebaseViewHolder(View view) {
         super(view);
-//        mTokenNumber = (TextView) view.findViewById(R.id.tokenNumberText);
+//        name = (TextView) view.findViewById(R.id.tokenNumberText);
 //        mDate = (TextView) view.findViewById(R.id.tokenDate);
 //        mTime = (TextView) view.findViewById(R.id.tokenTime);
 //        mStoreName = (TextView) view.findViewById(R.id.tokenStoreName);
