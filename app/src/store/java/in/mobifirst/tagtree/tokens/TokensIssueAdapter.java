@@ -57,8 +57,8 @@ public class TokensIssueAdapter extends RecyclerView.Adapter<TokensIssueAdapter.
             holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
         }
         holder.mTokenNumber.setText(token.getTokenNumber() + "");
-        holder.mTime.setText(TimeUtils.getTime(token.getTimestamp()));
-        holder.mDate.setText(TimeUtils.getDate(token.getTimestamp()));
+        holder.mTime.setText(TimeUtils.getTime(token.getAppointmentTime()));
+        holder.mDate.setText(TimeUtils.getDate(token.getDate()));
     }
 
     @Override

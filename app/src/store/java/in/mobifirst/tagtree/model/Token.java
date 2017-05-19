@@ -28,8 +28,8 @@ public class Token implements Parcelable {
     private String userName;
     private String mappingId;
 
-    private String serviceId;
     private long date;
+    private String serviceId;
     private long appointmentTime;
 
     public enum Status {
@@ -202,6 +202,22 @@ public class Token implements Parcelable {
         this.mappingId = mappingId;
     }
 
+    public String getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(String serviceId) {
+        this.serviceId = serviceId;
+    }
+
+    public long getAppointmentTime() {
+        return appointmentTime;
+    }
+
+    public void setAppointmentTime(long appointmentTime) {
+        this.appointmentTime = appointmentTime;
+    }
+
     @Exclude
     public boolean isCompleted() {
         return status == Status.COMPLETED.ordinal();
@@ -236,6 +252,8 @@ public class Token implements Parcelable {
         result.put("tokenFinishTime", tokenFinishTime);
         result.put("mappingId", mappingId);
         result.put("date", date);
+        result.put("serviceId", serviceId);
+        result.put("appointmentTime", appointmentTime);
         return result;
     }
 
@@ -312,6 +330,8 @@ public class Token implements Parcelable {
         parcel.writeLong(tokenFinishTime);
         parcel.writeString(userName);
         parcel.writeLong(date);
+        parcel.writeString(serviceId);
+        parcel.writeLong(appointmentTime);
     }
 
     protected Token(Parcel in) {
@@ -330,6 +350,8 @@ public class Token implements Parcelable {
         tokenFinishTime = in.readLong();
         userName = in.readString();
         date = in.readLong();
+        serviceId = in.readString();
+        appointmentTime = in.readLong();
     }
 
     public static final Creator<Token> CREATOR = new Creator<Token>() {

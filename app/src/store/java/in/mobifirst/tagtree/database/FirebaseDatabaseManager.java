@@ -109,11 +109,13 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         Log.e(TAG, "onDataChange --> " + subscriber.toString());
                         if (!subscriber.isUnsubscribed()) {
                             if (dataSnapshot != null) {
-                                HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
+//                                HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
+//                                });
+                                List<Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<ArrayList<Token>>() {
                                 });
                                 if (tokens != null) {
 
-                                    Observable.just(new ArrayList<>(tokens.values()))
+                                    Observable.just(tokens)
                                             .flatMap(new Func1<List<Token>, Observable<Token>>() {
                                                 @Override
                                                 public Observable<Token> call(List<Token> tokens) {
@@ -1693,18 +1695,24 @@ public class FirebaseDatabaseManager implements DatabaseManager {
      *                   3. calculate number of slots to be created basing on working hrs and day.
      *                   4. generate that many token objects and the rest is history.
      */
-    public Task<Boolean> checkAndGenerateAppointments(String storeUid, String serviceUid, String date) {
+    public Task<Boolean> checkAndGenerateAppointments(final String storeUid, final String serviceUid, final String date) {
         final TaskCompletionSource<Boolean> taskCompletionSource = new TaskCompletionSource<>();
 
         acquireLock(storeUid, serviceUid, date)
-                .addOnSuccessListener(new OnSuccessListener<Long>() {
+                .continueWithTask(new Continuation<Long, Task<Void>>() {
                     @Override
-                    public void onSuccess(Long aLong) {
-                        if (aLong == 143) {
-                            taskCompletionSource.setException(new Exception("slots are created already."));
-                        } else if (aLong == 314) {
-                            taskCompletionSource.setResult(true);
+                    public Task<Void> then(@NonNull Task<Long> task) throws Exception {
+                        Long aLong = task.getResult();
+                        if (aLong == 314) {
+                            return generateSlots(storeUid, serviceUid, date);
                         }
+                        return null;
+                    }
+                })
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        taskCompletionSource.setResult(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -1800,17 +1808,22 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             List<Pair<Double, Double>> timeSlots = getTimings(slot.getTimeSlots());
 
             Calendar calendar = Calendar.getInstance();
+            Calendar calendar2 = Calendar.getInstance();
             Date dateObj = TimeUtils.getDate(date);
             Long dateTime = dateObj.getTime();
             calendar.setTime(dateObj);
+            calendar2.setTime(dateObj);
             int counter = 0;
             for (Pair<Double, Double> pair : timeSlots) {
-                for (double i = pair.first; i <= pair.second; i = i + duration) {
-                    calendar.set(Calendar.HOUR_OF_DAY, (int) i);
-                    calendar.set(Calendar.MINUTE, 0);
-                    calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.HOUR_OF_DAY, pair.first.intValue());
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
 
-                    calendar.add(Calendar.MINUTE, duration);
+                calendar2.set(Calendar.HOUR_OF_DAY, pair.second.intValue());
+                calendar2.set(Calendar.MINUTE, 0);
+                calendar2.set(Calendar.SECOND, 0);
+
+                for (; calendar.before(calendar2); calendar.add(Calendar.MINUTE, duration)) {
                     long timeOfAppointment = calendar.getTimeInMillis();
 
                     String key = mDatabaseReference
@@ -1818,8 +1831,9 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                             .child(TOKENS_CHILD)
                             .push().getKey();
 
-                    Token token = new Token(key, service.getStoreId(), service.getId(), ++counter, dateTime, timeOfAppointment);
+                    Token token = new Token(key, service.getStoreId(), service.getId(), Long.valueOf(counter), dateTime, timeOfAppointment);
                     genTokens.add(counter, token);
+                    ++counter;
                 }
             }
             return genTokens;
@@ -1834,33 +1848,44 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             String[] values;
             double min;
             double max;
-            if (!TextUtils.isEmpty(tokens[0])) {
-                values = tokens[0].split(":");
-                min = Double.valueOf(values[0]);
-                max = Double.valueOf(values[1]);
-                timeSlots.add(new Pair<>(min, max));
+            for (String token : tokens) {
+                if (!TextUtils.isEmpty(token)) {
+                    values = token.split(":");
+                    min = Double.valueOf(values[0]);
+                    max = Double.valueOf(values[1]);
+                    timeSlots.add(new Pair<>(min, max));
+                }
             }
-
-            if (!TextUtils.isEmpty(tokens[1])) {
-                values = tokens[1].split(":");
-                min = Double.valueOf(values[0]);
-                max = Double.valueOf(values[1]);
-                timeSlots.add(new Pair<>(min, max));
-            }
-
-            if (!TextUtils.isEmpty(tokens[2])) {
-                values = tokens[2].split(":");
-                min = Double.valueOf(values[0]);
-                max = Double.valueOf(values[1]);
-                timeSlots.add(new Pair<>(min, max));
-            }
-
-            if (!TextUtils.isEmpty(tokens[3])) {
-                values = tokens[3].split(":");
-                min = Double.valueOf(values[0]);
-                max = Double.valueOf(values[1]);
-                timeSlots.add(new Pair<>(min, max));
-            }
+//            String[] values;
+//            double min;
+//            double max;
+//            if (!TextUtils.isEmpty(tokens[0])) {
+//                values = tokens[0].split(":");
+//                min = Double.valueOf(values[0]);
+//                max = Double.valueOf(values[1]);
+//                timeSlots.add(new Pair<>(min, max));
+//            }
+//
+//            if (!TextUtils.isEmpty(tokens[1])) {
+//                values = tokens[1].split(":");
+//                min = Double.valueOf(values[0]);
+//                max = Double.valueOf(values[1]);
+//                timeSlots.add(new Pair<>(min, max));
+//            }
+//
+//            if (!TextUtils.isEmpty(tokens[2])) {
+//                values = tokens[2].split(":");
+//                min = Double.valueOf(values[0]);
+//                max = Double.valueOf(values[1]);
+//                timeSlots.add(new Pair<>(min, max));
+//            }
+//
+//            if (!TextUtils.isEmpty(tokens[3])) {
+//                values = tokens[3].split(":");
+//                min = Double.valueOf(values[0]);
+//                max = Double.valueOf(values[1]);
+//                timeSlots.add(new Pair<>(min, max));
+//            }
         }
         return timeSlots;
     }
@@ -1880,14 +1905,16 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         int dayMask = covertCalendarDayToDaysMask(dayOfWeek);
 
         if (daysOfOperation[dayMask]) {
-            return dayMask;
+            int daysMask = 0; //0111 1111 -> days mask.
+            daysMask |= 1 << dayMask;
+            return daysMask;
         }
         return -1;
     }
 
     private static int covertCalendarDayToDaysMask(int dayOfWeek) {
         //Calendar days start from SUNDAY = 1
-        return (dayOfWeek - 2 + 7) % 7;
+        return (dayOfWeek - 2) % 7;
     }
 
 }
