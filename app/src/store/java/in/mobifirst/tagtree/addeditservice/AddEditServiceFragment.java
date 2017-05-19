@@ -8,7 +8,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +40,7 @@ import in.mobifirst.tagtree.model.Service;
 import in.mobifirst.tagtree.model.Slot;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
-import in.mobifirst.tagtree.tokens.TokensActivity;
+import in.mobifirst.tagtree.services.ServicesActivity;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 
@@ -60,6 +64,11 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
     private LinearLayout mSeekbarLayout;
     private Button mUpdateButton;
     private Switch mSwitch;
+
+    private TextInputEditText mServiceNameEditText;
+    private TextInputEditText mServiceDescEditText;
+    private TextInputLayout mServiceNameTextInputLayout;
+    private TextInputLayout mServiceDescTextInputLayout;
 
     private int daysOfOperation = -1;
     private String storeUid;
@@ -138,7 +147,11 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
             public void onClick(View v) {
                 if (mNetworkConnectionUtils.isConnected()) {
                     if (validateInput()) {
-                        Service service = new Service(storeUid, "Chandra", "An Engineer", daysOfOperation, 5);
+                        Service service = new Service(storeUid
+                                , mServiceNameEditText.getText().toString()
+                                , mServiceDescEditText.getText().toString()
+                                , daysOfOperation
+                                , 5);
                         service.setSlots(mAdapter.getmItems());
                         mPresenter.addServiceDetails(service);
                     }
@@ -155,6 +168,54 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
 
         Bundle bundle = getArguments();
         storeUid = bundle.getString(ApplicationConstants.STORE_UID);
+
+        mServiceNameTextInputLayout = (TextInputLayout) root.findViewById(R.id.serviceNameInputLayout);
+        mServiceDescTextInputLayout = (TextInputLayout) root.findViewById(R.id.serviceDescInputLayout);
+
+        mServiceNameEditText = (TextInputEditText) root.findViewById(R.id.serviceName);
+        mServiceNameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (TextUtils.isEmpty(charSequence)) {
+                    mServiceNameTextInputLayout.setError(getString(R.string.empty_store_name));
+                    mServiceNameTextInputLayout.setErrorEnabled(true);
+                } else {
+                    mServiceNameTextInputLayout.setErrorEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        mServiceDescEditText = (TextInputEditText) root.findViewById(R.id.description);
+        mServiceDescEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (TextUtils.isEmpty(charSequence)) {
+                    mServiceDescTextInputLayout.setError(getString(R.string.empty_store_area));
+                    mServiceDescTextInputLayout.setErrorEnabled(true);
+                } else {
+                    mServiceDescTextInputLayout.setErrorEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
         timeSlots = new String[4];
         mDaysGroup = (LinearLayout) root.findViewById(R.id.weekGroup);
@@ -419,16 +480,14 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
     }
 
     @Override
-    public void showTokensList(Service service) {
-        //todo: Find a better way to avoid crash
+    public void showServicesList(Service service) {
         if (getActivity() == null)
             return;
 
         mIQSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
         mIQSharedPreferences.putString(ApplicationConstants.STORE_UID, mFirebaseAuth.getAuthInstance().getCurrentUser().getUid());
-//        store.persistStore(mIQSharedPreferences);
 
-        TokensActivity.start(getActivity());
+        ServicesActivity.start(getActivity(), mFirebaseAuth.getAuthInstance().getCurrentUser().getUid());
         getActivity().finish();
     }
 
@@ -456,6 +515,20 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
     private boolean validateInput() {
         boolean result = false;
 
+        CharSequence storeName = mServiceNameEditText.getText();
+        if (TextUtils.isEmpty(storeName)) {
+            mServiceNameTextInputLayout.setError(getString(R.string.empty_service_name));
+            mServiceNameTextInputLayout.setErrorEnabled(true);
+            return result;
+        }
+
+        CharSequence storeArea = mServiceDescEditText.getText();
+        if (TextUtils.isEmpty(storeArea)) {
+            mServiceDescTextInputLayout.setError(getString(R.string.empty_service_desc));
+            mServiceDescTextInputLayout.setErrorEnabled(true);
+            return result;
+        }
+
         if (daysOfOperation == -1) {
             showMessage(getView(), "Select working Days.");
             return result;
@@ -466,6 +539,10 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
             showMessage(getView(), "Select working Hours.");
             return result;
         }
+
+        mServiceNameTextInputLayout.setErrorEnabled(false);
+        mServiceDescTextInputLayout.setErrorEnabled(false);
+
         return true;
     }
 }

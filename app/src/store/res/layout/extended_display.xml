@@ -10,7 +10,7 @@
     android:paddingTop="@dimen/activity_vertical_margin">
 
     <TextView
-        android:id="@+id/storeName"
+        android:id="@+id/serviceName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -28,7 +28,7 @@
         android:layout_centerHorizontal="true"
         android:textColor="#B71C1C"
         android:textStyle="bold"
-        android:layout_below="@+id/storeName"
+        android:layout_below="@+id/serviceName"
         android:gravity="center"
         tools:text="@string/store_area_name" />
 

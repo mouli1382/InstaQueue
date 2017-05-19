@@ -1,5 +1,7 @@
 package in.mobifirst.tagtree.model;
 
+import android.text.TextUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -101,5 +103,10 @@ public class Service {
 
     public void setDuration(int duration) {
         this.duration = duration;
+    }
+
+    public boolean isEmpty() {
+        return TextUtils.isEmpty(name)
+                || TextUtils.isEmpty(description);
     }
 }

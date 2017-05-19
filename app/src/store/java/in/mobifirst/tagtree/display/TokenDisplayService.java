@@ -78,7 +78,7 @@ public class TokenDisplayService extends PresentationService implements
     protected View buildPresoView(Context context, LayoutInflater inflater) {
         mRootView = inflater.inflate(R.layout.extended_display, null);
 
-        TextView storeName = (TextView) mRootView.findViewById(R.id.storeName);
+        TextView storeName = (TextView) mRootView.findViewById(R.id.serviceName);
         storeName.setText(mIQSharedPreferences.getSting(ApplicationConstants.DISPLAY_NAME_KEY));
         TextView storeArea = (TextView) mRootView.findViewById(R.id.storeArea);
         storeArea.setText(mIQSharedPreferences.getSting(ApplicationConstants.AREA_NAME_KEY));

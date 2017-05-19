@@ -141,5 +141,9 @@
     <string name="fetching_store_details">Fetching Store</string>
     <string name="fetching_service_details">Fetching Services</string>
 
+    <string name="service_name">Service Name</string>
+    <string name="description">Purpose of service</string>
+    <string name="empty_service_name">Please enter Service name</string>
+    <string name="empty_service_desc">Please enter Service description</string>
 
 </resources>

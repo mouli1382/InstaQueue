@@ -1,6 +1,5 @@
 package in.mobifirst.tagtree.addeditservice;
 
-import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import javax.inject.Inject;
@@ -8,10 +7,10 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.model.Service;
-import in.mobifirst.tagtree.model.Store;
-import in.mobifirst.tagtree.storage.FirebaseStorageManager;
+import rx.Observer;
 import rx.Subscriber;
-import rx.subscriptions.CompositeSubscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class AddEditServicePresenter implements AddEditServiceContract.Presenter {
 
@@ -19,21 +18,14 @@ public class AddEditServicePresenter implements AddEditServiceContract.Presenter
     private final FirebaseDatabaseManager mFirebaseDatabaseManager;
 
     @NonNull
-    private final FirebaseStorageManager mFirebaseStorageManager;
-
-    @NonNull
     private final FirebaseAuthenticationManager mFirebaseAuthenticationManager;
 
     @NonNull
     private final AddEditServiceContract.View mSettingsView;
 
-    @NonNull
-    private CompositeSubscription mSubscriptions;
-
     @Inject
-    AddEditServicePresenter(FirebaseStorageManager firebaseStorageManager, FirebaseDatabaseManager firebaseDatabaseManager,
+    AddEditServicePresenter(FirebaseDatabaseManager firebaseDatabaseManager,
                             FirebaseAuthenticationManager firebaseAuthenticationManager, AddEditServiceContract.View settingsView) {
-        mFirebaseStorageManager = firebaseStorageManager;
         mFirebaseDatabaseManager = firebaseDatabaseManager;
         mFirebaseAuthenticationManager = firebaseAuthenticationManager;
         mSettingsView = settingsView;
@@ -51,27 +43,28 @@ public class AddEditServicePresenter implements AddEditServiceContract.Presenter
 
     @Override
     public void unsubscribe() {
-        if (mSubscriptions != null) {
-            mSubscriptions.clear();
-        }
+//        if (mSubscriptions != null) {
+//            mSubscriptions.clear();
+//        }
     }
 
     @Override
-    public void addServiceDetails(Service service) {
+    public void addServiceDetails(final Service service) {
         if (service.isEmpty()) {
             mSettingsView.showEmptyServiceError();
         } else {
-            mFirebaseDatabaseManager.addStore(mFirebaseAuthenticationManager
-                    .getAuthInstance().getCurrentUser().getUid(), store, new Subscriber<String>() {
+            service.setStoreId(mFirebaseAuthenticationManager
+                    .getAuthInstance().getCurrentUser().getUid());
+            mFirebaseDatabaseManager.addNewService(service, new Subscriber<String>() {
                 @Override
                 public void onCompleted() {
-                    mSettingsView.showTokensList(store);
+                    mSettingsView.showServicesList(service);
                 }
 
                 @Override
                 public void onError(Throwable e) {
                     if (mSettingsView.isActive()) {
-                        mSettingsView.showAddStoreFailedError();
+                        mSettingsView.showAddServiceFailedError();
                     }
                 }
 
@@ -84,9 +77,10 @@ public class AddEditServicePresenter implements AddEditServiceContract.Presenter
 
     @Override
     public void getServiceDetails() {
-        mFirebaseDatabaseManager.getStoreById(mFirebaseAuthenticationManager
-                        .getAuthInstance().getCurrentUser().getUid(),
-                new Subscriber<Store>() {
+        mFirebaseDatabaseManager.getServiceById(null)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Service>() {
                     @Override
                     public void onCompleted() {
                     }
@@ -94,14 +88,14 @@ public class AddEditServicePresenter implements AddEditServiceContract.Presenter
                     @Override
                     public void onError(Throwable e) {
                         if (mSettingsView.isActive()) {
-                            mSettingsView.showAddStoreFailedError();
+                            mSettingsView.showEmptyServiceError();
                         }
                     }
 
                     @Override
-                    public void onNext(Store result) {
-                        if (result != null) {
-                            mSettingsView.populateStore(result);
+                    public void onNext(Service service) {
+                        if (service != null) {
+                            mSettingsView.populateService(service);
                         }
                     }
                 });

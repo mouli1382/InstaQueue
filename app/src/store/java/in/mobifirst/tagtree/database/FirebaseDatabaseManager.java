@@ -1489,6 +1489,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         mDatabaseReference
                 .child("/")
                 .child(SERVICES_CHILD)
+                .child(service.getStoreId())
                 .push()
                 .setValue(service)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {

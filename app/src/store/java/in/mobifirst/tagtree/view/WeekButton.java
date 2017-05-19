@@ -27,7 +27,8 @@ public class WeekButton extends android.widget.ToggleButton {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int h = getMeasuredHeight();
-        int w = getMeasuredWidth();
+//        int w = getMeasuredWidth();
+        int w = mWidth;
         if (h > 0 && w > 0) {
             if (w < h) {
                 if (MeasureSpec.getMode(getMeasuredHeightAndState()) != MeasureSpec.EXACTLY) {

@@ -13,7 +13,7 @@ public interface AddEditServiceContract {
 
         void showAddServiceFailedError();
 
-        void showTokensList(Service service);
+        void showServicesList(Service service);
 
         boolean isActive();
 

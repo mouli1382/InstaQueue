@@ -44,7 +44,6 @@ import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
-import in.mobifirst.tagtree.tokens.TokensActivity;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 
@@ -168,11 +167,11 @@ public class AddEditStoreFragment extends BaseFragment implements AddEditStoreCo
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_store, container, false);
 
-        mStoreNameTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeNameInputLayout);
-        mStoreAreaTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeAreaInputLayout);
+        mStoreNameTextInputLayout = (TextInputLayout) root.findViewById(R.id.serviceNameInputLayout);
+        mStoreAreaTextInputLayout = (TextInputLayout) root.findViewById(R.id.serviceDescInputLayout);
         mStoreWebsiteTextInputLayout = (TextInputLayout) root.findViewById(R.id.storeWebsiteInputLayout);
 
-        mStoreNameEditText = (TextInputEditText) root.findViewById(R.id.storeName);
+        mStoreNameEditText = (TextInputEditText) root.findViewById(R.id.serviceName);
         mStoreNameEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -194,7 +193,7 @@ public class AddEditStoreFragment extends BaseFragment implements AddEditStoreCo
 
             }
         });
-        mStoreAreaEditText = (TextInputEditText) root.findViewById(R.id.areaName);
+        mStoreAreaEditText = (TextInputEditText) root.findViewById(R.id.description);
         mStoreAreaEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
