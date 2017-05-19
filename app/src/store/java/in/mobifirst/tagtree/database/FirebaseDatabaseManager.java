@@ -43,6 +43,7 @@ import javax.inject.Inject;
 
 import in.mobifirst.tagtree.BuildConfig;
 import in.mobifirst.tagtree.application.IQStoreApplication;
+import in.mobifirst.tagtree.model.Service;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.model.StoreCounter;
 import in.mobifirst.tagtree.model.Token;
@@ -59,6 +60,7 @@ import rx.functions.Func2;
 public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String TAG = "FirebaseDatabaseManager";
 
+    private static final String SERVICES_CHILD = "services/";
     private static final String TOKENS_CHILD = "tokens/";
     private static final String STORE_CHILD = "store/";
     private static final String COUNTERS_CHILD = "counters/";
@@ -1404,5 +1406,105 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         return burstSource.getTask();
     }
 
+
+    public Observable<List<Service>> getAllServices(final String uid) {
+        return rx.Observable.create(new Observable.OnSubscribe<List<Service>>() {
+            @Override
+            public void call(final Subscriber<? super List<Service>> subscriber) {
+                final Query query = mDatabaseReference
+                        .child(SERVICES_CHILD)
+                        .orderByChild("storeId")
+                        .equalTo(uid);
+
+                final ValueEventListener listener = query.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.e(TAG, "onDataChange --> " + subscriber.toString());
+                        if (!subscriber.isUnsubscribed()) {
+                            if (dataSnapshot != null) {
+                                HashMap<String, Service> services = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Service>>() {
+                                });
+                                if (services != null && services.size() > 0) {
+                                    Observable.just(new ArrayList<>(services.values()))
+                                            .subscribe(new Action1<List<Service>>() {
+                                                @Override
+                                                public void call(List<Service> tokenList) {
+                                                    subscriber.onNext(tokenList);
+                                                }
+                                            });
+                                } else {
+                                    FirebaseCrash.report(new Exception("Empty Tokens"));
+                                    subscriber.onNext(null);
+                                }
+                            } else {
+                                FirebaseCrash.report(new Exception("Empty Tokens"));
+                                subscriber.onNext(null);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e(TAG, "[fetch All Tokens] onCancelled:" + databaseError);
+                        subscriber.onError(new Exception("Empty Tokens."));
+                        FirebaseCrash.report(new Exception("Empty Tokens"));
+                    }
+                });
+            }
+        });
+    }
+
+    public void getServiceById(String serviceId, ValueEventListener valueEventListener) {
+        DatabaseReference serviceRef = mDatabaseReference
+                .child(SERVICES_CHILD)
+                .child(serviceId);
+        serviceRef.addListenerForSingleValueEvent(valueEventListener);
+    }
+
+    public Observable<Service> getServiceById(final String serviceId) {
+        return Observable.create(new Observable.OnSubscribe<Service>() {
+            @Override
+            public void call(final Subscriber<? super Service> subscriber) {
+                getServiceById(serviceId, new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Service service = dataSnapshot.getValue(Service.class);
+                        subscriber.onNext(service);
+                        subscriber.onCompleted();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e(TAG, "[fetch Token] onCancelled:" + databaseError);
+                        subscriber.onCompleted();
+                    }
+                });
+            }
+        });
+    }
+
+    public void addNewService(Service service, final Subscriber<? super String> subscriber) {
+        Log.e(TAG, "addNewService START ------");
+
+        mDatabaseReference
+                .child("/")
+                .child(SERVICES_CHILD)
+                .push()
+                .setValue(service)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        subscriber.onNext(null);
+                        Log.e(TAG, "addNewService SUCCESS ------");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        subscriber.onError(e);
+                        Log.e(TAG, "addNewService ERROR ------");
+                    }
+                });
+    }
 }
 

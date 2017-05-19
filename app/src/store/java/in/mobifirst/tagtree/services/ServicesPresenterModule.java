@@ -1,6 +1,6 @@
 package in.mobifirst.tagtree.services;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 
 import dagger.Module;
 import dagger.Provides;
@@ -12,18 +12,18 @@ public class ServicesPresenterModule {
 
     private String mStoreId;
 
-    public ServicesPresenterModule(ServicesContract.View view, @Nullable String storeId) {
+    public ServicesPresenterModule(ServicesContract.View view, @NonNull String storeId) {
         mView = view;
         mStoreId = storeId;
     }
 
     @Provides
-    ServicesContract.View provideTokensContractView() {
+    ServicesContract.View provideServicesContractView() {
         return mView;
     }
 
     @Provides
-    @Nullable
+    @NonNull
     String provideStoreId() {
         return mStoreId;
     }

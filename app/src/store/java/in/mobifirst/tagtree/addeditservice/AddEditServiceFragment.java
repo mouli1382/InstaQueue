@@ -151,7 +151,7 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_service, container, false);
+        View root = inflater.inflate(R.layout.fragment_addedit_service, container, false);
 
         Bundle bundle = getArguments();
         storeUid = bundle.getString(ApplicationConstants.STORE_UID);

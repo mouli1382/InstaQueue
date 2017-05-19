@@ -1,6 +1,7 @@
 package in.mobifirst.tagtree.application;
 
 import in.mobifirst.tagtree.application.DaggerApplicationComponent;
+import in.mobifirst.tagtree.data.service.ServicesRepositoryModule;
 import in.mobifirst.tagtree.database.DatabaseModule;
 import in.mobifirst.tagtree.authentication.AuthenticationModule;
 import in.mobifirst.tagtree.data.token.TokensRepositoryModule;
@@ -23,6 +24,7 @@ public class IQStoreApplication extends IQApplication {
                     .authenticationModule(new AuthenticationModule())
                     .applicationModule(new ApplicationModule(this))
                     .tokensRepositoryModule(new TokensRepositoryModule())
+                    .servicesRepositoryModule(new ServicesRepositoryModule())
                     .storageModule(new StorageModule())
                     .build();
         }

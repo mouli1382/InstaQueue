@@ -6,21 +6,26 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseActivity;
-import in.mobifirst.tagtree.activity.RequestPermissionsActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
-import in.mobifirst.tagtree.model.Store;
+import in.mobifirst.tagtree.model.Service;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
+import in.mobifirst.tagtree.services.ServicesActivity;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import in.mobifirst.tagtree.util.NetworkConnectionUtils;
-import rx.Subscriber;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class ServiceDetailsFetcherActivity extends BaseActivity {
 
@@ -37,6 +42,7 @@ public class ServiceDetailsFetcherActivity extends BaseActivity {
     protected NetworkConnectionUtils mNetworkConnectionUtils;
 
     private ProgressBar mProgressBar;
+    private TextView mTextView;
 
     public static void start(Context caller) {
         Intent intent = new Intent(caller, ServiceDetailsFetcherActivity.class);
@@ -47,18 +53,20 @@ public class ServiceDetailsFetcherActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_store_fetcher);
+        setContentView(R.layout.activity_fetcher);
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mProgressBar.setVisibility(View.VISIBLE);
 
+        mTextView = (TextView) findViewById(R.id.progress_text);
+        mTextView.setText(R.string.fetching_service_details);
+        mTextView.setVisibility(View.VISIBLE);
+
         ((IQStoreApplication) getApplication()).getApplicationComponent()
                 .inject(this);
 
-        Store.clearStore(mIQSharedPreferences);
-
         if (mNetworkConnectionUtils.isConnected()) {
-            fetchStore();
+            fetchServices();
         } else {
             showNetworkError(mProgressBar);
         }
@@ -71,7 +79,7 @@ public class ServiceDetailsFetcherActivity extends BaseActivity {
             if (!isConnected) {
                 showNetworkError(mProgressBar);
             } else {
-                fetchStore();
+                fetchServices();
             }
         }
     };
@@ -91,20 +99,22 @@ public class ServiceDetailsFetcherActivity extends BaseActivity {
         TTLocalBroadcastManager.unRegisterReceiver(ServiceDetailsFetcherActivity.this, mNetworkBroadcastReceiver);
     }
 
-    private void fetchStore() {
-        mFirebaseDatabaseManager.getStoreById(mAuthenticationManager
-                        .getAuthInstance().getCurrentUser().getUid(),
-                new Subscriber<Store>() {
+    private void fetchServices() {
+        mFirebaseDatabaseManager.getAllServices(mAuthenticationManager
+                .getAuthInstance().getCurrentUser().getUid())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Service>>() {
                     @Override
                     public void onCompleted() {
                         mProgressBar.setVisibility(View.GONE);
+                        mTextView.setVisibility(View.GONE);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         if (mProgressBar != null) {
                             mProgressBar.setVisibility(View.GONE);
-
 //                            Snackbar.make(mProgressBar, R.string.failed_fetch_store,
 //                                    Snackbar.LENGTH_INDEFINITE)
 //                                    .setAction(android.R.string.ok, new View.OnClickListener() {
@@ -113,23 +123,25 @@ public class ServiceDetailsFetcherActivity extends BaseActivity {
 //                                        }
 //                                    }).show();
                         }
+                        if (mTextView != null) {
+                            mTextView.setVisibility(View.GONE);
+                        }
                     }
 
                     @Override
-                    public void onNext(Store result) {
-                        persistStore(result);
+                    public void onNext(List<Service> services) {
+                        nextScreen(services);
                     }
                 });
     }
 
-    private void persistStore(Store store) {
-        if (store == null) {
-            AddEditServiceActivity.start(ServiceDetailsFetcherActivity.this);
+    private void nextScreen(List<Service> services) {
+        if (services == null) {
+            AddEditServiceActivity.start(ServiceDetailsFetcherActivity.this, mAuthenticationManager.getAuthInstance().getCurrentUser().getUid());
         } else {
-            store.persistStore(mIQSharedPreferences);
             mIQSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
             mIQSharedPreferences.putString(ApplicationConstants.STORE_UID, mAuthenticationManager.getAuthInstance().getCurrentUser().getUid());
-            RequestPermissionsActivity.start(ServiceDetailsFetcherActivity.this);
+            ServicesActivity.start(ServiceDetailsFetcherActivity.this, mAuthenticationManager.getAuthInstance().getCurrentUser().getUid());
         }
         finish();
     }

@@ -138,4 +138,8 @@
     <string name="loading_services_error">Error while loading Services</string>
     <string name="successfully_saved_service_message">Service added</string>
 
+    <string name="fetching_store_details">Fetching Store</string>
+    <string name="fetching_service_details">Fetching Services</string>
+
+
 </resources>

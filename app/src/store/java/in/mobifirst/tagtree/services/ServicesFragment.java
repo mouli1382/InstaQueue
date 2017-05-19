@@ -25,13 +25,13 @@ import java.util.List;
 import javax.inject.Inject;
 
 import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.activity.RequestPermissionsActivity;
 import in.mobifirst.tagtree.addeditservice.AddEditServiceActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Service;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
-import in.mobifirst.tagtree.tokens.TokensActivity;
 import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 import in.mobifirst.tagtree.view.ScrollChildSwipeRefreshLayout;
 
@@ -280,9 +280,7 @@ public class ServicesFragment extends BaseFragment implements ServicesContract.V
 
     @Override
     public void showTokensList() {
-        Intent intent = new Intent(getContext(), TokensActivity.class);
-//        intent.putExtra(TokenDetailActivity.EXTRA_Token_ID, TokenId);
-        startActivity(intent);
+        RequestPermissionsActivity.start(getActivity());
     }
 
     /**

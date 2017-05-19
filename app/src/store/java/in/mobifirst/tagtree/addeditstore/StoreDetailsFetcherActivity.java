@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import javax.inject.Inject;
 
@@ -37,6 +38,7 @@ public class StoreDetailsFetcherActivity extends BaseActivity {
     protected NetworkConnectionUtils mNetworkConnectionUtils;
 
     private ProgressBar mProgressBar;
+    private TextView mTextView;
 
     public static void start(Context caller) {
         Intent intent = new Intent(caller, StoreDetailsFetcherActivity.class);
@@ -47,10 +49,14 @@ public class StoreDetailsFetcherActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_store_fetcher);
+        setContentView(R.layout.activity_fetcher);
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mProgressBar.setVisibility(View.VISIBLE);
+
+        mTextView = (TextView) findViewById(R.id.progress_text);
+        mTextView.setText(R.string.fetching_store_details);
+        mTextView.setVisibility(View.VISIBLE);
 
         ((IQStoreApplication) getApplication()).getApplicationComponent()
                 .inject(this);
@@ -98,12 +104,14 @@ public class StoreDetailsFetcherActivity extends BaseActivity {
                     @Override
                     public void onCompleted() {
                         mProgressBar.setVisibility(View.GONE);
+                        mTextView.setVisibility(View.GONE);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         if (mProgressBar != null) {
                             mProgressBar.setVisibility(View.GONE);
+                            mTextView.setVisibility(View.GONE);
 
 //                            Snackbar.make(mProgressBar, R.string.failed_fetch_store,
 //                                    Snackbar.LENGTH_INDEFINITE)

@@ -13,6 +13,8 @@ import in.mobifirst.tagtree.authentication.AuthenticationModule;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.authentication.google.GoogleSignInActivity;
 import in.mobifirst.tagtree.config.ResetPreference;
+import in.mobifirst.tagtree.data.service.ServicesRepository;
+import in.mobifirst.tagtree.data.service.ServicesRepositoryModule;
 import in.mobifirst.tagtree.data.token.TokensRepository;
 import in.mobifirst.tagtree.data.token.TokensRepositoryModule;
 import in.mobifirst.tagtree.database.DatabaseModule;
@@ -29,6 +31,7 @@ import in.mobifirst.tagtree.tokens.TokensFragment;
 
 @Singleton
 @Component(modules = {
+        ServicesRepositoryModule.class,
         TokensRepositoryModule.class,
         ApplicationModule.class,
         AuthenticationModule.class,
@@ -64,6 +67,8 @@ public interface ApplicationComponent {
     void inject(SmsReceiver smsReceiver);
 
     void inject(ResetPreference resetPreference);
+
+    ServicesRepository getServicesRepository();
 
     TokensRepository getTokensRepository();
 
