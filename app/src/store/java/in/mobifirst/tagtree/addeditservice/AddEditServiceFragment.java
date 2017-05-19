@@ -1,5 +1,6 @@
 package in.mobifirst.tagtree.addeditservice;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -40,7 +41,6 @@ import in.mobifirst.tagtree.model.Service;
 import in.mobifirst.tagtree.model.Slot;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
-import in.mobifirst.tagtree.services.ServicesActivity;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 
@@ -67,6 +67,8 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
 
     private TextInputEditText mServiceNameEditText;
     private TextInputEditText mServiceDescEditText;
+    private TextInputEditText mCountersEditText;
+    private TextInputLayout mStoreCountersTextInputLayout;
     private TextInputLayout mServiceNameTextInputLayout;
     private TextInputLayout mServiceDescTextInputLayout;
 
@@ -151,7 +153,7 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
                                 , mServiceNameEditText.getText().toString()
                                 , mServiceDescEditText.getText().toString()
                                 , daysOfOperation
-                                , 5);
+                                , Integer.parseInt(mCountersEditText.getText().toString()));
                         service.setSlots(mAdapter.getmItems());
                         mPresenter.addServiceDetails(service);
                     }
@@ -171,6 +173,7 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
 
         mServiceNameTextInputLayout = (TextInputLayout) root.findViewById(R.id.serviceNameInputLayout);
         mServiceDescTextInputLayout = (TextInputLayout) root.findViewById(R.id.serviceDescInputLayout);
+        mStoreCountersTextInputLayout = (TextInputLayout) root.findViewById(R.id.serviceDurationInputLayout);
 
         mServiceNameEditText = (TextInputEditText) root.findViewById(R.id.serviceName);
         mServiceNameEditText.addTextChangedListener(new TextWatcher() {
@@ -208,6 +211,35 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
                     mServiceDescTextInputLayout.setErrorEnabled(true);
                 } else {
                     mServiceDescTextInputLayout.setErrorEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        mCountersEditText = (TextInputEditText) root.findViewById(R.id.duration);
+        mCountersEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (TextUtils.isEmpty(charSequence)) {
+                    mStoreCountersTextInputLayout.setError(getString(R.string.empty_store_counters));
+                    mStoreCountersTextInputLayout.setErrorEnabled(true);
+                } else {
+                    int counterValue = Integer.parseInt(charSequence.toString());
+                    if (counterValue > 0 && counterValue < 60) {
+                        mStoreCountersTextInputLayout.setErrorEnabled(false);
+                    } else {
+                        mStoreCountersTextInputLayout.setError(getString(R.string.invalid_duration));
+                        mStoreCountersTextInputLayout.setErrorEnabled(true);
+                    }
                 }
             }
 
@@ -487,8 +519,11 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
         mIQSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
         mIQSharedPreferences.putString(ApplicationConstants.STORE_UID, mFirebaseAuth.getAuthInstance().getCurrentUser().getUid());
 
-        ServicesActivity.start(getActivity(), mFirebaseAuth.getAuthInstance().getCurrentUser().getUid());
+        getActivity().setResult(Activity.RESULT_OK);
         getActivity().finish();
+
+//        ServicesActivity.start(getActivity(), mFirebaseAuth.getAuthInstance().getCurrentUser().getUid());
+//        getActivity().finish();
     }
 
     @Override
@@ -529,6 +564,20 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
             return result;
         }
 
+        CharSequence counters = mCountersEditText.getText();
+        if (TextUtils.isEmpty(counters)) {
+            mStoreCountersTextInputLayout.setError(getString(R.string.empty_store_counters));
+            mStoreCountersTextInputLayout.setErrorEnabled(true);
+            return result;
+        } else {
+            int counterValue = Integer.parseInt(counters.toString());
+            if (counterValue < 1 || counterValue > 60) {
+                mStoreCountersTextInputLayout.setError(getString(R.string.invalid_store_counters));
+                mStoreCountersTextInputLayout.setErrorEnabled(true);
+                return result;
+            }
+        }
+
         if (daysOfOperation == -1) {
             showMessage(getView(), "Select working Days.");
             return result;
@@ -542,6 +591,7 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
 
         mServiceNameTextInputLayout.setErrorEnabled(false);
         mServiceDescTextInputLayout.setErrorEnabled(false);
+        mStoreCountersTextInputLayout.setErrorEnabled(false);
 
         return true;
     }

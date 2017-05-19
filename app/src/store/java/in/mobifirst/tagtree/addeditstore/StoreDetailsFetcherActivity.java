@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.activity.BaseActivity;
 import in.mobifirst.tagtree.activity.RequestPermissionsActivity;
+import in.mobifirst.tagtree.addeditservice.ServiceDetailsFetcherActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
@@ -135,9 +136,9 @@ public class StoreDetailsFetcherActivity extends BaseActivity {
             AddEditStoreActivity.start(StoreDetailsFetcherActivity.this);
         } else {
             store.persistStore(mIQSharedPreferences);
-            mIQSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
+//            mIQSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
             mIQSharedPreferences.putString(ApplicationConstants.STORE_UID, mAuthenticationManager.getAuthInstance().getCurrentUser().getUid());
-            RequestPermissionsActivity.start(StoreDetailsFetcherActivity.this);
+            ServiceDetailsFetcherActivity.start(StoreDetailsFetcherActivity.this);
         }
         finish();
     }

@@ -145,5 +145,7 @@
     <string name="description">Purpose of service</string>
     <string name="empty_service_name">Please enter Service name</string>
     <string name="empty_service_desc">Please enter Service description</string>
+    <string name="duration">Avg Time taken per customer in MINUTES</string>
+    <string name="invalid_duration">Enter between 1 - 60</string>
 
 </resources>
