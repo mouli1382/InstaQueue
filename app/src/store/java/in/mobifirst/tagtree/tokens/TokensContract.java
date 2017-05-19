@@ -85,5 +85,7 @@ public interface TokensContract {
         void setCounter(int counter);
 
         int getCounter();
+
+        void createAppointmentSlots(String serviceUid);
     }
 }

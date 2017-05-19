@@ -2,6 +2,8 @@ package in.mobifirst.tagtree.data.token;
 
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.tasks.Task;
+
 import java.util.List;
 
 import in.mobifirst.tagtree.model.Token;
@@ -34,4 +36,6 @@ public interface TokensDataSource {
     void clearCompletedTokens();
 
     void refreshTokens();
+
+    Task<Boolean> createAppointmentSlots(String serviceUid, long date);
 }

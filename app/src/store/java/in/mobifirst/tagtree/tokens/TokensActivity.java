@@ -31,6 +31,7 @@ import in.mobifirst.tagtree.data.token.TokensRepository;
 import in.mobifirst.tagtree.display.TokenDisplayService;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.util.ActivityUtilities;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 import in.mobifirst.tagtree.util.TimeUtils;
 import rx.Subscriber;
 import rx.Subscription;
@@ -52,8 +53,9 @@ public class TokensActivity extends BaseDrawerActivity {
     private String mDateString;
     private long mDate;
 
-    public static void start(Context caller) {
+    public static void start(Context caller, String serviceUid) {
         Intent intent = new Intent(caller, TokensActivity.class);
+        intent.putExtra(ApplicationConstants.SERVICE_UID, serviceUid);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         caller.startActivity(intent);
     }
@@ -87,6 +89,7 @@ public class TokensActivity extends BaseDrawerActivity {
                         FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
                         frameLayout.removeAllViewsInLayout();
                         SnapFragment snapFragment = SnapFragment.newInstance();
+                        snapFragment.setArguments(getServiceBundle());
                         ActivityUtilities.replaceFragmentToActivity(
                                 getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
 
@@ -115,6 +118,7 @@ public class TokensActivity extends BaseDrawerActivity {
             FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
             frameLayout.removeAllViewsInLayout();
             SnapFragment snapFragment = SnapFragment.newInstance();
+            snapFragment.setArguments(getServiceBundle());
             ActivityUtilities.replaceFragmentToActivity(
                     getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
 
@@ -136,6 +140,14 @@ public class TokensActivity extends BaseDrawerActivity {
         mTokensRepository = ((IQStoreApplication) getApplication()).getApplicationComponent().getTokensRepository();
 
         startService(new Intent(this, TokenDisplayService.class));
+    }
+
+    private Bundle getServiceBundle() {
+        String serviceUid = getIntent().getStringExtra(ApplicationConstants.SERVICE_UID);
+        Bundle b = new Bundle();
+        b.putString(ApplicationConstants.SERVICE_UID, serviceUid);
+
+        return b;
     }
 
     public void showDatePickerDialog(final View v) {

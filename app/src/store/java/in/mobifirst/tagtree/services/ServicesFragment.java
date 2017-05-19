@@ -296,8 +296,8 @@ public class ServicesFragment extends BaseFragment implements ServicesContract.V
     }
 
     @Override
-    public void showTokensList() {
-        RequestPermissionsActivity.start(getActivity());
+    public void showTokensList(Service service) {
+        RequestPermissionsActivity.start(getActivity(), service.getId());
     }
 
     /**
@@ -306,7 +306,7 @@ public class ServicesFragment extends BaseFragment implements ServicesContract.V
     ServicesFragment.ServiceItemListener mItemListener = new ServicesFragment.ServiceItemListener() {
         @Override
         public void onServiceClick(Service service) {
-            showTokensList();
+            showTokensList(service);
         }
 
         @Override

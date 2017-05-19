@@ -28,17 +28,28 @@ public class Token implements Parcelable {
     private String userName;
     private String mappingId;
 
+    private String serviceId;
     private long date;
     private long appointmentTime;
 
     public enum Status {
-        ISSUED, READY, CANCELLED, COMPLETED
+        UNKNOWN, ISSUED, READY, CANCELLED, COMPLETED
     }
 
     ;
 
     public Token() {
         // Default constructor required for calls to DataSnapshot.getValue(Token.class)
+    }
+
+    public Token(String uId, String storeId, String serviceId, long tokenNumber, long date, long appointmentTime) {
+        this.uId = uId;
+        this.storeId = storeId;
+        this.serviceId = serviceId;
+        this.tokenNumber = tokenNumber;
+        this.status = Status.UNKNOWN.ordinal();
+        this.date = date;
+        this.appointmentTime = appointmentTime;
     }
 
     public Token(String uId, String storeId, String phoneNumber, long tokenNumber, String senderPic, String senderName, int counter, String areaName, String mappingId, long date) {

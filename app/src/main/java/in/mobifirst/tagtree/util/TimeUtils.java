@@ -1,5 +1,6 @@
 package in.mobifirst.tagtree.util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -40,5 +41,17 @@ public class TimeUtils {
 
         calendar.add(Calendar.MINUTE, timeDuration);
         return sfd.format(calendar.getTime());
+    }
+
+    public static Date getDate(String dateString) {
+        Date date;
+        SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            date = sfd.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            date = null;
+        }
+        return date;
     }
 }

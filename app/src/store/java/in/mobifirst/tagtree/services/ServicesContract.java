@@ -29,7 +29,7 @@ public interface ServicesContract {
 
         boolean isActive();
 
-        void showTokensList();
+        void showTokensList(Service service);
     }
 
     interface Presenter extends BasePresenter {

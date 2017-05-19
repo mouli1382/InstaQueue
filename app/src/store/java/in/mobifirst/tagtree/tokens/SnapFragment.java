@@ -36,6 +36,7 @@ import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 
 public class SnapFragment extends BaseFragment implements TokensContract.View {
@@ -134,6 +135,8 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         Button dateButton = (Button) getActivity().findViewById(R.id.dateTextView);
         dateButton.setVisibility(View.VISIBLE);
 
+
+        final String serviceUid = getArguments().getString(ApplicationConstants.SERVICE_UID);
         // Set up floating action button
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab);
@@ -142,7 +145,8 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.addNewToken();
+                //ToDo - TESTING CM
+                mPresenter.createAppointmentSlots(serviceUid);
             }
         });
         fab.setVisibility(View.VISIBLE);

@@ -2,6 +2,8 @@ package in.mobifirst.tagtree.data.token;
 
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.tasks.Task;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -80,5 +82,10 @@ public class TokensRepository implements TokensDataSource {
     @Override
     public void refreshTokens() {
 
+    }
+
+    @Override
+    public Task<Boolean> createAppointmentSlots(String serviceUid, long date) {
+        return mTokensDataSource.createAppointmentSlots(serviceUid, date);
     }
 }

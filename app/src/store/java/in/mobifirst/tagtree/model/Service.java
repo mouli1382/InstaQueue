@@ -85,11 +85,11 @@ public class Service {
     }
 
     @Exclude
-    public Map<String, Slot> getSlotsMap() {
-        Map<String, Slot> map = new HashMap<>();
+    public Map<Integer, Slot> getSlotsMap() {
+        Map<Integer, Slot> map = new HashMap<>();
         if (slots != null && slots.size() > 0) {
             for (Slot slot : slots)
-                map.put(slot.getDay() + ":" + slot.getDaysMask(), slot);
+                map.put(slot.getDaysMask(), slot);
         }
         return map;
     }

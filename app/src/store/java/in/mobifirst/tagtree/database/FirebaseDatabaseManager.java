@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -33,6 +34,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -44,6 +46,7 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.BuildConfig;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.model.Service;
+import in.mobifirst.tagtree.model.Slot;
 import in.mobifirst.tagtree.model.Store;
 import in.mobifirst.tagtree.model.StoreCounter;
 import in.mobifirst.tagtree.model.Token;
@@ -1597,5 +1600,295 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                     }
                 });
     }
+
+
+    private Task<Long> acquireLock(final String storeUid, final String serviceUid, final String date) {
+        final TaskCompletionSource<Service> fetchService = new TaskCompletionSource<>();
+
+        mDatabaseReference
+                .child(SERVICES_CHILD)
+                .child(storeUid)
+                .child(serviceUid)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            Service service = dataSnapshot.getValue(Service.class);
+                            if (service == null) {
+                                fetchService.setException(new Exception("service does not exist."));
+                            } else {
+                                fetchService.setResult(service);
+                            }
+                        } else {
+                            fetchService.setException(new Exception("service does not exist."));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        fetchService.setException(databaseError.toException());
+                    }
+                });
+
+        return fetchService.getTask()
+                .continueWithTask(new Continuation<Service, Task<Long>>() {
+                    @Override
+                    public Task<Long> then(@NonNull Task<Service> task) throws Exception {
+                        return incrementLock(storeUid, serviceUid, date);
+                    }
+                });
+    }
+
+    /**
+     * @param storeUid
+     * @param serviceUid
+     * @param date
+     * @return ToDo - need to revisit if it does not work.
+     * Using the transaction as the locking mechanism.
+     * Increment lock under store/service/date to 314. create slots only if it is 314.
+     */
+    private Task<Long> incrementLock(String storeUid, String serviceUid, String date) {
+        final TaskCompletionSource<Long> incrementLock = new TaskCompletionSource<>();
+        DatabaseReference creationLockRef = mDatabaseReference
+                .child("/")
+                .child(SERVICES_CHILD)
+                .child(storeUid)
+                .child(serviceUid)
+                .child(date)
+                .child("createLock");
+        creationLockRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Long currentValue = mutableData.getValue(Long.class);
+                if (currentValue == null) {
+                    mutableData.setValue(314);
+                } else {
+                    mutableData.setValue(143);
+                }
+
+                if (mutableData.equals(currentValue)) {
+                    return Transaction.abort();
+                } else {
+                    return Transaction.success(mutableData);
+                }
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                if (databaseError == null && b) {
+                    incrementLock.setResult(dataSnapshot.getValue(Long.class));
+                }
+            }
+        });
+        return incrementLock.getTask();
+    }
+
+    /**
+     * @param storeUid
+     * @param serviceUid
+     * @param date       Use transaction as the lock. check the int value and exit other concurrent users if the slots are created already.
+     *                   <p>
+     *                   1. fetch service details from db.
+     *                   2. validate date. one cannot edit their past.
+     *                   3. calculate number of slots to be created basing on working hrs and day.
+     *                   4. generate that many token objects and the rest is history.
+     */
+    public Task<Boolean> checkAndGenerateAppointments(String storeUid, String serviceUid, String date) {
+        final TaskCompletionSource<Boolean> taskCompletionSource = new TaskCompletionSource<>();
+
+        acquireLock(storeUid, serviceUid, date)
+                .addOnSuccessListener(new OnSuccessListener<Long>() {
+                    @Override
+                    public void onSuccess(Long aLong) {
+                        if (aLong == 143) {
+                            taskCompletionSource.setException(new Exception("slots are created already."));
+                        } else if (aLong == 314) {
+                            taskCompletionSource.setResult(true);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        taskCompletionSource.setException(new Exception("slots are created already."));
+                    }
+                });
+        return taskCompletionSource.getTask();
+    }
+
+    private Task<Void> generateSlots(String storeUid, String serviceUid, final String date) {
+        final TaskCompletionSource<Service> fetchService = new TaskCompletionSource<>();
+
+        mDatabaseReference
+                .child(SERVICES_CHILD)
+                .child(storeUid)
+                .child(serviceUid)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            Service service = dataSnapshot.getValue(Service.class);
+                            if (service == null) {
+                                fetchService.setException(new Exception("service does not exist."));
+                            } else {
+                                fetchService.setResult(service);
+                            }
+                        } else {
+                            fetchService.setException(new Exception("service does not exist."));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        fetchService.setException(databaseError.toException());
+                    }
+                });
+
+        return fetchService.getTask()
+                .continueWithTask(new Continuation<Service, Task<Void>>() {
+                    @Override
+                    public Task<Void> then(@NonNull Task<Service> task) throws Exception {
+                        Service service = task.getResult();
+
+                        List<Token> generatedTokenObjs = getNewTokenObjects(service, date);
+
+                        return mDatabaseReference
+                                .child("/")
+                                .child(TOKENS_CHILD)
+                                .setValue(generatedTokenObjs);
+                    }
+                });
+    }
+
+    private boolean validateService(Service service) {
+        boolean result = false;
+        int daysOfOpeation = service.getDaysOfOperation();
+        int duration = service.getDuration();
+        List<Slot> slots = service.getSlots();
+
+        if (daysOfOpeation == -1) {
+            return result;
+        }
+
+        if (duration < 1 || duration > 60) {
+            return result;
+        }
+
+        if (slots == null || slots.size() == 0) {
+            return result;
+        }
+        return true;
+    }
+
+    private List<Token> getNewTokenObjects(Service service, String date) {
+        if (service == null) {
+            return null;
+        }
+
+        int daysOfOpeation = service.getDaysOfOperation();
+        int duration = service.getDuration();
+
+        if (!validateService(service)) {
+            return null;
+        }
+
+        int dayMask = isTodayAWorkingDay(date, daysOfOpeation);
+        if (dayMask != -1) {
+            List<Token> genTokens = new ArrayList<>();
+            Map<Integer, Slot> map = service.getSlotsMap();
+            Slot slot = map.get(dayMask);
+            List<Pair<Double, Double>> timeSlots = getTimings(slot.getTimeSlots());
+
+            Calendar calendar = Calendar.getInstance();
+            Date dateObj = TimeUtils.getDate(date);
+            Long dateTime = dateObj.getTime();
+            calendar.setTime(dateObj);
+            int counter = 0;
+            for (Pair<Double, Double> pair : timeSlots) {
+                for (double i = pair.first; i <= pair.second; i = i + duration) {
+                    calendar.set(Calendar.HOUR_OF_DAY, (int) i);
+                    calendar.set(Calendar.MINUTE, 0);
+                    calendar.set(Calendar.SECOND, 0);
+
+                    calendar.add(Calendar.MINUTE, duration);
+                    long timeOfAppointment = calendar.getTimeInMillis();
+
+                    String key = mDatabaseReference
+                            .child("/")
+                            .child(TOKENS_CHILD)
+                            .push().getKey();
+
+                    Token token = new Token(key, service.getStoreId(), service.getId(), ++counter, dateTime, timeOfAppointment);
+                    genTokens.add(counter, token);
+                }
+            }
+            return genTokens;
+        }
+        return null;
+    }
+
+    private List<Pair<Double, Double>> getTimings(String dayHours) {
+        String[] tokens = dayHours.split(";");
+        List<Pair<Double, Double>> timeSlots = new ArrayList<>();
+        if (tokens != null && tokens.length > 0) {
+            String[] values;
+            double min;
+            double max;
+            if (!TextUtils.isEmpty(tokens[0])) {
+                values = tokens[0].split(":");
+                min = Double.valueOf(values[0]);
+                max = Double.valueOf(values[1]);
+                timeSlots.add(new Pair<>(min, max));
+            }
+
+            if (!TextUtils.isEmpty(tokens[1])) {
+                values = tokens[1].split(":");
+                min = Double.valueOf(values[0]);
+                max = Double.valueOf(values[1]);
+                timeSlots.add(new Pair<>(min, max));
+            }
+
+            if (!TextUtils.isEmpty(tokens[2])) {
+                values = tokens[2].split(":");
+                min = Double.valueOf(values[0]);
+                max = Double.valueOf(values[1]);
+                timeSlots.add(new Pair<>(min, max));
+            }
+
+            if (!TextUtils.isEmpty(tokens[3])) {
+                values = tokens[3].split(":");
+                min = Double.valueOf(values[0]);
+                max = Double.valueOf(values[1]);
+                timeSlots.add(new Pair<>(min, max));
+            }
+        }
+        return timeSlots;
+    }
+
+
+    private static int isTodayAWorkingDay(String dateString, int daysOfOperationMask) {
+        boolean[] daysOfOperation = new boolean[7];
+        for (int i = 0; i < 7; ++i) {
+            daysOfOperation[i] = ((daysOfOperationMask >> i & 1) != 0);
+        }
+
+        Date date = TimeUtils.getDate(dateString);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+
+        int dayMask = covertCalendarDayToDaysMask(dayOfWeek);
+
+        if (daysOfOperation[dayMask]) {
+            return dayMask;
+        }
+        return -1;
+    }
+
+    private static int covertCalendarDayToDaysMask(int dayOfWeek) {
+        //Calendar days start from SUNDAY = 1
+        return (dayOfWeek - 2 + 7) % 7;
+    }
+
 }
 

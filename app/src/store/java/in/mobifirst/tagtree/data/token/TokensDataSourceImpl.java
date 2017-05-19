@@ -2,6 +2,7 @@ package in.mobifirst.tagtree.data.token;
 
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.tokens.Snap;
+import in.mobifirst.tagtree.util.TimeUtils;
 import rx.Observable;
 import rx.Subscriber;
 
@@ -85,5 +87,10 @@ public class TokensDataSourceImpl implements TokensDataSource {
 
     @Override
     public void refreshTokens() {
+    }
+
+    @Override
+    public Task<Boolean> createAppointmentSlots(String serviceUid, long date) {
+        return mFirebaseDatabaseManager.checkAndGenerateAppointments(mFirebaseAuth.getCurrentUser().getUid(), serviceUid, TimeUtils.getDate(date));
     }
 }

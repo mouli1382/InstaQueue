@@ -6,6 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -372,4 +375,24 @@ final class TokensPresenter implements TokensContract.Presenter {
         return mCurrentCounter;
     }
 
+    @Override
+    public void createAppointmentSlots(String serviceUid) {
+        mTokensView.setLoadingIndicator(true);
+        mTokensRepository.createAppointmentSlots(serviceUid, mDate)
+                .addOnSuccessListener(new OnSuccessListener<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean aBoolean) {
+                        if (aBoolean) {
+                            mTokensView.setLoadingIndicator(false);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        mTokensView.setLoadingIndicator(false);
+                        mTokensView.showLoadingTokensError();
+                    }
+                });
+    }
 }
