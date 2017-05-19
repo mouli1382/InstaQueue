@@ -469,6 +469,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     public void getStoreById(String storeId, ValueEventListener valueEventListener) {
         DatabaseReference storeRef = mDatabaseReference
+                .child("/")
                 .child(STORE_CHILD)
                 .child(storeId);
         storeRef.addListenerForSingleValueEvent(valueEventListener);
@@ -496,6 +497,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     public void addStore(final String uid, final Store store, final Subscriber<? super String> subscriber) {
+        TaskCompletionSource<Boolean> completionSource = new TaskCompletionSource<>();
         mDatabaseReference
                 .child("store")
                 .child(uid)
@@ -534,7 +536,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                                                         mDatabaseReference
                                                                                                 .child("store")
                                                                                                 .child(uid)
-                                                                                                .child("numberOfCounters").setValue(store.getNumberOfCounters())
+                                                                                                .child("businessType").setValue(store.getBusinessType())
                                                                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                                                     @Override
                                                                                                     public void onSuccess(Void aVoid) {
@@ -1407,16 +1409,16 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
 
-    public Observable<List<Service>> getAllServices(final String uid) {
+    public Observable<List<Service>> getAllServices(final String storeUid) {
         return rx.Observable.create(new Observable.OnSubscribe<List<Service>>() {
             @Override
             public void call(final Subscriber<? super List<Service>> subscriber) {
                 final Query query = mDatabaseReference
+                        .child("/")
                         .child(SERVICES_CHILD)
-                        .orderByChild("storeId")
-                        .equalTo(uid);
+                        .child(storeUid);
 
-                final ValueEventListener listener = query.addValueEventListener(new ValueEventListener() {
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Log.e(TAG, "onDataChange --> " + subscriber.toString());
@@ -1425,13 +1427,14 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                 HashMap<String, Service> services = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Service>>() {
                                 });
                                 if (services != null && services.size() > 0) {
-                                    Observable.just(new ArrayList<>(services.values()))
-                                            .subscribe(new Action1<List<Service>>() {
-                                                @Override
-                                                public void call(List<Service> tokenList) {
-                                                    subscriber.onNext(tokenList);
-                                                }
-                                            });
+                                    subscriber.onNext(new ArrayList<>(services.values()));
+//                                    Observable.just(new ArrayList<>(services.values()))
+//                                            .subscribe(new Action1<List<Service>>() {
+//                                                @Override
+//                                                public void call(List<Service> tokenList) {
+//                                                    subscriber.onNext(tokenList);
+//                                                }
+//                                            });
                                 } else {
                                     FirebaseCrash.report(new Exception("Empty Tokens"));
                                     subscriber.onNext(null);
@@ -1454,18 +1457,19 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         });
     }
 
-    public void getServiceById(String serviceId, ValueEventListener valueEventListener) {
+    public void getServiceById(String storeUid, String serviceId, ValueEventListener valueEventListener) {
         DatabaseReference serviceRef = mDatabaseReference
                 .child(SERVICES_CHILD)
+                .child(storeUid)
                 .child(serviceId);
         serviceRef.addListenerForSingleValueEvent(valueEventListener);
     }
 
-    public Observable<Service> getServiceById(final String serviceId) {
+    public Observable<Service> getServiceById(final String storeUid, final String serviceId) {
         return Observable.create(new Observable.OnSubscribe<Service>() {
             @Override
             public void call(final Subscriber<? super Service> subscriber) {
-                getServiceById(serviceId, new ValueEventListener() {
+                getServiceById(storeUid, serviceId, new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Service service = dataSnapshot.getValue(Service.class);
@@ -1483,19 +1487,105 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         });
     }
 
-    public void addNewService(Service service, final Subscriber<? super String> subscriber) {
-        Log.e(TAG, "addNewService START ------");
+    private Task<Void> addServiceToStore(String storeId, final Service service) {
+        final TaskCompletionSource<Store> completionSource = new TaskCompletionSource();
+
+        getStoreById(storeId, new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Store store = dataSnapshot.getValue(Store.class);
+                    completionSource.setResult(store);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                completionSource.setException(databaseError.toException());
+            }
+        });
+
+        return completionSource.getTask()
+                .continueWithTask(new Continuation<Store, Task<Void>>() {
+                    @Override
+                    public Task<Void> then(@NonNull Task<Store> task) throws Exception {
+                        Store store = task.getResult();
+                        List<String> serviceList = store.getServices();
+                        if (serviceList == null) {
+                            serviceList = new ArrayList<>();
+                        }
+
+                        serviceList.add(service.getId());
+                        return mDatabaseReference
+                                .child("/")
+                                .child(STORE_CHILD)
+                                .child(service.getStoreId())
+                                .child(SERVICES_CHILD)
+                                .setValue(serviceList);
+                    }
+                });
+    }
+
+    public void editService(final Service service, final Subscriber<? super String> subscriber) {
+        Log.e(TAG, "editService START ------");
+
+        if (TextUtils.isEmpty(service.getId())) {
+            return;
+        }
 
         mDatabaseReference
                 .child("/")
                 .child(SERVICES_CHILD)
                 .child(service.getStoreId())
-                .push()
+                .child(service.getId())
                 .setValue(service)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         subscriber.onNext(null);
+                        subscriber.onCompleted();
+                        Log.e(TAG, "editService SUCCESS ------");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        subscriber.onError(e);
+                        Log.e(TAG, "editService ERROR ------");
+                    }
+                });
+    }
+
+
+    public void addNewService(final Service service, final Subscriber<? super String> subscriber) {
+        Log.e(TAG, "addNewService START ------");
+
+        if (TextUtils.isEmpty(service.getId())) {
+            String key = mDatabaseReference
+                    .child("/")
+                    .child(SERVICES_CHILD)
+                    .child(service.getStoreId())
+                    .push().getKey();
+            service.setId(key);
+        }
+
+        mDatabaseReference
+                .child("/")
+                .child(SERVICES_CHILD)
+                .child(service.getStoreId())
+                .child(service.getId())
+                .setValue(service)
+                .continueWithTask(new Continuation<Void, Task<Void>>() {
+                    @Override
+                    public Task<Void> then(@NonNull Task<Void> task) throws Exception {
+                        return addServiceToStore(service.getStoreId(), service);
+                    }
+                })
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        subscriber.onNext(null);
+                        subscriber.onCompleted();
                         Log.e(TAG, "addNewService SUCCESS ------");
                     }
                 })

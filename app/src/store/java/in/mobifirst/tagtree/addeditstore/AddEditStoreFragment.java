@@ -38,6 +38,7 @@ import javax.inject.Inject;
 
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.addeditservice.AddEditServiceActivity;
+import in.mobifirst.tagtree.addeditservice.ServiceDetailsFetcherActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
 import in.mobifirst.tagtree.fragment.BaseFragment;
@@ -389,11 +390,11 @@ public class AddEditStoreFragment extends BaseFragment implements AddEditStoreCo
         if (getActivity() == null)
             return;
 
-        mIQSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
+//        mIQSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
         mIQSharedPreferences.putString(ApplicationConstants.STORE_UID, mFirebaseAuth.getAuthInstance().getCurrentUser().getUid());
         store.persistStore(mIQSharedPreferences);
 
-        AddEditServiceActivity.start(getActivity(), store.getStoreId());
+        ServiceDetailsFetcherActivity.start(getActivity()/*, store.getStoreId()*/);
         getActivity().finish();
     }
 

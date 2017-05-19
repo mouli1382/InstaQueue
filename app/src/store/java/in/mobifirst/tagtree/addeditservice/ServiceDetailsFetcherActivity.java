@@ -136,13 +136,13 @@ public class ServiceDetailsFetcherActivity extends BaseActivity {
     }
 
     private void nextScreen(List<Service> services) {
-        if (services == null) {
-            AddEditServiceActivity.start(ServiceDetailsFetcherActivity.this, mAuthenticationManager.getAuthInstance().getCurrentUser().getUid());
-        } else {
+//        if (services == null) {
+//            AddEditServiceActivity.start(ServiceDetailsFetcherActivity.this, mAuthenticationManager.getAuthInstance().getCurrentUser().getUid());
+//        } else {
             mIQSharedPreferences.putBoolean(ApplicationConstants.FTU_COMPLETED_KEY, true);
             mIQSharedPreferences.putString(ApplicationConstants.STORE_UID, mAuthenticationManager.getAuthInstance().getCurrentUser().getUid());
             ServicesActivity.start(ServiceDetailsFetcherActivity.this, mAuthenticationManager.getAuthInstance().getCurrentUser().getUid());
-        }
+//        }
         finish();
     }
 }

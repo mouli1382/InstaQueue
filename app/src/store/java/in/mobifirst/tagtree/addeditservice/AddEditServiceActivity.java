@@ -24,10 +24,11 @@ public class AddEditServiceActivity extends BaseActivity {
 
     IQSharedPreferences mIQSharedPreferences;
 
-    public static void start(Context caller, String storeId) {
+    public static void start(Context caller, String storeId, String serviceId) {
         Intent intent = new Intent(caller, AddEditServiceActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtra(ApplicationConstants.STORE_UID, storeId);
+        intent.putExtra(ApplicationConstants.SERVICE_UID, serviceId);
         caller.startActivity(intent);
     }
 
@@ -44,7 +45,7 @@ public class AddEditServiceActivity extends BaseActivity {
         //ToDo inject it - avoid cyclic dependency.
         mIQSharedPreferences = ((IQStoreApplication) getApplicationContext()).getApplicationComponent().getIQSharedPreferences();
         if (mIQSharedPreferences.getBoolean(ApplicationConstants.FTU_COMPLETED_KEY)) {
-            actionBar.setTitle(R.string.my_account);
+            actionBar.setTitle(R.string.my_service);
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         } else {
@@ -54,6 +55,7 @@ public class AddEditServiceActivity extends BaseActivity {
         AddEditServiceFragment addEditServiceFragment =
                 (AddEditServiceFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
 
+        String serviceId = getIntent().getStringExtra(ApplicationConstants.SERVICE_UID);
         if (addEditServiceFragment == null) {
             addEditServiceFragment = AddEditServiceFragment.newInstance();
 
@@ -67,7 +69,7 @@ public class AddEditServiceActivity extends BaseActivity {
 
         DaggerAddEditServiceComponent.builder()
                 .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
-                .addEditServicePresenterModule(new AddEditServicePresenterModule(addEditServiceFragment))
+                .addEditServicePresenterModule(new AddEditServicePresenterModule(addEditServiceFragment, serviceId))
                 .build()
                 .inject(this);
     }

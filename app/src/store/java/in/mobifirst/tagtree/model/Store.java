@@ -18,7 +18,6 @@ public class Store {
     private String area;
     private String website;
     private String logoUrl;
-    private int numberOfCounters;
     private long credits;
     private long tokenCounter;
     private long globaltokenCounter;
@@ -33,7 +32,6 @@ public class Store {
         this.area = area;
         this.website = website;
         this.logoUrl = logoUrl;
-        this.numberOfCounters = numberOfCounters;
         this.businessType = businessType;
         this.services = services;
     }
@@ -107,14 +105,6 @@ public class Store {
         this.area = area;
     }
 
-    public int getNumberOfCounters() {
-        return numberOfCounters;
-    }
-
-    public void setNumberOfCounters(int numberOfCounters) {
-        this.numberOfCounters = numberOfCounters;
-    }
-
     public String getBusinessType() {
         return businessType;
     }
@@ -149,7 +139,6 @@ public class Store {
         sharedPreferences.putString(ApplicationConstants.AREA_NAME_KEY, area);
         sharedPreferences.putString(ApplicationConstants.WEBSITE_KEY, website);
         sharedPreferences.putString(ApplicationConstants.WEBSITE_LOGO_URL_KEY, logoUrl);
-        sharedPreferences.putInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY, numberOfCounters);
 //        sharedPreferences.putLong(ApplicationConstants.CREDITS_KEY, credits);
     }
 
@@ -159,7 +148,6 @@ public class Store {
         sharedPreferences.remove(ApplicationConstants.AREA_NAME_KEY);
         sharedPreferences.remove(ApplicationConstants.WEBSITE_KEY);
         sharedPreferences.remove(ApplicationConstants.WEBSITE_LOGO_URL_KEY);
-        sharedPreferences.remove(ApplicationConstants.NUMBER_OF_COUNTERS_KEY);
 //        sharedPreferences.putLong(ApplicationConstants.CREDITS_KEY, credits);
     }
 }

@@ -2,7 +2,8 @@ package in.mobifirst.tagtree.model;
 
 import android.text.TextUtils;
 
-import java.util.ArrayList;
+import com.google.firebase.database.Exclude;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,12 +17,15 @@ public class Service {
     private int daysOfOperation;
 
     // key = day:dayMask ; value = slot object
-    private Map<String, Slot> slots;
+    private List<Slot> slots;
     private int duration; //time per serve in minutes.
 
     //ToDo - move previous day's metrics to history to improve performance.
     // Holds date wise operational metrics.
     private Map<String, ServiceDateWiseData> dateWise;
+
+    public Service() {
+    }
 
     public Service(String storeId, String name, String description, int daysOfOperation, int duration) {
         this.storeId = storeId;
@@ -31,12 +35,11 @@ public class Service {
         this.duration = duration;
     }
 
-    public Service(String id, String storeId, String name, String description, int daysOfOperation, Map<String, Slot> slots, int duration) {
+    public Service(String id, String storeId, String name, String description, List<Slot> slots, int duration) {
         this.id = id;
         this.storeId = storeId;
         this.name = name;
         this.description = description;
-        this.daysOfOperation = daysOfOperation;
         this.slots = slots;
         this.duration = duration;
     }
@@ -81,20 +84,22 @@ public class Service {
         this.daysOfOperation = daysOfOperation;
     }
 
-    public List<Slot> getSlots() {
-        if (slots != null && slots.size() > 0) {
-            return new ArrayList<>(slots.values());
-        }
-        return new ArrayList<>();
-    }
-
-    public void setSlots(List<Slot> slots) {
+    @Exclude
+    public Map<String, Slot> getSlotsMap() {
         Map<String, Slot> map = new HashMap<>();
         if (slots != null && slots.size() > 0) {
             for (Slot slot : slots)
                 map.put(slot.getDay() + ":" + slot.getDaysMask(), slot);
         }
-        this.slots = map;
+        return map;
+    }
+
+    public List<Slot> getSlots() {
+        return slots;
+    }
+
+    public void setSlots(List<Slot> slots) {
+        this.slots = slots;
     }
 
     public int getDuration() {
@@ -105,6 +110,7 @@ public class Service {
         this.duration = duration;
     }
 
+    @Exclude
     public boolean isEmpty() {
         return TextUtils.isEmpty(name)
                 || TextUtils.isEmpty(description);

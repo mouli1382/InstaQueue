@@ -29,7 +29,7 @@ public class ServicesDataSourceImpl implements ServicesDataSource {
 
     @Override
     public Observable<Service> getService(@NonNull String serviceId) {
-        return mFirebaseDatabaseManager.getServiceById(serviceId);
+        return mFirebaseDatabaseManager.getServiceById(mFirebaseAuth.getCurrentUser().getUid(), serviceId);
     }
 
     @Override

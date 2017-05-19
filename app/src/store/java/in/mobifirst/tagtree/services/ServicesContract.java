@@ -19,6 +19,8 @@ public interface ServicesContract {
 
         void showAddService();
 
+        void editService(String storeUid, String serviceUid);
+
         void showLoadingServicesError();
 
         void showNoServices();

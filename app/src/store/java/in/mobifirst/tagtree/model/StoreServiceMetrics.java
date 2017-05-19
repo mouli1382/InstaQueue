@@ -12,6 +12,9 @@ public class StoreServiceMetrics {
     private List<String> cancelledAppointments;
     private List<String> noShowAppointments;
 
+    public StoreServiceMetrics() {
+    }
+
     public StoreServiceMetrics(long avgTurnAroundTime, long avgWaitTime, long avgBurstTime, List<String> servedAppointments, List<String> cancelledAppointments, List<String> noShowAppointments) {
         this.avgTurnAroundTime = avgTurnAroundTime;
         this.avgWaitTime = avgWaitTime;

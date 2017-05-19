@@ -29,6 +29,19 @@
                 android:value=".tokens.TokensActivity" />
         </activity>
         <activity
+            android:name=".services.ServicesActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".addeditservice.AddEditServiceActivity"
+            android:parentActivityName=".services.ServicesActivity"
+            android:screenOrientation="portrait" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".services.ServicesActivity" />
+        </activity>
+        <activity
             android:name=".addeditstore.AddEditStoreActivity"
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait" />
@@ -44,8 +57,13 @@
         <activity
             android:name="com.razorpay.CheckoutActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
+
         <activity android:name=".addeditstore.StoreDetailsFetcherActivity"
             android:screenOrientation="portrait" />
+
+        <activity android:name=".addeditservice.ServiceDetailsFetcherActivity"
+            android:screenOrientation="portrait" />
+
         <activity android:name=".activity.RazorPayActivity"
             android:screenOrientation="portrait" />
         <!-- Add your API key here -->

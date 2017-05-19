@@ -13,6 +13,10 @@ import java.util.Map;
 public class Statistics {
     private Map<String, StoreServiceMetrics> dateWiseStats;
 
+    public Statistics() {
+
+    }
+
     public Statistics(Map<String, StoreServiceMetrics> dateWiseStats) {
         this.dateWiseStats = dateWiseStats;
     }

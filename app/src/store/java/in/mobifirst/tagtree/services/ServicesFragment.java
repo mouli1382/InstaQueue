@@ -10,6 +10,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -32,6 +33,7 @@ import in.mobifirst.tagtree.fragment.BaseFragment;
 import in.mobifirst.tagtree.model.Service;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
+import in.mobifirst.tagtree.util.ApplicationConstants;
 import in.mobifirst.tagtree.util.NetworkConnectionUtils;
 import in.mobifirst.tagtree.view.ScrollChildSwipeRefreshLayout;
 
@@ -127,7 +129,13 @@ public class ServicesFragment extends BaseFragment implements ServicesContract.V
         // Set up floating action button
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab);
-        fab.setVisibility(View.GONE);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresenter.addNewService();
+            }
+        });
+        fab.setVisibility(View.VISIBLE);
     }
 
     @Nullable
@@ -140,6 +148,7 @@ public class ServicesFragment extends BaseFragment implements ServicesContract.V
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setHasFixedSize(true);
+        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(mServicesAdapter);
 
         mServicesView = (LinearLayout) root.findViewById(R.id.servicesLL);
@@ -241,6 +250,14 @@ public class ServicesFragment extends BaseFragment implements ServicesContract.V
     }
 
     @Override
+    public void editService(String storeUid, String serviceUid) {
+        Intent intent = new Intent(getContext(), AddEditServiceActivity.class);
+        intent.putExtra(ApplicationConstants.STORE_UID, storeUid);
+        intent.putExtra(ApplicationConstants.SERVICE_UID, serviceUid);
+        startActivityForResult(intent, AddEditServiceActivity.REQUEST_ADD_SERVICE);
+    }
+
+    @Override
     public void showLoadingServicesError() {
         showMessage(getString(R.string.loading_services_error));
     }
@@ -291,9 +308,16 @@ public class ServicesFragment extends BaseFragment implements ServicesContract.V
         public void onServiceClick(Service service) {
             showTokensList();
         }
+
+        @Override
+        public void onServiceLongClick(Service service) {
+            mPresenter.openServiceDetails(service);
+        }
     };
 
     public interface ServiceItemListener {
         void onServiceClick(Service service);
+
+        void onServiceLongClick(Service service);
     }
 }

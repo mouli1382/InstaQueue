@@ -13,6 +13,8 @@ public interface AddEditServiceContract {
 
         void showAddServiceFailedError();
 
+        void showEditServiceFailedError();
+
         void showServicesList(Service service);
 
         boolean isActive();
@@ -22,6 +24,8 @@ public interface AddEditServiceContract {
 
     interface Presenter extends BasePresenter {
         void addServiceDetails(Service service);
+
+        void editServiceDetails(Service service);
 
         void getServiceDetails();
     }

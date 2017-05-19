@@ -77,6 +77,7 @@ final class ServicesPresenter implements ServicesContract.Presenter {
 
     @Override
     public void openServiceDetails(@NonNull Service service) {
+        mServicesView.editService(mStoreId, service.getId());
     }
 
     private void loadServices(final boolean showLoadingUI) {

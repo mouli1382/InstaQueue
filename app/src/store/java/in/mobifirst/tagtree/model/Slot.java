@@ -6,6 +6,9 @@ public class Slot {
     private int daysMask;
     private String timeSlots;
 
+    public Slot() {
+    }
+
     public Slot(String day, int daysMask, String timeSlots) {
         this.day = day;
         this.daysMask = daysMask;

@@ -67,13 +67,14 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
 
     private TextInputEditText mServiceNameEditText;
     private TextInputEditText mServiceDescEditText;
-    private TextInputEditText mCountersEditText;
-    private TextInputLayout mStoreCountersTextInputLayout;
+    private TextInputEditText mDurationEditText;
+    private TextInputLayout mServiceDurationTextInputLayout;
     private TextInputLayout mServiceNameTextInputLayout;
     private TextInputLayout mServiceDescTextInputLayout;
 
     private int daysOfOperation = -1;
     private String storeUid;
+    private String serviceUid;
     private String[] timeSlots;
 
     @Inject
@@ -153,9 +154,14 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
                                 , mServiceNameEditText.getText().toString()
                                 , mServiceDescEditText.getText().toString()
                                 , daysOfOperation
-                                , Integer.parseInt(mCountersEditText.getText().toString()));
+                                , Integer.parseInt(mDurationEditText.getText().toString()));
                         service.setSlots(mAdapter.getmItems());
-                        mPresenter.addServiceDetails(service);
+                        if (!TextUtils.isEmpty(serviceUid)) {
+                            service.setId(serviceUid);
+                            mPresenter.editServiceDetails(service);
+                        } else {
+                            mPresenter.addServiceDetails(service);
+                        }
                     }
                 }
             }
@@ -173,7 +179,7 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
 
         mServiceNameTextInputLayout = (TextInputLayout) root.findViewById(R.id.serviceNameInputLayout);
         mServiceDescTextInputLayout = (TextInputLayout) root.findViewById(R.id.serviceDescInputLayout);
-        mStoreCountersTextInputLayout = (TextInputLayout) root.findViewById(R.id.serviceDurationInputLayout);
+        mServiceDurationTextInputLayout = (TextInputLayout) root.findViewById(R.id.serviceDurationInputLayout);
 
         mServiceNameEditText = (TextInputEditText) root.findViewById(R.id.serviceName);
         mServiceNameEditText.addTextChangedListener(new TextWatcher() {
@@ -220,8 +226,8 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
             }
         });
 
-        mCountersEditText = (TextInputEditText) root.findViewById(R.id.duration);
-        mCountersEditText.addTextChangedListener(new TextWatcher() {
+        mDurationEditText = (TextInputEditText) root.findViewById(R.id.duration);
+        mDurationEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -230,15 +236,15 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if (TextUtils.isEmpty(charSequence)) {
-                    mStoreCountersTextInputLayout.setError(getString(R.string.empty_store_counters));
-                    mStoreCountersTextInputLayout.setErrorEnabled(true);
+                    mServiceDurationTextInputLayout.setError(getString(R.string.empty_store_counters));
+                    mServiceDurationTextInputLayout.setErrorEnabled(true);
                 } else {
                     int counterValue = Integer.parseInt(charSequence.toString());
                     if (counterValue > 0 && counterValue < 60) {
-                        mStoreCountersTextInputLayout.setErrorEnabled(false);
+                        mServiceDurationTextInputLayout.setErrorEnabled(false);
                     } else {
-                        mStoreCountersTextInputLayout.setError(getString(R.string.invalid_duration));
-                        mStoreCountersTextInputLayout.setErrorEnabled(true);
+                        mServiceDurationTextInputLayout.setError(getString(R.string.invalid_duration));
+                        mServiceDurationTextInputLayout.setErrorEnabled(true);
                     }
                 }
             }
@@ -303,6 +309,7 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
                         daysMask |= 1 << i;
                     }
                 }
+                daysOfOperation = daysMask;
                 loadSpinner(daysMask);
             }
         });
@@ -503,12 +510,17 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
 
     @Override
     public void showEmptyServiceError() {
-        Snackbar.make(getView(), getString(R.string.empty_store_details), Snackbar.LENGTH_LONG).show();
+        Snackbar.make(getView(), getString(R.string.empty_service_details), Snackbar.LENGTH_LONG).show();
     }
 
     @Override
     public void showAddServiceFailedError() {
-        Snackbar.make(getView(), getString(R.string.add_store_failed), Snackbar.LENGTH_LONG).show();
+        Snackbar.make(getView(), getString(R.string.add_service_failed), Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showEditServiceFailedError() {
+        Snackbar.make(getView(), getString(R.string.edit_service_failed), Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -521,9 +533,6 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
 
         getActivity().setResult(Activity.RESULT_OK);
         getActivity().finish();
-
-//        ServicesActivity.start(getActivity(), mFirebaseAuth.getAuthInstance().getCurrentUser().getUid());
-//        getActivity().finish();
     }
 
     @Override
@@ -534,6 +543,11 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
     @Override
     public void populateService(Service service) {
         if (isAdded() && service != null) {
+            serviceUid = service.getId();
+
+            mServiceNameEditText.setText(service.getName());
+            mServiceDescEditText.setText(service.getDescription());
+            mDurationEditText.setText(service.getDuration() + "");
 
             daysOfOperation = service.getDaysOfOperation();
             if (-1 != daysOfOperation) {
@@ -564,16 +578,16 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
             return result;
         }
 
-        CharSequence counters = mCountersEditText.getText();
+        CharSequence counters = mDurationEditText.getText();
         if (TextUtils.isEmpty(counters)) {
-            mStoreCountersTextInputLayout.setError(getString(R.string.empty_store_counters));
-            mStoreCountersTextInputLayout.setErrorEnabled(true);
+            mServiceDurationTextInputLayout.setError(getString(R.string.empty_store_counters));
+            mServiceDurationTextInputLayout.setErrorEnabled(true);
             return result;
         } else {
             int counterValue = Integer.parseInt(counters.toString());
             if (counterValue < 1 || counterValue > 60) {
-                mStoreCountersTextInputLayout.setError(getString(R.string.invalid_store_counters));
-                mStoreCountersTextInputLayout.setErrorEnabled(true);
+                mServiceDurationTextInputLayout.setError(getString(R.string.invalid_duration));
+                mServiceDurationTextInputLayout.setErrorEnabled(true);
                 return result;
             }
         }
@@ -591,7 +605,7 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
 
         mServiceNameTextInputLayout.setErrorEnabled(false);
         mServiceDescTextInputLayout.setErrorEnabled(false);
-        mStoreCountersTextInputLayout.setErrorEnabled(false);
+        mServiceDurationTextInputLayout.setErrorEnabled(false);
 
         return true;
     }

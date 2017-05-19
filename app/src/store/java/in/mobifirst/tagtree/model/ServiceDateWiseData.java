@@ -20,6 +20,9 @@ public class ServiceDateWiseData {
     private long avgBurstTime;
     private Map<String, Long> tokens;
 
+    public ServiceDateWiseData() {
+    }
+
     public long getAvgWaitTime() {
         return avgWaitTime;
     }
