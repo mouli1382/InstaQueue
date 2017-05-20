@@ -32,6 +32,8 @@ public class Token implements Parcelable {
     private String serviceId;
     private long appointmentTime;
 
+    private String timeRange; //Maintaining 1Hr range for a smoother display.
+
     public enum Status {
         UNKNOWN, ISSUED, READY, CANCELLED, COMPLETED
     }
@@ -42,7 +44,7 @@ public class Token implements Parcelable {
         // Default constructor required for calls to DataSnapshot.getValue(Token.class)
     }
 
-    public Token(String uId, String storeId, String serviceId, long tokenNumber, long date, long appointmentTime) {
+    public Token(String uId, String storeId, String serviceId, long tokenNumber, long date, long appointmentTime, String timeRange) {
         this.uId = uId;
         this.storeId = storeId;
         this.serviceId = serviceId;
@@ -50,6 +52,7 @@ public class Token implements Parcelable {
         this.status = Status.UNKNOWN.ordinal();
         this.date = date;
         this.appointmentTime = appointmentTime;
+        this.timeRange = timeRange;
     }
 
     public Token(String uId, String storeId, String phoneNumber, long tokenNumber, String senderPic, String senderName, int counter, String areaName, String mappingId, long date) {
@@ -218,6 +221,14 @@ public class Token implements Parcelable {
         this.appointmentTime = appointmentTime;
     }
 
+    public String getTimeRange() {
+        return timeRange;
+    }
+
+    public void setTimeRange(String timeRange) {
+        this.timeRange = timeRange;
+    }
+
     @Exclude
     public boolean isCompleted() {
         return status == Status.COMPLETED.ordinal();
@@ -254,6 +265,7 @@ public class Token implements Parcelable {
         result.put("date", date);
         result.put("serviceId", serviceId);
         result.put("appointmentTime", appointmentTime);
+        result.put("timeRange", timeRange);
         return result;
     }
 
@@ -332,6 +344,7 @@ public class Token implements Parcelable {
         parcel.writeLong(date);
         parcel.writeString(serviceId);
         parcel.writeLong(appointmentTime);
+        parcel.writeString(timeRange);
     }
 
     protected Token(Parcel in) {
@@ -352,6 +365,7 @@ public class Token implements Parcelable {
         date = in.readLong();
         serviceId = in.readString();
         appointmentTime = in.readLong();
+        timeRange = in.readString();
     }
 
     public static final Creator<Token> CREATOR = new Creator<Token>() {

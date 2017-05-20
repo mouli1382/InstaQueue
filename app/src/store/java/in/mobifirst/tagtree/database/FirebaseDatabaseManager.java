@@ -34,6 +34,8 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -155,22 +157,29 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                     return !token.isCompleted();
                                                 }
                                             })
-                                            .toMultimap(new Func1<Token, Integer>() {
+                                            .toMultimap(new Func1<Token, String>() {
                                                 @Override
-                                                public Integer call(Token token) {
-                                                    return token.getCounter();
+                                                public String call(Token token) {
+                                                    return token.getTimeRange();
                                                 }
                                             })
-                                            .map(new Func1<Map<Integer, Collection<Token>>, List<Snap>>() {
+                                            .map(new Func1<Map<String, Collection<Token>>, List<Snap>>() {
                                                 @Override
-                                                public List<Snap> call(Map<Integer, Collection<Token>> integerCollectionMap) {
-                                                    TreeMap<Integer, Collection<Token>> sortedMap = new TreeMap<>();
-                                                    sortedMap.putAll(integerCollectionMap);
+                                                public List<Snap> call(Map<String, Collection<Token>> stringCollectionMap) {
+                                                    TreeMap<String, Collection<Token>> sortedMap = new TreeMap<>();
+                                                    sortedMap.putAll(stringCollectionMap);
                                                     ArrayList<Snap> snaps = new ArrayList<>(sortedMap.size());
-                                                    Iterator<Integer> keyIterator = sortedMap.keySet().iterator();
+                                                    Iterator<String> keyIterator = sortedMap.keySet().iterator();
                                                     while (keyIterator.hasNext()) {
-                                                        int key = keyIterator.next();
-                                                        Snap snap = new Snap(key, new ArrayList<>(sortedMap.get(key)));
+                                                        String key = keyIterator.next();
+                                                        ArrayList<Token> tokens = new ArrayList<>(sortedMap.get(key));
+                                                        Collections.sort(tokens, new Comparator<Token>() {
+                                                            @Override
+                                                            public int compare(Token o1, Token o2) {
+                                                                return new Long(o1.getTokenNumber()).compareTo(o2.getTokenNumber());
+                                                            }
+                                                        });
+                                                        Snap snap = new Snap(key, tokens);
                                                         snaps.add(snap);
                                                     }
                                                     return snaps;
@@ -391,7 +400,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                     public Task<Long> then(@NonNull Task<Long> task) throws Exception {
                         final Long currentToken = task.getResult();
 //                        if (currentToken > 2) {
-//                            return positionInQueue(token.getStoreId(), token.getCounter())
+//                            return positionInQueue(token.getStoreId(), token.getTimeRange())
 //                                    .continueWithTask(new Continuation<Integer, Task<Long>>() {
 //                                        @Override
 //                                        public Task<Long> then(@NonNull Task<Integer> task) throws Exception {
@@ -902,7 +911,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 //                .child(STORE_CHILD)
 //                .child(token.getStoreId())
 //                .child(COUNTERS_CHILD)
-//                .child("" + token.getCounter())
+//                .child("" + token.getTimeRange())
 //                .child(TimeUtils.getDate(token.getDate()))
 //                .child("tokenCounter");
 //        tokenCounterRef.runTransaction(handler);
@@ -944,11 +953,11 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 //        //Your message to send, Add URL encoding here.
 //        if (status == false) {
 //            message = "You've received a token from " + token.getSenderName().trim() + " "
-//                    + token.getAreaName().trim() + ". Token= " + (token.getTokenNumber()) + ", Counter= " + token.getCounter()
+//                    + token.getAreaName().trim() + ". Token= " + (token.getTokenNumber()) + ", Counter= " + token.getTimeRange()
 //                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates";
 //        } else {
 //            message = "It's your turn at " + token.getSenderName() + " " + token.getAreaName() + "."
-//                    + " Token = " + token.getTokenNumber() + ", Counter = " + token.getCounter()
+//                    + " Token = " + token.getTokenNumber() + ", Counter = " + token.getTimeRange()
 //                    + ". Download the app " + CLIENT_APP_PLAYSTORE_URL + " for real time updates.";
 //        }
 //        //define route
@@ -1180,7 +1189,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 //                                    .child(STORE_CHILD)
 //                                    .child(tokenUpdated.getStoreId())
 //                                    .child(COUNTERS_CHILD)
-//                                    .child("" + tokenUpdated.getCounter())
+//                                    .child("" + tokenUpdated.getTimeRange())
 //                                    .child(TOKENS_CHILD)
 //                                    .child(tokenUpdated.getuId())
 //                                    .removeValue();
@@ -1826,29 +1835,54 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
             Calendar calendar = Calendar.getInstance();
             Calendar calendar2 = Calendar.getInstance();
+            Calendar calendar3 = Calendar.getInstance();
             Date dateObj = TimeUtils.getDate(date);
             Long dateTime = dateObj.getTime();
             calendar.setTime(dateObj);
             calendar2.setTime(dateObj);
+            calendar3.setTime(dateObj);
             int counter = 0;
+            StringBuilder timeRangeBuilder;
             for (Pair<Double, Double> pair : timeSlots) {
-                calendar.set(Calendar.HOUR_OF_DAY, pair.first.intValue());
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.SECOND, 0);
+                timeRangeBuilder = new StringBuilder();
 
-                calendar2.set(Calendar.HOUR_OF_DAY, pair.second.intValue());
-                calendar2.set(Calendar.MINUTE, 0);
-                calendar2.set(Calendar.SECOND, 0);
+                calendar.setTimeInMillis(TimeUtils.convertDoubleToTime(pair.first));
+                calendar2.setTimeInMillis(TimeUtils.convertDoubleToTime(pair.second));
+
+                calendar3.setTimeInMillis(TimeUtils.convertDoubleToTime(pair.first));
+                calendar3.roll(Calendar.HOUR_OF_DAY, 1);
+                timeRangeBuilder.append(TimeUtils.getHrMin(calendar.getTimeInMillis()) + "-" + TimeUtils.getHrMin(calendar3.getTimeInMillis()));
 
                 for (; calendar.before(calendar2); calendar.add(Calendar.MINUTE, duration)) {
                     long timeOfAppointment = calendar.getTimeInMillis();
 
+                    if (calendar.compareTo(calendar3) == 0) {
+                        timeRangeBuilder = new StringBuilder();
+                        String prevTime = TimeUtils.getHrMin(calendar3.getTimeInMillis());
+                        calendar3.roll(Calendar.HOUR_OF_DAY, 1);
+                        if (calendar3.before(calendar2)) {
+                            timeRangeBuilder.append(prevTime + "-" + TimeUtils.getHrMin(calendar3.getTimeInMillis()));
+                        } else {
+                            timeRangeBuilder.append(prevTime + "-" + TimeUtils.getHrMin(calendar2.getTimeInMillis()));
+                        }
+                    }
+
                     String key = mDatabaseReference
                             .child("/")
                             .child(TOKENS_CHILD)
+                            .child(service.getStoreId())
+                            .child(service.getId())
+                            .child(date)
                             .push().getKey();
 
-                    Token token = new Token(key, service.getStoreId(), service.getId(), Long.valueOf(counter), dateTime, timeOfAppointment);
+                    Token token = new Token(key
+                            , service.getStoreId()
+                            , service.getId()
+                            , Long.valueOf(counter)
+                            , dateTime
+                            , timeOfAppointment
+                            , timeRangeBuilder.toString());
+
                     genTokens.add(counter, token);
                     ++counter;
                 }
@@ -1931,7 +1965,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     private static int covertCalendarDayToDaysMask(int dayOfWeek) {
         //Calendar days start from SUNDAY = 1
-        return (dayOfWeek - 2) % 7;
+        return (dayOfWeek + 5) % 7;
     }
 
 }

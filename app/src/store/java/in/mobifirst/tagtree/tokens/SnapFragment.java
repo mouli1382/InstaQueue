@@ -10,9 +10,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -34,6 +33,7 @@ import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.fragment.BaseFragment;
+import in.mobifirst.tagtree.model.Service;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.util.ApplicationConstants;
@@ -61,6 +61,8 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
     private LinearLayout mTokensView;
 
     private TextView mFilteringLabelView;
+
+    private ExpandableListView mExpandableListView;
 
     public SnapFragment() {
         // Requires empty public constructor
@@ -136,7 +138,7 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         dateButton.setVisibility(View.VISIBLE);
 
 
-        final String serviceUid = getArguments().getString(ApplicationConstants.SERVICE_UID);
+        final Service service = (Service) getArguments().getParcelable(ApplicationConstants.SERVICE_UID);
         // Set up floating action button
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab);
@@ -146,7 +148,7 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
             @Override
             public void onClick(View v) {
                 //ToDo - TESTING CM
-                mPresenter.createAppointmentSlots(serviceUid);
+                mPresenter.createAppointmentSlots(service.getId());
             }
         });
         fab.setVisibility(View.VISIBLE);
@@ -158,14 +160,8 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_issuetokens, container, false);
 
-        RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-
-//        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2, LinearLayoutManager.VERTICAL, false);
-
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(mSnapAdapter);
+        mExpandableListView = (ExpandableListView) root.findViewById(R.id.expandableListView);
+        mExpandableListView.setAdapter(mSnapAdapter);
 
         mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
         mTokensView = (LinearLayout) root.findViewById(R.id.tokensLL);
@@ -191,7 +187,7 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
         // Set the scrolling view in the custom SwipeRefreshLayout.
-        swipeRefreshLayout.setScrollUpChild(recyclerView);
+        swipeRefreshLayout.setScrollUpChild(mExpandableListView);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -334,7 +330,9 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
     public void showSnaps(List<Snap> snaps) {
         if (isActive()) {
             setLoadingIndicator(false);
-            mSnapAdapter.replaceData(snaps);
+            mSnapAdapter = new SnapAdapter(getActivity(), snaps);
+            mExpandableListView.setAdapter(mSnapAdapter);
+//            mSnapAdapter.replaceData(snaps);
             mTokensView.setVisibility(View.VISIBLE);
             mNoTokensView.setVisibility(View.GONE);
         }

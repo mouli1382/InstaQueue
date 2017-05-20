@@ -218,7 +218,7 @@ final class TokensPresenter implements TokensContract.Presenter {
 //                .toMultimap(new Func1<Token, Integer>() {
 //                    @Override
 //                    public Integer call(Token token) {
-//                        return token.getCounter();
+//                        return token.getTimeRange();
 //                    }
 //                })
 //                .map(new Func1<Map<Integer, Collection<Token>>, List<Snap>>() {

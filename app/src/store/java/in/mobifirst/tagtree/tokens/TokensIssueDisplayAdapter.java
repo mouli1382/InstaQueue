@@ -59,7 +59,7 @@ public class TokensIssueDisplayAdapter extends RecyclerView.Adapter<TokensIssueD
 
 //            holder.name.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
             //ToDo uncomment this to read out tokens at all the counters.
-//            TTSHelper.getInstance().speak("Token number " + token.getTokenNumber() + " at counter number " + token.getCounter());
+//            TTSHelper.getInstance().speak("Token number " + token.getTokenNumber() + " at counter number " + token.getTimeRange());
         } else {
             holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_default));
             holder.mView.setBackgroundColor(color);

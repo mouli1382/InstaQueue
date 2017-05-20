@@ -10,20 +10,20 @@ import in.mobifirst.tagtree.model.Token;
 
 public class Snap implements Parcelable {
 
-    private int counter;
+    private String timeRange;
     private List<Token> tokenList;
 
-    public Snap(int counter, List<Token> tokens) {
-        this.counter = counter;
+    public Snap(String time, List<Token> tokens) {
+        this.timeRange = time;
         tokenList = tokens;
     }
 
-    public int getCounter() {
-        return counter;
+    public String getTimeRange() {
+        return timeRange;
     }
 
-    public void setCounter(int counter) {
-        this.counter = counter;
+    public void setTimeRange(String timeRange) {
+        this.timeRange = timeRange;
     }
 
     public List<Token> getTokenList() {
@@ -41,12 +41,12 @@ public class Snap implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(counter);
+        parcel.writeString(timeRange);
         parcel.writeTypedList(tokenList);
     }
 
     protected Snap(Parcel in) {
-        counter = in.readInt();
+        timeRange = in.readString();
         in.readTypedList(tokenList, Token.CREATOR);
     }
 

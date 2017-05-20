@@ -102,7 +102,7 @@
     <string name="counter_no">కౌంటర్</string>
     <string name="playstore_link">నిజ సమయంలో టోకెన్ స్థితిని ట్రాక్ చేయడానికి PlayStore నుండి అప్లికేషన్ డౌన్లోడ్ చేయుము</string>
     <string name="config">Settings</string>
-    <string name="reset">Would you like to reset the token counter?</string>
+    <string name="reset">Would you like to reset the token timeRange?</string>
     <string name="reset_button">RESET</string>
     <string name="reset_title">Reset</string>
 
@@ -123,7 +123,7 @@
         <item>1</item>
     </string-array>
 
-    <string name="summary_reset_preference">Reset token counter to issue tokens from 1.</string>
+    <string name="summary_reset_preference">Reset token timeRange to issue tokens from 1.</string>
     <string name="title_reset_preference">Reset</string>
     <string name="display_no_tokens">Congratulations! You have served all your Customers.</string>
     <string name="create_token">Creating Token...</string>

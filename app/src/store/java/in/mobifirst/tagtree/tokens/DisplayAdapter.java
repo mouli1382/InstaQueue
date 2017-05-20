@@ -52,7 +52,7 @@ public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.ViewHold
     public void onBindViewHolder(ViewHolder holder, int position) {
         Snap snap = mSnaps.get(position);
 
-        int counter = snap.getCounter();
+        String counter = snap.getTimeRange();
         List<Token> tokens = new ArrayList<>(snap.getTokenList());
 
         holder.recyclerView.setLayoutManager(new LinearLayoutManager(holder

@@ -54,4 +54,46 @@ public class TimeUtils {
         }
         return date;
     }
+
+    public static String convertDoubleToTimeString(Double aDouble) {
+        aDouble = aDouble * 10;
+        int startInt = aDouble.intValue();
+
+        int hr = startInt / 10;
+        int min = startInt % 10;
+        if (min == 5) {
+            min = 30;
+        }
+
+        SimpleDateFormat sfd = new SimpleDateFormat("HH:mm");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hr);
+        calendar.set(Calendar.MINUTE, min);
+        calendar.set(Calendar.SECOND, 0);
+
+        return sfd.format(calendar.getTime());
+    }
+
+    public static String getHrMin(long timestamp) {
+        SimpleDateFormat sfd = new SimpleDateFormat("HH:mm");
+        return sfd.format(new Date(timestamp));
+    }
+
+    public static long convertDoubleToTime(Double aDouble) {
+        aDouble = aDouble * 10;
+        int startInt = aDouble.intValue();
+
+        int hr = startInt / 10;
+        int min = startInt % 10;
+        if (min == 5) {
+            min = 30;
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hr);
+        calendar.set(Calendar.MINUTE, min);
+        calendar.set(Calendar.SECOND, 0);
+
+        return calendar.getTimeInMillis();
+    }
 }
