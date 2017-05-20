@@ -37,6 +37,8 @@ public interface TokensContract {
 
         void showNoTokens();
 
+        void setServiceName(String serviceName);
+
         void showActiveFilterLabel();
 
         void showCompletedFilterLabel();

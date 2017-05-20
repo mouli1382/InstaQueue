@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import in.mobifirst.tagtree.addedittoken.AddEditTokenActivity;
 import in.mobifirst.tagtree.data.token.TokensDataSource;
 import in.mobifirst.tagtree.data.token.TokensRepository;
+import in.mobifirst.tagtree.model.Service;
 import in.mobifirst.tagtree.model.Token;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import rx.Observer;
@@ -44,9 +45,12 @@ final class TokensPresenter implements TokensContract.Presenter {
     @Nullable
     private long mDate;
 
+    @NonNull
+    private Service mService;
+
     @Inject
-    TokensPresenter(@Nullable long date, TokensRepository tokensRepository, TokensContract.View tokensView) {
-        Log.e(TAG, "constructor");
+    TokensPresenter(@NonNull Service service, @Nullable long date, TokensRepository tokensRepository, TokensContract.View tokensView) {
+        mService = service;
         mDate = date;
         mTokensRepository = tokensRepository;
         mTokensView = tokensView;
@@ -116,7 +120,7 @@ final class TokensPresenter implements TokensContract.Presenter {
 
         mSubscriptions.clear();
         Subscription subscription = mTokensRepository
-                .getTokens(mCurrentCounter)
+                .getTokens(mService.getId(), mCurrentCounter)
 //                .flatMap(new Func1<List<Token>, Observable<Token>>() {
 //                    @Override
 //                    public Observable<Token> call(List<Token> tokens) {
@@ -175,7 +179,7 @@ final class TokensPresenter implements TokensContract.Presenter {
 
         mSubscriptions.clear();
         Subscription subscription = mTokensRepository
-                .getSnaps(mDate, false)
+                .getSnaps(mService.getId(), mDate, false)
 //                .flatMap(new Func1<List<Token>, Observable<Token>>() {
 //                    @Override
 //                    public Observable<Token> call(List<Token> tokens) {
@@ -284,20 +288,21 @@ final class TokensPresenter implements TokensContract.Presenter {
     }
 
     private void showFilterLabel() {
-        switch (mCurrentFiltering) {
-            case ACTIVE_TOKENS:
-                mTokensView.showActiveFilterLabel();
-                break;
-            case COMPLETED_TOKENS:
-                mTokensView.showCompletedFilterLabel();
-                break;
-            case CANCELLED_TOKENS:
-                mTokensView.showCancelledFilterLabel();
-                break;
-            default:
-                mTokensView.showAllFilterLabel();
-                break;
-        }
+        mTokensView.setServiceName(mService.getName());
+//        switch (mCurrentFiltering) {
+//            case ACTIVE_TOKENS:
+//                mTokensView.showActiveFilterLabel();
+//                break;
+//            case COMPLETED_TOKENS:
+//                mTokensView.showCompletedFilterLabel();
+//                break;
+//            case CANCELLED_TOKENS:
+//                mTokensView.showCancelledFilterLabel();
+//                break;
+//            default:
+//                mTokensView.showAllFilterLabel();
+//                break;
+//        }
     }
 
     private void processEmptyTokens() {

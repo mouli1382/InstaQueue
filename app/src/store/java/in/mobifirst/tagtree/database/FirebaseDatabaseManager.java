@@ -94,12 +94,16 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     //ToDo limit by date and status.
-    public Observable<List<Snap>> getAllSnaps(final String uId, final long date, final boolean ascending) {
+    public Observable<List<Snap>> getAllSnaps(final String uId, final String serviceUid, final long date, final boolean ascending) {
         return rx.Observable.create(new Observable.OnSubscribe<List<Snap>>() {
             @Override
             public void call(final Subscriber<? super List<Snap>> subscriber) {
                 final Query query = mDatabaseReference
+                        .child("/")
                         .child(TOKENS_CHILD)
+                        .child(uId)
+                        .child(serviceUid)
+                        .child(TimeUtils.getDate(date))
                         .orderByChild("storeId")
                         .equalTo(uId);
 
@@ -201,12 +205,16 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     //ToDo limit by date and status.
-    public Observable<List<Token>> getAllTokens(final String uId, final int currentCounter) {
+    public Observable<List<Token>> getAllTokens(final String uId, final String serviceUid, final int currentCounter) {
         return rx.Observable.create(new Observable.OnSubscribe<List<Token>>() {
             @Override
             public void call(final Subscriber<? super List<Token>> subscriber) {
                 final Query query = mDatabaseReference
+                        .child("/")
                         .child(TOKENS_CHILD)
+                        .child(uId)
+                        .child(serviceUid)
+                        .child(TimeUtils.getDate(Calendar.getInstance().getTimeInMillis()))
                         .orderByChild("storeId")
                         .equalTo(uId);
 
@@ -216,10 +224,12 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         Log.e(TAG, "onDataChange --> " + subscriber.toString());
                         if (!subscriber.isUnsubscribed()) {
                             if (dataSnapshot != null) {
-                                HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
+//                                HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
+//                                });
+                                List<Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<ArrayList<Token>>() {
                                 });
                                 if (tokens != null) {
-                                    Observable.just(new ArrayList<>(tokens.values()))
+                                    Observable.just(tokens)
                                             .flatMap(new Func1<List<Token>, Observable<Token>>() {
                                                 @Override
                                                 public Observable<Token> call(List<Token> tokens) {
@@ -280,18 +290,22 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         });
     }
 
-    public void getTokenById(String tokenId, ValueEventListener valueEventListener) {
+    public void getTokenById(String storeUid, String serviceUid, long date, String tokenId, ValueEventListener valueEventListener) {
         DatabaseReference tokenRef = mDatabaseReference
+                .child("/")
                 .child(TOKENS_CHILD)
+                .child(storeUid)
+                .child(serviceUid)
+                .child(TimeUtils.getDate(date))
                 .child(tokenId);
         tokenRef.addListenerForSingleValueEvent(valueEventListener);
     }
 
-    public Observable<Token> getTokenById(final String tokenId) {
+    public Observable<Token> getTokenById(final String storeUid, final String serviceUid, final long date, final String tokenId) {
         return Observable.create(new Observable.OnSubscribe<Token>() {
             @Override
             public void call(final Subscriber<? super Token> subscriber) {
-                getTokenById(tokenId, new ValueEventListener() {
+                getTokenById(storeUid, serviceUid, date, tokenId, new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Token token = dataSnapshot.getValue(Token.class);
@@ -1724,7 +1738,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         return taskCompletionSource.getTask();
     }
 
-    private Task<Void> generateSlots(String storeUid, String serviceUid, final String date) {
+    private Task<Void> generateSlots(final String storeUid, final String serviceUid, final String date) {
         final TaskCompletionSource<Service> fetchService = new TaskCompletionSource<>();
 
         mDatabaseReference
@@ -1763,6 +1777,9 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         return mDatabaseReference
                                 .child("/")
                                 .child(TOKENS_CHILD)
+                                .child(storeUid)
+                                .child(serviceUid)
+                                .child(date)
                                 .setValue(generatedTokenObjs);
                     }
                 });

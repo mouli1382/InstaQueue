@@ -2,6 +2,7 @@ package in.mobifirst.tagtree.tokens;
 
 
 import android.content.Context;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
@@ -53,8 +54,11 @@ public class SnapAdapter extends RecyclerView.Adapter<SnapAdapter.ViewHolder> {
 
         holder.snapTextView.setText("Counter " + counter);
 
-        holder.recyclerView.setLayoutManager(new LinearLayoutManager(holder
-                .recyclerView.getContext(), LinearLayoutManager.HORIZONTAL, false));
+//        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2, LinearLayoutManager.VERTICAL, false);
+//        holder.recyclerView.setLayoutManager(new LinearLayoutManager(holder
+//                .recyclerView.getContext(), LinearLayoutManager.HORIZONTAL, false));
+        holder.recyclerView.setLayoutManager(new GridLayoutManager(holder
+                .recyclerView.getContext(), 3, LinearLayoutManager.VERTICAL, false));
         holder.recyclerView.setOnFlingListener(null);
         new LinearSnapHelper().attachToRecyclerView(holder.recyclerView);
 

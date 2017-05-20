@@ -10,6 +10,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 
 import in.mobifirst.tagtree.R;
+import in.mobifirst.tagtree.model.Service;
 import in.mobifirst.tagtree.tokens.TokensActivity;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 
@@ -18,9 +19,9 @@ import static in.mobifirst.tagtree.util.ApplicationConstants.REQUEST_CODE_RECEIV
 
 public class RequestPermissionsActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
-    public static void start(Context caller, String serviceUid) {
+    public static void start(Context caller, Service service) {
         Intent intent = new Intent(caller, RequestPermissionsActivity.class);
-        intent.putExtra(ApplicationConstants.SERVICE_UID, serviceUid);
+        intent.putExtra(ApplicationConstants.SERVICE_UID, service);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         caller.startActivity(intent);
     }
@@ -61,7 +62,7 @@ public class RequestPermissionsActivity extends BaseDrawerActivity implements Ac
     }
 
     private void startOnBoardingActivity() {
-        TokensActivity.start(RequestPermissionsActivity.this, getIntent().getStringExtra(ApplicationConstants.SERVICE_UID));
+        TokensActivity.start(RequestPermissionsActivity.this, (Service) getIntent().getParcelableExtra(ApplicationConstants.SERVICE_UID));
         finish();
     }
 }

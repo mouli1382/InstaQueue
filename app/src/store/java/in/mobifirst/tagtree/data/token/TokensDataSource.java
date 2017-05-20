@@ -13,11 +13,11 @@ import rx.Subscriber;
 
 public interface TokensDataSource {
 
-    Observable<List<Token>> getTokens(int mCurrentCounter);
+    Observable<List<Token>> getTokens(String serviceUid, int currentCounter);
 
-    Observable<List<Snap>> getSnaps(long mDate, boolean ascending);
+    Observable<List<Snap>> getSnaps(String serviceUid, long date, boolean ascending);
 
-    Observable<Token> getToken(@NonNull String tokenId);
+    Observable<Token> getToken(String serviceUid, long date, @NonNull String tokenId);
 
     void addNewToken(@NonNull Token token, Subscriber<? super String> subscriber);
 

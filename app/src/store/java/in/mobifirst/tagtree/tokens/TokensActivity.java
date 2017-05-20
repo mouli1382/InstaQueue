@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.SwitchCompat;
@@ -29,6 +30,7 @@ import in.mobifirst.tagtree.activity.CreditsActivity;
 import in.mobifirst.tagtree.application.IQStoreApplication;
 import in.mobifirst.tagtree.data.token.TokensRepository;
 import in.mobifirst.tagtree.display.TokenDisplayService;
+import in.mobifirst.tagtree.model.Service;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.util.ActivityUtilities;
 import in.mobifirst.tagtree.util.ApplicationConstants;
@@ -53,9 +55,12 @@ public class TokensActivity extends BaseDrawerActivity {
     private String mDateString;
     private long mDate;
 
-    public static void start(Context caller, String serviceUid) {
+    @NonNull
+    private Service mService;
+
+    public static void start(Context caller, Service service) {
         Intent intent = new Intent(caller, TokensActivity.class);
-        intent.putExtra(ApplicationConstants.SERVICE_UID, serviceUid);
+        intent.putExtra(ApplicationConstants.SERVICE_UID, service);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         caller.startActivity(intent);
     }
@@ -64,6 +69,7 @@ public class TokensActivity extends BaseDrawerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mService = getIntent().getParcelableExtra(ApplicationConstants.SERVICE_UID);
         mDate = Calendar.getInstance().getTimeInMillis();
         mDateString = TimeUtils.getDate(mDate);
 
@@ -96,7 +102,7 @@ public class TokensActivity extends BaseDrawerActivity {
                         // Create the presenter
                         DaggerTokensComponent.builder()
                                 .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
-                                .tokensPresenterModule(new TokensPresenterModule(snapFragment, mDate)).build()
+                                .tokensPresenterModule(new TokensPresenterModule(snapFragment, mService, mDate)).build()
                                 .inject(TokensActivity.this);
                     } else {
                         FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
@@ -108,7 +114,7 @@ public class TokensActivity extends BaseDrawerActivity {
                         // Create the presenter
                         DaggerTokensComponent.builder()
                                 .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
-                                .tokensPresenterModule(new TokensPresenterModule(tokensFragment, mDate)).build()
+                                .tokensPresenterModule(new TokensPresenterModule(tokensFragment, mService, mDate)).build()
                                 .inject(TokensActivity.this);
                     }
                 }
@@ -125,7 +131,7 @@ public class TokensActivity extends BaseDrawerActivity {
             // Create the presenter
             DaggerTokensComponent.builder()
                     .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
-                    .tokensPresenterModule(new TokensPresenterModule(snapFragment, mDate)).build()
+                    .tokensPresenterModule(new TokensPresenterModule(snapFragment, mService, mDate)).build()
                     .inject(TokensActivity.this);
         }
 
@@ -143,9 +149,8 @@ public class TokensActivity extends BaseDrawerActivity {
     }
 
     private Bundle getServiceBundle() {
-        String serviceUid = getIntent().getStringExtra(ApplicationConstants.SERVICE_UID);
         Bundle b = new Bundle();
-        b.putString(ApplicationConstants.SERVICE_UID, serviceUid);
+        b.putParcelable(ApplicationConstants.SERVICE_UID, mService);
 
         return b;
     }
@@ -164,13 +169,14 @@ public class TokensActivity extends BaseDrawerActivity {
                 FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
                 frameLayout.removeAllViewsInLayout();
                 SnapFragment snapFragment = SnapFragment.newInstance();
+                snapFragment.setArguments(getServiceBundle());
                 ActivityUtilities.replaceFragmentToActivity(
                         getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
 
                 // Create the presenter
                 DaggerTokensComponent.builder()
                         .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
-                        .tokensPresenterModule(new TokensPresenterModule(snapFragment, mDate)).build()
+                        .tokensPresenterModule(new TokensPresenterModule(snapFragment, mService, mDate)).build()
                         .inject(TokensActivity.this);
             }
         });
@@ -257,7 +263,7 @@ public class TokensActivity extends BaseDrawerActivity {
         mSubscriptions.clear();
         //Always show the today's tokens on the secondary display.
         Subscription subscription = mTokensRepository
-                .getSnaps(Calendar.getInstance().getTimeInMillis(), true)
+                .getSnaps(mService.getId(), Calendar.getInstance().getTimeInMillis(), true)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Snap>>() {

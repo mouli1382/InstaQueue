@@ -297,7 +297,7 @@ public class ServicesFragment extends BaseFragment implements ServicesContract.V
 
     @Override
     public void showTokensList(Service service) {
-        RequestPermissionsActivity.start(getActivity(), service.getId());
+        RequestPermissionsActivity.start(getActivity(), service);
     }
 
     /**

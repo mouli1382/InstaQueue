@@ -1,5 +1,7 @@
 package in.mobifirst.tagtree.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
 import com.google.firebase.database.Exclude;
@@ -8,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Service {
+public class Service implements Parcelable {
 
     private String id;
     private String storeId;
@@ -115,4 +117,36 @@ public class Service {
         return TextUtils.isEmpty(name)
                 || TextUtils.isEmpty(description);
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeString(id);
+        parcel.writeString(storeId);
+        parcel.writeString(name);
+        parcel.writeString(description);
+    }
+
+    protected Service(Parcel in) {
+        id = in.readString();
+        storeId = in.readString();
+        name = in.readString();
+        description = in.readString();
+    }
+
+    public static final Creator<Service> CREATOR = new Creator<Service>() {
+        @Override
+        public Service createFromParcel(Parcel in) {
+            return new Service(in);
+        }
+
+        @Override
+        public Service[] newArray(int size) {
+            return new Service[size];
+        }
+    };
 }

@@ -25,18 +25,18 @@ public class TokensRepository implements TokensDataSource {
     }
 
     @Override
-    public Observable<List<Token>> getTokens(int mCurrentCounter) {
-        return mTokensDataSource.getTokens(mCurrentCounter);
+    public Observable<List<Token>> getTokens(String serviceUid, int mCurrentCounter) {
+        return mTokensDataSource.getTokens(serviceUid, mCurrentCounter);
     }
 
     @Override
-    public Observable<List<Snap>> getSnaps(long date, boolean ascending) {
-        return mTokensDataSource.getSnaps(date, ascending);
+    public Observable<List<Snap>> getSnaps(String serviceUid, long date, boolean ascending) {
+        return mTokensDataSource.getSnaps(serviceUid, date, ascending);
     }
 
     @Override
-    public Observable<Token> getToken(@NonNull String tokenId) {
-        return mTokensDataSource.getToken(tokenId);
+    public Observable<Token> getToken(String serviceUid, long date, @NonNull String tokenId) {
+        return mTokensDataSource.getToken(serviceUid, date, tokenId);
     }
 
     @Override

@@ -371,6 +371,11 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
     }
 
     @Override
+    public void setServiceName(String serviceName) {
+        mFilteringLabelView.setText(serviceName);
+    }
+
+    @Override
     public void showNoCompletedTokens() {
         showNoTokensViews(
                 getResources().getString(R.string.no_tokens_completed),
