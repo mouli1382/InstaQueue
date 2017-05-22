@@ -1,6 +1,8 @@
 package in.mobifirst.tagtree.tokens;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,10 +19,11 @@ import in.mobifirst.tagtree.util.TimeUtils;
 public class TokensIssueAdapter extends RecyclerView.Adapter<TokensIssueAdapter.ViewHolder> {
 
     private List<Token> mTokens;
-    private TokensFragment.TokenItemListener mTokenItemListener;
+    private SnapFragment.TokenItemListener mTokenItemListener;
     private Context mContext;
 
-    public TokensIssueAdapter(List<Token> items, TokensFragment.TokenItemListener tokenItemListener) {
+    public TokensIssueAdapter(Context context, List<Token> items, SnapFragment.TokenItemListener tokenItemListener) {
+        mContext = context;
         setList(items);
         mTokenItemListener = tokenItemListener;
     }
@@ -49,13 +52,28 @@ public class TokensIssueAdapter extends RecyclerView.Adapter<TokensIssueAdapter.
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        Token token = mTokens.get(position);
+        final Token token = mTokens.get(position);
 
         if (token.isActive()) {
-            holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.colorAccent));
-        } else {
-            holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));
+            holder.mCardView.setCardBackgroundColor(Color.parseColor("#1B5E20"));
+        } else if (token.isCompleted()) {
+            holder.mCardView.setCardBackgroundColor(Color.parseColor("#607D8B"));
+        } else if (token.isIssued()) {
+            holder.mCardView.setCardBackgroundColor(Color.parseColor("#673AB7"));
         }
+
+        if (token.isUnknown()) {
+            holder.mCardView.setEnabled(true);
+            holder.mCardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mTokenItemListener.onTokenClick(token);
+                }
+            });
+        } else {
+            holder.mCardView.setEnabled(false);
+        }
+
         holder.mTokenNumber.setText(token.getTokenNumber() + "");
         holder.mTime.setText(TimeUtils.getTime(token.getAppointmentTime()));
         holder.mDate.setText(TimeUtils.getDate(token.getDate()));
@@ -70,9 +88,11 @@ public class TokensIssueAdapter extends RecyclerView.Adapter<TokensIssueAdapter.
         protected TextView mTokenNumber;
         protected TextView mTime;
         protected TextView mDate;
+        protected CardView mCardView;
 
         public ViewHolder(View view) {
             super(view);
+            mCardView = (CardView) view;
             mTokenNumber = (TextView) view.findViewById(R.id.token_number);
             mTime = (TextView) view.findViewById(R.id.time);
             mDate = (TextView) view.findViewById(R.id.date);

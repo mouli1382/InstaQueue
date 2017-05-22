@@ -21,24 +21,26 @@ import in.mobifirst.tagtree.R;
 public class SnapAdapter extends BaseExpandableListAdapter {
 
     private Context mContext;
+    private SnapFragment.TokenItemListener mTokenItemListener;
     private List<Snap> mSnaps = new ArrayList<>();
 
-    public SnapAdapter(Context context) {
-        mContext = context;
-    }
+//    public SnapAdapter(Context context) {
+//        mContext = context;
+//    }
+//
+//    public void replaceData(List<Snap> snaps) {
+//        setList(snaps);
+//        notifyDataSetChanged();
+//    }
+//
+//    private void setList(List<Snap> snaps) {
+//        mSnaps = snaps;
+//    }
 
-    public void replaceData(List<Snap> snaps) {
-        setList(snaps);
-        notifyDataSetChanged();
-    }
-
-    private void setList(List<Snap> snaps) {
-        mSnaps = snaps;
-    }
-
-    public SnapAdapter(Context context, List<Snap> snaps) {
+    public SnapAdapter(Context context, List<Snap> snaps, SnapFragment.TokenItemListener tokenItemListener) {
         this.mContext = context;
         this.mSnaps = snaps;
+        mTokenItemListener = tokenItemListener;
     }
 
     @Override
@@ -141,14 +143,14 @@ public class SnapAdapter extends BaseExpandableListAdapter {
         childHolder.recyclerView.setOnFlingListener(null);
         new LinearSnapHelper().attachToRecyclerView(childHolder.recyclerView);
 
-        childHolder.recyclerView.setAdapter(new TokensIssueAdapter(mContext, group.getTokenList()));
+        childHolder.recyclerView.setAdapter(new TokensIssueAdapter(mContext, group.getTokenList(), mTokenItemListener));
 
         return convertView;
     }
 
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return false;
+        return true;
     }
 
     @Override

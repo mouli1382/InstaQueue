@@ -1,20 +1,21 @@
 package in.mobifirst.tagtree.addedittoken;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 
 import dagger.Module;
 import dagger.Provides;
+import in.mobifirst.tagtree.model.Token;
 
 @Module
 public class AddEditTokenPresenterModule {
 
     private final AddEditTokenContract.View mView;
 
-    private String mTokenId;
+    private Token mToken;
 
-    public AddEditTokenPresenterModule(AddEditTokenContract.View view, @Nullable String tokenId) {
+    public AddEditTokenPresenterModule(AddEditTokenContract.View view, @NonNull Token token) {
         mView = view;
-        mTokenId = tokenId;
+        mToken = token;
     }
 
     @Provides
@@ -22,9 +23,10 @@ public class AddEditTokenPresenterModule {
         return mView;
     }
 
+
     @Provides
-    @Nullable
-    String provideTokenId() {
-        return mTokenId;
+    @NonNull
+    Token provideToken() {
+        return mToken;
     }
 }

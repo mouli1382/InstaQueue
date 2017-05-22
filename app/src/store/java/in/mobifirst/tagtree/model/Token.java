@@ -22,7 +22,6 @@ public class Token implements Parcelable {
     private String senderPic;
     private String senderName;
     private String areaName;
-    private int counter;
     private long activatedTokenTime;
     private long tokenFinishTime;
     private String userName;
@@ -55,7 +54,7 @@ public class Token implements Parcelable {
         this.timeRange = timeRange;
     }
 
-    public Token(String uId, String storeId, String phoneNumber, long tokenNumber, String senderPic, String senderName, int counter, String areaName, String mappingId, long date) {
+    public Token(String uId, String storeId, String phoneNumber, long tokenNumber, String senderPic, String senderName, String areaName, String mappingId, long date) {
         this.uId = uId;
         this.storeId = storeId;
         this.phoneNumber = phoneNumber;
@@ -65,7 +64,6 @@ public class Token implements Parcelable {
         this.senderPic = senderPic;
         this.senderName = senderName;
         this.areaName = areaName;
-        this.counter = counter;
         this.mappingId = mappingId;
         this.date = date;
     }
@@ -83,14 +81,6 @@ public class Token implements Parcelable {
 
     public void setDate(long date) {
         this.date = date;
-    }
-
-    public int getCounter() {
-        return counter;
-    }
-
-    public void setCounter(int counter) {
-        this.counter = counter;
     }
 
     public String getuId() {
@@ -235,6 +225,16 @@ public class Token implements Parcelable {
     }
 
     @Exclude
+    public boolean isUnknown() {
+        return status == Status.UNKNOWN.ordinal();
+    }
+
+    @Exclude
+    public boolean isIssued() {
+        return status == Status.ISSUED.ordinal();
+    }
+
+    @Exclude
     public boolean isActive() {
         return status == Status.READY.ordinal();
     }
@@ -257,7 +257,6 @@ public class Token implements Parcelable {
         result.put("buzzCount", buzzCount);
         result.put("senderName", senderName);
         result.put("senderPic", senderPic);
-        result.put("counter", counter);
         result.put("areaName", areaName);
         result.put("activatedTokenTime", activatedTokenTime);
         result.put("tokenFinishTime", tokenFinishTime);
@@ -280,7 +279,6 @@ public class Token implements Parcelable {
         if (getTimestamp() != token.getTimestamp()) return false;
         if (getStatus() != token.getStatus()) return false;
         if (getBuzzCount() != token.getBuzzCount()) return false;
-        if (getCounter() != token.getCounter()) return false;
         if (getActivatedTokenTime() != token.getActivatedTokenTime()) return false;
         if (getTokenFinishTime() != token.getTokenFinishTime()) return false;
         if (getDate() != token.getDate()) return false;
@@ -311,7 +309,6 @@ public class Token implements Parcelable {
         result = 31 * result + (getSenderPic() != null ? getSenderPic().hashCode() : 0);
         result = 31 * result + (getSenderName() != null ? getSenderName().hashCode() : 0);
         result = 31 * result + (getAreaName() != null ? getAreaName().hashCode() : 0);
-        result = 31 * result + getCounter();
         result = 31 * result + (int) (getActivatedTokenTime() ^ (getActivatedTokenTime() >>> 32));
         result = 31 * result + (int) (getTokenFinishTime() ^ (getTokenFinishTime() >>> 32));
         result = 31 * result + (getUserName() != null ? getUserName().hashCode() : 0);
@@ -337,7 +334,6 @@ public class Token implements Parcelable {
         parcel.writeString(senderPic);
         parcel.writeString(senderName);
         parcel.writeString(areaName);
-        parcel.writeInt(counter);
         parcel.writeLong(activatedTokenTime);
         parcel.writeLong(tokenFinishTime);
         parcel.writeString(userName);
@@ -358,7 +354,6 @@ public class Token implements Parcelable {
         senderPic = in.readString();
         senderName = in.readString();
         areaName = in.readString();
-        counter = in.readInt();
         activatedTokenTime = in.readLong();
         tokenFinishTime = in.readLong();
         userName = in.readString();

@@ -1,8 +1,6 @@
 package in.mobifirst.tagtree.addedittoken;
 
 import android.app.Activity;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +11,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.DialogFragment;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.KeyEvent;
@@ -21,14 +18,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.Spinner;
 import android.widget.TextView;
-
-import java.util.Calendar;
 
 import javax.inject.Inject;
 
@@ -39,7 +30,6 @@ import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.receiver.TTLocalBroadcastManager;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 import in.mobifirst.tagtree.util.NetworkConnectionUtils;
-import in.mobifirst.tagtree.util.TimeUtils;
 import in.mobifirst.tagtree.view.ProgressDialogFragment;
 
 
@@ -58,12 +48,7 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
 
     private TextInputLayout mPhoneNumberInputLayout;
     private TextInputEditText mPhoneNumberEditText;
-    private Spinner mCounterSpinner;
-    private int mNumberOfCounters;
-
-    private Button mDateButton;
-    private String mDateString;
-    private long mDate;
+    private Button mAddButton;
 
     public static AddEditTokenFragment newInstance() {
         return new AddEditTokenFragment();
@@ -93,16 +78,17 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
         super.onResume();
         if (!mNetworkConnectionUtils.isConnected()) {
             showNetworkError(getView());
+        } else {
+            mPresenter.subscribe();
         }
         TTLocalBroadcastManager.registerReceiver(getActivity(), mNetworkBroadcastReceiver, TTLocalBroadcastManager.NETWORK_INTENT_ACTION);
-//        mPresenter.subscribe();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        mPresenter.unsubscribe();
         TTLocalBroadcastManager.unRegisterReceiver(getActivity(), mNetworkBroadcastReceiver);
-//        mPresenter.unsubscribe();
     }
 
     @Override
@@ -116,19 +102,19 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
 
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab);
-        fab.setImageResource(R.drawable.ic_done);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mNetworkConnectionUtils.isConnected()) {
-                    if (validateInput()) {
-                        //ToDo hardcoding to IND country code as of now.
-                        mPresenter.addNewToken("+91" + mPhoneNumberEditText.getText().toString(),
-                                (mNumberOfCounters > 1 ? (mCounterSpinner.getSelectedItemPosition() + 1) : 1), mDate);
-                    }
-                }
-            }
-        });
+        fab.setVisibility(View.GONE);
+//        fab.setImageResource(R.drawable.ic_done);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (mNetworkConnectionUtils.isConnected()) {
+//                    if (validateInput()) {
+//                        //ToDo hardcoding to IND country code as of now.
+//                        mPresenter.addNewToken("+91" + mPhoneNumberEditText.getText().toString());
+//                    }
+//                }
+//            }
+//        });
     }
 
     @Nullable
@@ -156,94 +142,23 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
             }
         });
 
-        //Set today by default.
-        Calendar c = Calendar.getInstance();
-        mDate = c.getTimeInMillis();
-        mDateString = TimeUtils.getDate(mDate);
-        mDateButton = (Button) root.findViewById(R.id.date);
-        mDateButton.setText(mDateString);
-        mDateButton.setOnClickListener(new View.OnClickListener() {
+        mAddButton = (Button) root.findViewById(R.id.addTokenButton);
+        mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDatePickerDialog(v);
+                if (mNetworkConnectionUtils.isConnected()) {
+                    if (validateInput()) {
+                        //ToDo hardcoding to IND country code as of now.
+                        mPresenter.addNewToken("+91" + mPhoneNumberEditText.getText().toString());
+                    }
+                }
             }
         });
-
-        mNumberOfCounters = iqSharedPreferences.getInt(ApplicationConstants.NUMBER_OF_COUNTERS_KEY);
-
-        mCounterSpinner = (Spinner) root.findViewById(R.id.counter_spinner);
-        if (mNumberOfCounters > 1) {
-            // Create an ArrayAdapter using the string array and a default spinner layout
-            String[] items = new String[mNumberOfCounters];
-            for (int i = 0; i < mNumberOfCounters; i++) {
-                items[i] = "Counter-" + (i + 1);
-            }
-            final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            // Apply the adapter to the spinner
-            mCounterSpinner.setAdapter(adapter);
-            mCounterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                    String counter = adapter.getItem(i);
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> adapterView) {
-
-                }
-            });
-        } else {
-            mCounterSpinner.setVisibility(View.GONE);
-        }
 
         setRetainInstance(true);
         return root;
     }
 
-    private void showDatePickerDialog(final View v) {
-        DatePickerDialogFragment datePickerDialogFragment = new DatePickerDialogFragment();
-        datePickerDialogFragment.setiDatePickerCallback(new DatePickerDialogFragment.IDatePickerCallback() {
-            @Override
-            public void onDatePicked(int year, int month, int day) {
-                final Calendar c = Calendar.getInstance();
-                c.set(year, month, day);
-                mDate = c.getTimeInMillis();
-                mDateString = TimeUtils.getDate(mDate);
-                ((Button) v).setText(mDateString);
-            }
-        });
-        datePickerDialogFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
-    }
-
-    public static class DatePickerDialogFragment extends DialogFragment
-            implements DatePickerDialog.OnDateSetListener {
-        private IDatePickerCallback iDatePickerCallback;
-
-        interface IDatePickerCallback {
-            void onDatePicked(int year, int month, int day);
-        }
-
-        public void setiDatePickerCallback(IDatePickerCallback iDatePickerCallback) {
-            this.iDatePickerCallback = iDatePickerCallback;
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
-
-            // Create a new instance of DatePickerDialog and return it
-            return new DatePickerDialog(getActivity(), this, year, month, day);
-        }
-
-        public void onDateSet(DatePicker view, int year, int month, int day) {
-            iDatePickerCallback.onDatePicked(year, month, day);
-        }
-    }
 
     private boolean validateInput() {
         CharSequence phone = mPhoneNumberEditText.getText();
@@ -252,11 +167,6 @@ public class AddEditTokenFragment extends BaseFragment implements AddEditTokenCo
             return false;
         } else {
             mPhoneNumberInputLayout.setError("");
-        }
-
-        if (TextUtils.isEmpty(mDateString)) {
-            Snackbar.make(getView(), getString(R.string.invalid_date), Snackbar.LENGTH_LONG).show();
-            return false;
         }
 
         return true;

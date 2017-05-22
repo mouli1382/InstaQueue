@@ -24,7 +24,7 @@ public class Service implements Parcelable {
 
     //ToDo - move previous day's metrics to history to improve performance.
     // Holds date wise operational metrics.
-    private Map<String, ServiceDateWiseData> dateWise;
+    private Map<String, ServiceDateWiseData> metrics;
 
     public Service() {
     }
@@ -84,6 +84,14 @@ public class Service implements Parcelable {
 
     public void setDaysOfOperation(int daysOfOperation) {
         this.daysOfOperation = daysOfOperation;
+    }
+
+    public Map<String, ServiceDateWiseData> getMetrics() {
+        return metrics;
+    }
+
+    public void setMetrics(Map<String, ServiceDateWiseData> metrics) {
+        this.metrics = metrics;
     }
 
     @Exclude

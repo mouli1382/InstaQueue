@@ -50,17 +50,10 @@
         </android.support.design.widget.TextInputLayout>
 
         <Button
-            android:id="@+id/date"
+            android:id="@+id/addTokenButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/date"
-            android:layout_marginBottom="16dp"/>
-
-        <Spinner
-            android:id="@+id/counter_spinner"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
-
+            android:text="Add"/>
 
 
     </LinearLayout>

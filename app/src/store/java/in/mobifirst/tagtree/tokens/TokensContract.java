@@ -21,7 +21,7 @@ public interface TokensContract {
 
         void showSnaps(List<Snap> snaps);
 
-        void showAddToken();
+        void showAddToken(Token token);
 
         void showTokenDetailsUi(String tokenId);
 

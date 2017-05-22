@@ -21,8 +21,7 @@
         <activity
             android:name=".addedittoken.AddEditTokenActivity"
             android:parentActivityName=".tokens.TokensActivity"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.DialogWhenLarge">
+            android:screenOrientation="portrait">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data

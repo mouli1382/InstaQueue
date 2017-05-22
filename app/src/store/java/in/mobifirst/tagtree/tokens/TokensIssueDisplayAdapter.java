@@ -52,7 +52,7 @@ public class TokensIssueDisplayAdapter extends RecyclerView.Adapter<TokensIssueD
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Token token = mTokens.get(position);
-        int color = colorArray[token.getCounter() % 3];
+        int color = colorArray[(int) token.getTokenNumber() % 3];
         if (token.isActive()) {
             holder.mView.setBackgroundColor(Color.parseColor("#FFD600"));
             holder.mTokenNumber.setTextColor(mContext.getResources().getColor(R.color.common_google_signin_btn_text_dark_focused));

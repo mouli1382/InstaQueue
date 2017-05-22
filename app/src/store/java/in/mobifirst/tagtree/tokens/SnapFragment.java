@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -95,7 +96,7 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         super.onCreate(savedInstanceState);
         ((IQStoreApplication) getActivity().getApplicationContext()).getApplicationComponent()
                 .inject(this);
-        mSnapAdapter = new SnapAdapter(getActivity());
+        mSnapAdapter = new SnapAdapter(getActivity(), new ArrayList<Snap>(), mItemListener);
     }
 
     @Override
@@ -179,12 +180,12 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         mNoTokenIcon = (ImageView) root.findViewById(R.id.notokensIcon);
         mNoTokenMainView = (TextView) root.findViewById(R.id.notokensMain);
         mNoTokenAddView = (TextView) root.findViewById(R.id.notokensAdd);
-        mNoTokenAddView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAddToken();
-            }
-        });
+//        mNoTokenAddView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                showAddToken();
+//            }
+//        });
 
         // Set up progress indicator
         final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
@@ -271,31 +272,6 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         }
     }
 
-    /**
-     * Listener for clicks on Tokens in the ListView.
-     */
-    TokenItemListener mItemListener = new TokenItemListener() {
-        @Override
-        public void onTokenClick(Token clickedToken) {
-            mPresenter.openTokenDetails(clickedToken);
-        }
-
-        @Override
-        public void onCompleteTokenClick(Token completedToken) {
-            mPresenter.completeToken(completedToken);
-        }
-
-        @Override
-        public void onActivateTokenClick(Token activatedToken) {
-            mPresenter.activateToken(activatedToken);
-        }
-
-        @Override
-        public void onCancelTokenClick(Token cancelledToken) {
-            mPresenter.cancelToken(cancelledToken);
-        }
-    };
-
     @Override
     public void setLoadingIndicator(final boolean active) {
 
@@ -348,7 +324,7 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
     public void showSnaps(List<Snap> snaps) {
         if (isActive()) {
             setLoadingIndicator(false);
-            mSnapAdapter = new SnapAdapter(getActivity(), snaps);
+            mSnapAdapter = new SnapAdapter(getActivity(), snaps, mItemListener);
             mExpandableListView.setAdapter(mSnapAdapter);
 //            mSnapAdapter.replaceData(snaps);
             mTokensView.setVisibility(View.VISIBLE);
@@ -456,8 +432,9 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
     }
 
     @Override
-    public void showAddToken() {
+    public void showAddToken(Token token) {
         Intent intent = new Intent(getContext(), AddEditTokenActivity.class);
+        intent.putExtra(ApplicationConstants.TOKEN_UID, token);
         startActivityForResult(intent, AddEditTokenActivity.REQUEST_ADD_TOKEN);
     }
 
@@ -504,15 +481,18 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         return isAdded();
     }
 
+    /**
+     * Listener for clicks on Tokens in the ListView.
+     */
+    SnapFragment.TokenItemListener mItemListener = new SnapFragment.TokenItemListener() {
+        @Override
+        public void onTokenClick(Token clickedToken) {
+            showAddToken(clickedToken);
+        }
+    };
+
 
     public interface TokenItemListener {
-
         void onTokenClick(Token clickedToken);
-
-        void onCompleteTokenClick(Token completedToken);
-
-        void onActivateTokenClick(Token activatedToken);
-
-        void onCancelTokenClick(Token activatedToken);
     }
 }

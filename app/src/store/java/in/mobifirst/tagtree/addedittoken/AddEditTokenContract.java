@@ -23,8 +23,8 @@ public interface AddEditTokenContract {
 
     interface Presenter extends BasePresenter {
 
-        void addNewToken(String phoneNumber, int counterNumber, long date);
+        void addNewToken(String phoneNumber);
 
-//        void populateToken();
+        void populateToken();
     }
 }

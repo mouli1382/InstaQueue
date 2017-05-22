@@ -244,7 +244,7 @@ final class TokensPresenter implements TokensContract.Presenter {
 
     @Override
     public void addNewToken() {
-        mTokensView.showAddToken();
+//        mTokensView.showAddToken();
     }
 
     @Override

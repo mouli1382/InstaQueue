@@ -75,6 +75,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private static final String COUNTERS_USERS = "counterUserCount/";
     private static final String TOPICS_CHILD = "topics/";
     private static final String TOKENS_HISTORY_CHILD = "token-history";
+    private static final String METRICS_CHILD = "metrics/";
     private final static String mMsg91Url = "https://control.msg91.com/api/sendhttp.php?";
     private final static String mMsgBulkSMSUrl = "http://login.bulksmsgateway.in/sendmessage.php?";
 
@@ -115,13 +116,11 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         Log.e(TAG, "onDataChange --> " + subscriber.toString());
                         if (!subscriber.isUnsubscribed()) {
                             if (dataSnapshot != null) {
-//                                HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
-//                                });
-                                List<Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<ArrayList<Token>>() {
+                                HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
                                 });
                                 if (tokens != null) {
 
-                                    Observable.just(tokens)
+                                    Observable.just(new ArrayList<>(tokens.values()))
                                             .flatMap(new Func1<List<Token>, Observable<Token>>() {
                                                 @Override
                                                 public Observable<Token> call(List<Token> tokens) {
@@ -151,12 +150,12 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                                     return Observable.from(tokens);
                                                 }
                                             })
-                                            .filter(new Func1<Token, Boolean>() {
-                                                @Override
-                                                public Boolean call(Token token) {
-                                                    return !token.isCompleted();
-                                                }
-                                            })
+//                                            .filter(new Func1<Token, Boolean>() {
+//                                                @Override
+//                                                public Boolean call(Token token) {
+//                                                    return !token.isCompleted();
+//                                                }
+//                                            })
                                             .toMultimap(new Func1<Token, String>() {
                                                 @Override
                                                 public String call(Token token) {
@@ -224,34 +223,32 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         .child(uId)
                         .child(serviceUid)
                         .child(TimeUtils.getDate(Calendar.getInstance().getTimeInMillis()))
-                        .orderByChild("storeId")
-                        .equalTo(uId);
+                        .orderByChild("serviceId")
+                        .equalTo(serviceUid);
 
-                final ValueEventListener listener = query.addValueEventListener(new ValueEventListener() {
+                query.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Log.e(TAG, "onDataChange --> " + subscriber.toString());
                         if (!subscriber.isUnsubscribed()) {
                             if (dataSnapshot != null) {
-//                                HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
-//                                });
-                                List<Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<ArrayList<Token>>() {
+                                HashMap<String, Token> tokens = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Token>>() {
                                 });
                                 if (tokens != null) {
-                                    Observable.just(tokens)
+                                    Observable.just(new ArrayList<>(tokens.values()))
                                             .flatMap(new Func1<List<Token>, Observable<Token>>() {
                                                 @Override
                                                 public Observable<Token> call(List<Token> tokens) {
                                                     return Observable.from(tokens);
                                                 }
                                             })
-                                            .filter(new Func1<Token, Boolean>() {
-                                                @Override
-                                                public Boolean call(Token token) {
-                                                    return TimeUtils.getDate(token.getDate())
-                                                            .equalsIgnoreCase(TimeUtils.getDate(Calendar.getInstance().getTimeInMillis()));
-                                                }
-                                            })
+//                                            .filter(new Func1<Token, Boolean>() {
+//                                                @Override
+//                                                public Boolean call(Token token) {
+//                                                    return TimeUtils.getDate(token.getDate())
+//                                                            .equalsIgnoreCase(TimeUtils.getDate(Calendar.getInstance().getTimeInMillis()));
+//                                                }
+//                                            })
                                             .toSortedList(new Func2<Token, Token, Integer>() {
                                                 @Override
                                                 public Integer call(Token token, Token token2) {
@@ -267,7 +264,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                                             .filter(new Func1<Token, Boolean>() {
                                                 @Override
                                                 public Boolean call(Token token) {
-                                                    return token.getCounter() == currentCounter && !token.isCompleted();
+                                                    return token.getServiceId().equalsIgnoreCase(serviceUid) && (token.isIssued() || token.isActive());
                                                 }
                                             })
                                             .toList()
@@ -300,14 +297,14 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
     public void getTokenById(String storeUid, String serviceUid, long date, String tokenId, ValueEventListener valueEventListener) {
-        DatabaseReference tokenRef = mDatabaseReference
+        mDatabaseReference
                 .child("/")
                 .child(TOKENS_CHILD)
                 .child(storeUid)
                 .child(serviceUid)
                 .child(TimeUtils.getDate(date))
-                .child(tokenId);
-        tokenRef.addListenerForSingleValueEvent(valueEventListener);
+                .child(tokenId)
+                .addListenerForSingleValueEvent(valueEventListener);
     }
 
     public Observable<Token> getTokenById(final String storeUid, final String serviceUid, final long date, final String tokenId) {
@@ -317,9 +314,13 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 getTokenById(storeUid, serviceUid, date, tokenId, new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        Token token = dataSnapshot.getValue(Token.class);
-                        subscriber.onNext(token);
-                        subscriber.onCompleted();
+                        if (dataSnapshot.exists()) {
+                            Token token = dataSnapshot.getValue(Token.class);
+                            subscriber.onNext(token);
+                            subscriber.onCompleted();
+                        } else {
+                            subscriber.onNext(null);
+                        }
                     }
 
                     @Override
@@ -335,10 +336,11 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private Task<Void> addTokenUnderStoreCounter(Token token) {
         //Save the token Id under the token number which makes client job easy in sorting and calculating TAT.
         return mDatabaseReference
-                .child(STORE_CHILD)
+                .child(SERVICES_CHILD)
                 .child(token.getStoreId())
-                .child(COUNTERS_CHILD)
-                .child("" + token.getCounter())
+                .child(token.getServiceId())
+                .child(METRICS_CHILD)
+                .child(TimeUtils.getDate(token.getDate()))
                 .child(TOKENS_CHILD)
                 .child(token.getuId())
                 .setValue(token.getTokenNumber());
@@ -391,14 +393,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                 .continueWithTask(new Continuation<Boolean, Task<Long>>() {
                     @Override
                     public Task<Long> then(@NonNull Task<Boolean> task) throws Exception {
-                        Log.e(TAG, "decrementCredits DONE ------");
-                        return incrementTokenCounter(token);
-                    }
-                })
-                .continueWithTask(new Continuation<Long, Task<Long>>() {
-                    @Override
-                    public Task<Long> then(@NonNull Task<Long> task) throws Exception {
-                        final Long currentToken = task.getResult();
+//                        final Long currentToken = task.getResult();
 //                        if (currentToken > 2) {
 //                            return positionInQueue(token.getStoreId(), token.getTimeRange())
 //                                    .continueWithTask(new Continuation<Integer, Task<Long>>() {
@@ -409,7 +404,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 //                                    });
 //
 //                        } else {
-                        return addNewToken(token, currentToken, -1);
+                        return addNewToken(token, -1, -1);
 //                        }
                     }
                 })
@@ -432,7 +427,8 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         Log.e(TAG, "addNewToken START ------");
         final TaskCompletionSource<Long> addTokenSource = new TaskCompletionSource<>();
 
-        DatabaseReference storeRef = mDatabaseReference.getRef()
+        DatabaseReference storeRef = mDatabaseReference
+                .child("/")
                 .child("store")
                 .child(token.getStoreId());
 
@@ -440,33 +436,29 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    String key = mDatabaseReference.child(TOKENS_CHILD)
-                            .push().getKey();
                     Store store = dataSnapshot.getValue(Store.class);
-                    String areaName = store.getArea();
-                    final Token newToken = new Token(key, token.getStoreId(),
-                            token.getPhoneNumber(),
-                            currentToken,
-                            mSharedPrefs.getSting((ApplicationConstants.WEBSITE_LOGO_URL_KEY)),
-                            mSharedPrefs.getSting(ApplicationConstants.DISPLAY_NAME_KEY),
-                            token.getCounter(),
-                            areaName,
-                            token.getMappingId(), token.getDate());
+                    token.setSenderName(store.getName());
+                    token.setSenderPic(store.getLogoUrl());
+                    token.setAreaName(store.getArea());
 
                     mDatabaseReference
+                            .child("/")
                             .child(TOKENS_CHILD)
-                            .child(key)
-                            .setValue(newToken.toMap())
+                            .child(token.getStoreId())
+                            .child(token.getServiceId())
+                            .child(TimeUtils.getDate(token.getDate()))
+                            .child(token.getuId())
+                            .setValue(token.toMap())
                             .continueWithTask(new Continuation<Void, Task<Void>>() {
                                 @Override
                                 public Task<Void> then(@NonNull Task<Void> task) throws Exception {
-                                    return addTokenUnderStoreCounter(newToken);
+                                    return addTokenUnderStoreCounter(token);
                                 }
                             })
                             .continueWithTask(new Continuation<Void, Task<Void>>() {
                                 @Override
                                 public Task<Void> then(@NonNull Task<Void> task) throws Exception {
-                                    return sendSMS(newToken, false, position);
+                                    return sendSMS(token, false, position);
                                 }
                             })
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -677,13 +669,13 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         default:
                             message = appointmentEnglish + "token=" + (token.getTokenNumber()) + " from " + token.getSenderName().trim() + ","
                                     + token.getAreaName().trim() + ","
-                                    + "Counter #" + token.getCounter()
+                                    + "Counter #" + token.getServiceId()
                                     + (position != -1 ? positionEnglish : "") + ". To avoid standing in Q, download TagTree app or click on the link." + CLIENT_APP_PLAYSTORE_URL + " and save your time and energy";
                             break;
                         case 1: //Telugu
                             message = appointmentTelugu + "టోకెన్=" + (token.getTokenNumber()) + "," + token.getSenderName().trim() + ","
                                     + token.getAreaName().trim() + ","
-                                    + "కౌంటర్ #" + token.getCounter() + "."
+                                    + "కౌంటర్ #" + token.getServiceId() + "."
                                     + (position != -1 ? positionTelugu : "") +
                                     "Q లో  నిలబడటం నివారించేందుకు, ఇప్పుడే  క్రింద లింక్ క్లిక్ చేయండి."
                                     + CLIENT_APP_PLAYSTORE_URL
@@ -861,48 +853,48 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 //        }
     }
 
-    private Task<Long> incrementTokenCounter(Token token) {
-        final TaskCompletionSource<Long> incrementTokenTask = new TaskCompletionSource<>();
-        Log.e(TAG, "incrementTokenCounter START ------");
-        DatabaseReference tokenCounterRef = mDatabaseReference
-                .child("/")
-                .child(STORE_CHILD)
-                .child(token.getStoreId())
-                .child(COUNTERS_CHILD)
-                .child("" + token.getCounter())
-                .child(TimeUtils.getDate(token.getDate()))
-                .child("tokenCounter");
-        tokenCounterRef.runTransaction(new Transaction.Handler() {
-            @Override
-            public Transaction.Result doTransaction(MutableData mutableData) {
-                Long currentValue = mutableData.getValue(Long.class);
-                if (currentValue == null) {
-                    mutableData.setValue(1);
-                } else {
-                    mutableData.setValue(currentValue + 1);
-                }
-
-                if (mutableData.equals(currentValue)) {
-                    return Transaction.abort();
-                } else {
-                    Log.e(TAG, "incrementTokenCounter SUCCESS ------");
-                    return Transaction.success(mutableData);
-                }
-            }
-
-            @Override
-            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                if (databaseError == null && b) {
-                    Log.e(TAG, "incrementTokenCounter END ------");
-                    incrementTokenTask.setResult(dataSnapshot.getValue(Long.class));
-                } /*else {
-                    incrementTokenTask.setException(databaseError.toException());
-                }*/
-            }
-        });
-
-        return incrementTokenTask.getTask();
-    }
+//    private Task<Long> incrementTokenCounter(Token token) {
+//        final TaskCompletionSource<Long> incrementTokenTask = new TaskCompletionSource<>();
+//        Log.e(TAG, "incrementTokenCounter START ------");
+//        DatabaseReference tokenCounterRef = mDatabaseReference
+//                .child("/")
+//                .child(STORE_CHILD)
+//                .child(token.getStoreId())
+//                .child(COUNTERS_CHILD)
+//                .child("" + token.getCounter())
+//                .child(TimeUtils.getDate(token.getDate()))
+//                .child("tokenCounter");
+//        tokenCounterRef.runTransaction(new Transaction.Handler() {
+//            @Override
+//            public Transaction.Result doTransaction(MutableData mutableData) {
+//                Long currentValue = mutableData.getValue(Long.class);
+//                if (currentValue == null) {
+//                    mutableData.setValue(1);
+//                } else {
+//                    mutableData.setValue(currentValue + 1);
+//                }
+//
+//                if (mutableData.equals(currentValue)) {
+//                    return Transaction.abort();
+//                } else {
+//                    Log.e(TAG, "incrementTokenCounter SUCCESS ------");
+//                    return Transaction.success(mutableData);
+//                }
+//            }
+//
+//            @Override
+//            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+//                if (databaseError == null && b) {
+//                    Log.e(TAG, "incrementTokenCounter END ------");
+//                    incrementTokenTask.setResult(dataSnapshot.getValue(Long.class));
+//                } /*else {
+//                    incrementTokenTask.setException(databaseError.toException());
+//                }*/
+//            }
+//        });
+//
+//        return incrementTokenTask.getTask();
+//    }
 
 //    private void incrementTokenCounter(Token token, @NonNull Transaction.Handler handler) {
 //
@@ -1017,36 +1009,42 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     //Reset token counter
     public void resetTokenCounter(String storeId) {
-        DatabaseReference tokenCounterRef = mDatabaseReference
-                .child("store")
-                .child(storeId)
-                .child("tokenCounter");
-        tokenCounterRef.runTransaction(new Transaction.Handler() {
-            @Override
-            public Transaction.Result doTransaction(MutableData mutableData) {
-                mutableData.setValue(0);
-
-                return Transaction.success(mutableData);
-            }
-
-            @Override
-            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-
-            }
-        });
+//        DatabaseReference tokenCounterRef = mDatabaseReference
+//                .child("/")
+//                .child("store")
+//                .child(storeId)
+//                .child("tokenCounter");
+//        tokenCounterRef.runTransaction(new Transaction.Handler() {
+//            @Override
+//            public Transaction.Result doTransaction(MutableData mutableData) {
+//                mutableData.setValue(0);
+//
+//                return Transaction.success(mutableData);
+//            }
+//
+//            @Override
+//            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+//
+//            }
+//        });
     }
 
     private Task<Void> moveToHistory(Token token) {
         return mDatabaseReference
+                .child("/")
                 .child(TOKENS_HISTORY_CHILD)
-                .push()
+                .child(token.getuId())
                 .setValue(token.toMap());
     }
 
     private Task<Void> removeFromTokenTable(Token token) {
         //Remove it from the token table
         return mDatabaseReference
+                .child("/")
                 .child(TOKENS_CHILD)
+                .child(token.getStoreId())
+                .child(token.getServiceId())
+                .child(TimeUtils.getDate(token.getDate()))
                 .child(token.getuId())
                 .removeValue();
     }
@@ -1054,10 +1052,12 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private Task<Void> removeTokenFromStore(Token token) {
         //Remove the activated token from the store counter so that the TAT is calculated on the issued tokens only.
         return mDatabaseReference
-                .child(STORE_CHILD)
+                .child("/")
+                .child(SERVICES_CHILD)
                 .child(token.getStoreId())
-                .child(COUNTERS_CHILD)
-                .child("" + token.getCounter())
+                .child(token.getServiceId())
+                .child(METRICS_CHILD)
+                .child(TimeUtils.getDate(token.getDate()))
                 .child(TOKENS_CHILD)
                 .child(token.getuId())
                 .removeValue();
@@ -1127,7 +1127,11 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
             //Update the token completion time
             mDatabaseReference
+                    .child("/")
                     .child(TOKENS_CHILD)
+                    .child(token.getStoreId())
+                    .child(token.getServiceId())
+                    .child(TimeUtils.getDate(token.getDate()))
                     .child(token.getuId())
                     .setValue(token)
                     .continueWithTask(new Continuation<Void, Task<Void>>() {
@@ -1135,7 +1139,11 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         public Task<Void> then(@NonNull Task<Void> task) throws Exception {
                             Log.e(TAG, "updateToken token status updated to COMPLETED.... ");
                             return mDatabaseReference
+                                    .child("/")
                                     .child(TOKENS_CHILD)
+                                    .child(token.getStoreId())
+                                    .child(token.getServiceId())
+                                    .child(TimeUtils.getDate(token.getDate()))
                                     .child(token.getuId())
                                     .child("tokenFinishTime")
                                     .setValue(ServerValue.TIMESTAMP);
@@ -1146,8 +1154,13 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         public void onSuccess(Void aVoid) {
                             Log.e(TAG, "updateToken token finish time updated.... ");
                             mDatabaseReference
+                                    .child("/")
                                     .child(TOKENS_CHILD)
-                                    .child(token.getuId()).addListenerForSingleValueEvent(completionListener);
+                                    .child(token.getStoreId())
+                                    .child(token.getServiceId())
+                                    .child(TimeUtils.getDate(token.getDate()))
+                                    .child(token.getuId())
+                                    .addListenerForSingleValueEvent(completionListener);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -1206,7 +1219,11 @@ public class FirebaseDatabaseManager implements DatabaseManager {
             };
 
             mDatabaseReference
+                    .child("/")
                     .child(TOKENS_CHILD)
+                    .child(token.getStoreId())
+                    .child(token.getServiceId())
+                    .child(TimeUtils.getDate(token.getDate()))
                     .child(token.getuId())
                     .setValue(token)
                     .continueWithTask(new Continuation<Void, Task<Void>>() {
@@ -1214,7 +1231,11 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         public Task<Void> then(@NonNull Task<Void> task) throws Exception {
                             Log.e(TAG, "updateToken status updated to READY.... ");
                             return mDatabaseReference
+                                    .child("/")
                                     .child(TOKENS_CHILD)
+                                    .child(token.getStoreId())
+                                    .child(token.getServiceId())
+                                    .child(TimeUtils.getDate(token.getDate()))
                                     .child(token.getuId())
                                     .child("activatedTokenTime")
                                     .setValue(ServerValue.TIMESTAMP);
@@ -1225,8 +1246,13 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                         public void onSuccess(Void aVoid) {
                             Log.e(TAG, "updateToken token activation time updated.... ");
                             mDatabaseReference
+                                    .child("/")
                                     .child(TOKENS_CHILD)
-                                    .child(token.getuId()).addListenerForSingleValueEvent(valueEventListener);
+                                    .child(token.getStoreId())
+                                    .child(token.getServiceId())
+                                    .child(TimeUtils.getDate(token.getDate()))
+                                    .child(token.getuId())
+                                    .addListenerForSingleValueEvent(valueEventListener);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -1290,10 +1316,11 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
     private Task<Void> setActiveTokenNumber(Token token) {
         return mDatabaseReference
-                .child(STORE_CHILD)
+                .child("/")
+                .child(SERVICES_CHILD)
                 .child(token.getStoreId())
-                .child(COUNTERS_CHILD)
-                .child("" + token.getCounter())
+                .child(token.getServiceId())
+                .child(METRICS_CHILD)
                 .child(TimeUtils.getDate(token.getDate()))
                 .child(COUNTERS_LAST_ACTIVE_TOKEN)
                 .setValue(token.getTokenNumber());
@@ -1340,10 +1367,12 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     private Task<Boolean> incrementUserCount(Token token) {
         IncrementTransactionHander handler = new IncrementTransactionHander();
         mDatabaseReference
-                .child(STORE_CHILD)
+                .child("/")
+                .child(SERVICES_CHILD)
                 .child(token.getStoreId())
-                .child(COUNTERS_CHILD)
-                .child("" + token.getCounter())
+                .child(token.getServiceId())
+                .child(METRICS_CHILD)
+                .child(TimeUtils.getDate(token.getDate()))
                 .child(COUNTERS_USERS)
                 .runTransaction(handler);
         return handler.getTask();
@@ -1358,10 +1387,12 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
         final long finalWaitTimePerToken = waitTimePerToken;
         mDatabaseReference
-                .child(STORE_CHILD)
+                .child("/")
+                .child(SERVICES_CHILD)
                 .child(token.getStoreId())
-                .child(COUNTERS_CHILD)
-                .child("" + token.getCounter())
+                .child(token.getServiceId())
+                .child(METRICS_CHILD)
+                .child(TimeUtils.getDate(token.getDate()))
                 .child(COUNTERS_AVG_TAT_CHILD)
                 .runTransaction(new Transaction.Handler() {
                     @Override
@@ -1403,10 +1434,12 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
         final long finalBurstTime = burstTime;
         mDatabaseReference
-                .child(STORE_CHILD)
+                .child("/")
+                .child(SERVICES_CHILD)
                 .child(token.getStoreId())
-                .child(COUNTERS_CHILD)
-                .child("" + token.getCounter())
+                .child(token.getServiceId())
+                .child(METRICS_CHILD)
+                .child(TimeUtils.getDate(token.getDate()))
                 .child(COUNTERS_AVG_BURST_CHILD)
                 .runTransaction(new Transaction.Handler() {
                     @Override
@@ -1781,7 +1814,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                     public Task<Void> then(@NonNull Task<Service> task) throws Exception {
                         Service service = task.getResult();
 
-                        List<Token> generatedTokenObjs = getNewTokenObjects(service, date);
+                        Map<String, Token> generatedTokenObjs = getNewTokenObjects(service, date);
 
                         return mDatabaseReference
                                 .child("/")
@@ -1814,7 +1847,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
         return true;
     }
 
-    private List<Token> getNewTokenObjects(Service service, String date) {
+    private Map<String, Token> getNewTokenObjects(Service service, String date) {
         if (service == null) {
             return null;
         }
@@ -1828,7 +1861,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
 
         int dayMask = isTodayAWorkingDay(date, daysOfOpeation);
         if (dayMask != -1) {
-            List<Token> genTokens = new ArrayList<>();
+            Map<String, Token> genTokens = new HashMap<>();
             Map<Integer, Slot> map = service.getSlotsMap();
             Slot slot = map.get(dayMask);
             List<Pair<Double, Double>> timeSlots = getTimings(slot.getTimeSlots());
@@ -1883,7 +1916,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                             , timeOfAppointment
                             , timeRangeBuilder.toString());
 
-                    genTokens.add(counter, token);
+                    genTokens.put(key, token);
                     ++counter;
                 }
             }

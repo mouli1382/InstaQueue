@@ -80,8 +80,8 @@ public class TokensAdapter extends RecyclerView.Adapter<TokensAdapter.ViewHolder
         } else {
             holder.mSenderName.setText(token.getPhoneNumber());
         }
-        holder.mTokenDate.setText(TimeUtils.getDate(token.getTimestamp()));
-        holder.mTokenTime.setText(TimeUtils.getTime(token.getTimestamp()));
+        holder.mTokenDate.setText(TimeUtils.getDate(token.getDate()));
+        holder.mTokenTime.setText(TimeUtils.getTime(token.getAppointmentTime()));
     }
 
     @Override
