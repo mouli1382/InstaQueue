@@ -143,6 +143,7 @@
 
     <string name="fetching_store_details">Fetching Store</string>
     <string name="fetching_service_details">Fetching Services</string>
+    <string name="fetching_appointment_details">Loading Appointments</string>
 
     <string name="service_name">Service Name</string>
     <string name="description">Purpose of service</string>
@@ -150,5 +151,7 @@
     <string name="empty_service_desc">Please enter Service description</string>
     <string name="duration">Avg Time taken per customer in MINUTES</string>
     <string name="invalid_duration">Enter between 1 - 60</string>
+
+    <string name="not_open_today">Sorry! we are not working today. \n Please select another date.</string>
 
 </resources>

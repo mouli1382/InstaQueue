@@ -1878,7 +1878,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
                     Token token = new Token(key
                             , service.getStoreId()
                             , service.getId()
-                            , Long.valueOf(counter)
+                            , Long.valueOf(counter + 1)
                             , dateTime
                             , timeOfAppointment
                             , timeRangeBuilder.toString());
@@ -1942,7 +1942,7 @@ public class FirebaseDatabaseManager implements DatabaseManager {
     }
 
 
-    private static int isTodayAWorkingDay(String dateString, int daysOfOperationMask) {
+    public static int isTodayAWorkingDay(String dateString, int daysOfOperationMask) {
         boolean[] daysOfOperation = new boolean[7];
         for (int i = 0; i < 7; ++i) {
             daysOfOperation[i] = ((daysOfOperationMask >> i & 1) != 0);

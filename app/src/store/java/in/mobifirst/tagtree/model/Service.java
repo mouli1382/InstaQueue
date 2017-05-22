@@ -129,6 +129,7 @@ public class Service implements Parcelable {
         parcel.writeString(storeId);
         parcel.writeString(name);
         parcel.writeString(description);
+        parcel.writeInt(daysOfOperation);
     }
 
     protected Service(Parcel in) {
@@ -136,6 +137,7 @@ public class Service implements Parcelable {
         storeId = in.readString();
         name = in.readString();
         description = in.readString();
+        daysOfOperation = in.readInt();
     }
 
     public static final Creator<Service> CREATOR = new Creator<Service>() {

@@ -9,9 +9,11 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 
+import java.util.Calendar;
+
 import in.mobifirst.tagtree.R;
 import in.mobifirst.tagtree.model.Service;
-import in.mobifirst.tagtree.tokens.TokensActivity;
+import in.mobifirst.tagtree.tokens.TokensFetcherActivity;
 import in.mobifirst.tagtree.util.ApplicationConstants;
 
 import static in.mobifirst.tagtree.util.ApplicationConstants.PERMISSION_RECEIVE_SMS;
@@ -62,7 +64,9 @@ public class RequestPermissionsActivity extends BaseDrawerActivity implements Ac
     }
 
     private void startOnBoardingActivity() {
-        TokensActivity.start(RequestPermissionsActivity.this, (Service) getIntent().getParcelableExtra(ApplicationConstants.SERVICE_UID));
+        TokensFetcherActivity.start(RequestPermissionsActivity.this
+                , (Service) getIntent().getParcelableExtra(ApplicationConstants.SERVICE_UID)
+                , Calendar.getInstance().getTimeInMillis());
         finish();
     }
 }

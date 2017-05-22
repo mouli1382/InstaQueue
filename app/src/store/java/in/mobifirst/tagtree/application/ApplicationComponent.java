@@ -8,6 +8,8 @@ import in.mobifirst.tagtree.activity.RazorPayActivity;
 import in.mobifirst.tagtree.activity.WelcomeActivity;
 import in.mobifirst.tagtree.addeditservice.AddEditServiceFragment;
 import in.mobifirst.tagtree.addeditservice.ServiceDetailsFetcherActivity;
+import in.mobifirst.tagtree.addeditstore.AddEditStoreFragment;
+import in.mobifirst.tagtree.addeditstore.StoreDetailsFetcherActivity;
 import in.mobifirst.tagtree.addedittoken.AddEditTokenFragment;
 import in.mobifirst.tagtree.authentication.AuthenticationModule;
 import in.mobifirst.tagtree.authentication.FirebaseAuthenticationManager;
@@ -19,14 +21,13 @@ import in.mobifirst.tagtree.data.token.TokensRepository;
 import in.mobifirst.tagtree.data.token.TokensRepositoryModule;
 import in.mobifirst.tagtree.database.DatabaseModule;
 import in.mobifirst.tagtree.database.FirebaseDatabaseManager;
-import in.mobifirst.tagtree.addeditstore.StoreDetailsFetcherActivity;
-import in.mobifirst.tagtree.addeditstore.AddEditStoreFragment;
 import in.mobifirst.tagtree.preferences.IQSharedPreferences;
 import in.mobifirst.tagtree.services.ServicesFragment;
 import in.mobifirst.tagtree.sms.SmsReceiver;
 import in.mobifirst.tagtree.storage.FirebaseStorageManager;
 import in.mobifirst.tagtree.storage.StorageModule;
 import in.mobifirst.tagtree.tokens.SnapFragment;
+import in.mobifirst.tagtree.tokens.TokensFetcherActivity;
 import in.mobifirst.tagtree.tokens.TokensFragment;
 
 @Singleton
@@ -49,6 +50,8 @@ public interface ApplicationComponent {
     void inject(StoreDetailsFetcherActivity settingsFetcherActivity);
 
     void inject(ServiceDetailsFetcherActivity serviceDetailsFetcherActivity);
+
+    void inject(TokensFetcherActivity tokensFetcherActivity);
 
     void inject(AddEditStoreFragment settingsFragment);
 

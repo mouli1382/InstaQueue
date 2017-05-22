@@ -29,7 +29,10 @@ import android.widget.ToggleButton;
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -76,6 +79,7 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
     private String storeUid;
     private String serviceUid;
     private String[] timeSlots;
+    private Map<Integer, Slot> slotMap = new HashMap<>();
 
     @Inject
     IQSharedPreferences mIQSharedPreferences;
@@ -155,7 +159,7 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
                                 , mServiceDescEditText.getText().toString()
                                 , daysOfOperation
                                 , Integer.parseInt(mDurationEditText.getText().toString()));
-                        service.setSlots(mAdapter.getmItems());
+                        service.setSlots(mAdapter.getItems());
                         if (!TextUtils.isEmpty(serviceUid)) {
                             service.setId(serviceUid);
                             mPresenter.editServiceDetails(service);
@@ -327,7 +331,7 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
                 );
 
                 if (mSwitch.isChecked()) {
-                    List<Slot> items = mAdapter.getmItems();
+                    List<Slot> items = mAdapter.getItems();
                     for (Slot slot : items) {
                         slot.setTimeSlots(stringBuilder.toString());
                     }
@@ -348,14 +352,30 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
     private void loadSpinner(int daysOfOperation) {
         if (daysOfOperation > 0) {
             mDaysSpinner.setVisibility(View.VISIBLE);
-            List<Slot> items = new ArrayList<>();
-            for (int i = 0; i < 7; ++i) {
-                if (mDays[i].isChecked()) {
-                    items.add(new Slot(mDays[i].getText().toString(), 1 << i, ""));
+            if (mAdapter != null && mAdapter.getCount() > 0) {
+                List<Slot> items = new ArrayList<>();
+                for (int i = 0; i < 7; ++i) {
+                    if (mDays[i].isChecked()) {
+                        Slot slot;
+                        int key = 1 << i;
+                        if (slotMap.containsKey(key)) {
+                            slot = slotMap.get(key);
+                        } else {
+                            slot = new Slot(mDays[i].getText().toString(), key, "");
+                        }
+                        items.add(slot);
+                    }
                 }
+                mAdapter = new CustomAdapter(getActivity(), items);
+            } else {
+                List<Slot> items = new ArrayList<>();
+                for (int i = 0; i < 7; ++i) {
+                    if (mDays[i].isChecked()) {
+                        items.add(new Slot(mDays[i].getText().toString(), 1 << i, ""));
+                    }
+                }
+                mAdapter = new CustomAdapter(getActivity(), items);
             }
-
-            mAdapter = new CustomAdapter(getActivity(), items);
             mDaysSpinner.setAdapter(mAdapter);
             mDaysSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -403,65 +423,61 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
 
     private void addTimeRangeSelectors(Slot slot) {
         mSeekbarLayout.setVisibility(View.VISIBLE);
+        timeSlots = new String[4];
+        earlymorning.resetSelectedValues();
+        morning.resetSelectedValues();
+        afternoon.resetSelectedValues();
+        evening.resetSelectedValues();
+
         String dayHours = slot.getTimeSlots();
-        if (TextUtils.isEmpty(dayHours)) {
-            timeSlots = new String[4];
-            earlymorning.resetSelectedValues();
-            morning.resetSelectedValues();
-            afternoon.resetSelectedValues();
-            evening.resetSelectedValues();
-        } else {
+        if (!TextUtils.isEmpty(dayHours)) {
             String[] tokens = dayHours.split(";");
             if (tokens != null && tokens.length > 0) {
                 String[] values;
                 double min;
                 double max;
-                if (!TextUtils.isEmpty(tokens[0])) {
-                    values = tokens[0].split(":");
-                    min = Double.valueOf(values[0]);
-                    max = Double.valueOf(values[1]);
-                    earlymorning.setSelectedMinValue(min);
-                    earlymorning.setSelectedMaxValue(max);
-                    timeSlots[0] = min + ":" + max;
-                } else {
-                    timeSlots[0] = "";
-                    earlymorning.resetSelectedValues();
-                }
-
-                if (!TextUtils.isEmpty(tokens[1])) {
-                    values = tokens[1].split(":");
-                    min = Double.valueOf(values[0]);
-                    max = Double.valueOf(values[1]);
-                    morning.setSelectedMinValue(min);
-                    morning.setSelectedMaxValue(max);
-                    timeSlots[1] = min + ":" + max;
-                } else {
-                    timeSlots[1] = "";
-                    morning.resetSelectedValues();
-                }
-
-                if (!TextUtils.isEmpty(tokens[2])) {
-                    values = tokens[2].split(":");
-                    min = Double.valueOf(values[0]);
-                    max = Double.valueOf(values[1]);
-                    afternoon.setSelectedMinValue(Double.valueOf(values[0]));
-                    afternoon.setSelectedMaxValue(Double.valueOf(values[1]));
-                    timeSlots[2] = min + ":" + max;
-                } else {
-                    timeSlots[2] = "";
-                    afternoon.resetSelectedValues();
-                }
-
-                if (!TextUtils.isEmpty(tokens[3])) {
-                    values = tokens[3].split(":");
-                    min = Double.valueOf(values[0]);
-                    max = Double.valueOf(values[1]);
-                    evening.setSelectedMinValue(Double.valueOf(values[0]));
-                    evening.setSelectedMaxValue(Double.valueOf(values[1]));
-                    timeSlots[3] = min + ":" + max;
-                } else {
-                    timeSlots[3] = "";
-                    evening.resetSelectedValues();
+                List<String> timeList = Arrays.asList(tokens);
+                for (int i = 0; i < timeList.size(); ++i) {
+                    if (!TextUtils.isEmpty(tokens[i])) {
+                        values = tokens[i].split(":");
+                        min = Double.valueOf(values[0]);
+                        max = Double.valueOf(values[1]);
+                        switch (i) {
+                            case 0:
+                                earlymorning.setSelectedMinValue(min);
+                                earlymorning.setSelectedMaxValue(max);
+                                break;
+                            case 1:
+                                morning.setSelectedMinValue(min);
+                                morning.setSelectedMaxValue(max);
+                                break;
+                            case 2:
+                                afternoon.setSelectedMinValue(min);
+                                afternoon.setSelectedMaxValue(max);
+                                break;
+                            case 3:
+                                evening.setSelectedMinValue(min);
+                                evening.setSelectedMaxValue(max);
+                                break;
+                        }
+                        timeSlots[i] = min + ":" + max;
+                    } else {
+                        timeSlots[i] = "";
+                        switch (i) {
+                            case 0:
+                                earlymorning.resetSelectedValues();
+                                break;
+                            case 1:
+                                morning.resetSelectedValues();
+                                break;
+                            case 2:
+                                afternoon.resetSelectedValues();
+                                break;
+                            case 3:
+                                evening.resetSelectedValues();
+                                break;
+                        }
+                    }
                 }
             }
         }
@@ -478,7 +494,7 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
             mContext = context;
         }
 
-        public List<Slot> getmItems() {
+        public List<Slot> getItems() {
             return mItems;
         }
 
@@ -555,7 +571,7 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
                     mDays[i].setChecked((daysOfOperation & (1 << i)) != 0);
                 }
             }
-
+            slotMap = service.getSlotsMap();
             loadSpinner(daysOfOperation, service.getSlots());
         }
     }
@@ -597,7 +613,7 @@ public class AddEditServiceFragment extends BaseFragment implements AddEditServi
             return result;
         }
 
-        List<Slot> slots = mAdapter.getmItems();
+        List<Slot> slots = mAdapter.getItems();
         if (slots == null || slots.size() == 0) {
             showMessage(getView(), "Select working Hours.");
             return result;

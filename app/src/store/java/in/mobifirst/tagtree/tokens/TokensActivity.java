@@ -53,14 +53,20 @@ public class TokensActivity extends BaseDrawerActivity {
 
     private Button mDateButton;
     private String mDateString;
+
+    @NonNull
     private long mDate;
 
     @NonNull
     private Service mService;
 
-    public static void start(Context caller, Service service) {
+    private boolean isOpenToday;
+
+    public static void start(Context caller, Service service, @NonNull long date, boolean isOpenToday) {
         Intent intent = new Intent(caller, TokensActivity.class);
         intent.putExtra(ApplicationConstants.SERVICE_UID, service);
+        intent.putExtra(ApplicationConstants.BOOKING_DATE, date);
+        intent.putExtra(ApplicationConstants.IS_OPEN_TODAY, isOpenToday);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         caller.startActivity(intent);
     }
@@ -70,7 +76,8 @@ public class TokensActivity extends BaseDrawerActivity {
         super.onCreate(savedInstanceState);
 
         mService = getIntent().getParcelableExtra(ApplicationConstants.SERVICE_UID);
-        mDate = Calendar.getInstance().getTimeInMillis();
+        mDate = getIntent().getLongExtra(ApplicationConstants.BOOKING_DATE, Calendar.getInstance().getTimeInMillis());
+        isOpenToday = getIntent().getBooleanExtra(ApplicationConstants.IS_OPEN_TODAY, false);
         mDateString = TimeUtils.getDate(mDate);
 
         // Set up the toolbar.
@@ -87,6 +94,13 @@ public class TokensActivity extends BaseDrawerActivity {
         });
 
         SwitchCompat flow = (SwitchCompat) findViewById(R.id.switchCompat);
+
+        if (isOpenToday) {
+            flow.setEnabled(true);
+        } else {
+            flow.setEnabled(false);
+        }
+
         flow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean issueFlow) {
@@ -151,6 +165,7 @@ public class TokensActivity extends BaseDrawerActivity {
     private Bundle getServiceBundle() {
         Bundle b = new Bundle();
         b.putParcelable(ApplicationConstants.SERVICE_UID, mService);
+        b.putBoolean(ApplicationConstants.IS_OPEN_TODAY, isOpenToday);
 
         return b;
     }
@@ -166,18 +181,21 @@ public class TokensActivity extends BaseDrawerActivity {
                 mDateString = TimeUtils.getDate(mDate);
                 mDateButton.setText(mDateString);
 
-                FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
-                frameLayout.removeAllViewsInLayout();
-                SnapFragment snapFragment = SnapFragment.newInstance();
-                snapFragment.setArguments(getServiceBundle());
-                ActivityUtilities.replaceFragmentToActivity(
-                        getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
+                TokensFetcherActivity.start(TokensActivity.this, mService, mDate);
+                finish();
 
-                // Create the presenter
-                DaggerTokensComponent.builder()
-                        .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
-                        .tokensPresenterModule(new TokensPresenterModule(snapFragment, mService, mDate)).build()
-                        .inject(TokensActivity.this);
+//                FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_base_drawer);
+//                frameLayout.removeAllViewsInLayout();
+//                SnapFragment snapFragment = SnapFragment.newInstance();
+//                snapFragment.setArguments(getServiceBundle());
+//                ActivityUtilities.replaceFragmentToActivity(
+//                        getSupportFragmentManager(), snapFragment, R.id.content_base_drawer);
+//
+//                // Create the presenter
+//                DaggerTokensComponent.builder()
+//                        .applicationComponent(((IQStoreApplication) getApplication()).getApplicationComponent())
+//                        .tokensPresenterModule(new TokensPresenterModule(snapFragment, mService, mDate)).build()
+//                        .inject(TokensActivity.this);
             }
         });
         datePickerDialogFragment.show(getSupportFragmentManager(), "datePicker");

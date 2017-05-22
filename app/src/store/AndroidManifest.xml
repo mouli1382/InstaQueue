@@ -21,7 +21,8 @@
         <activity
             android:name=".addedittoken.AddEditTokenActivity"
             android:parentActivityName=".tokens.TokensActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.DialogWhenLarge">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
@@ -34,7 +35,7 @@
         <activity
             android:name=".addeditservice.AddEditServiceActivity"
             android:parentActivityName=".services.ServicesActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
@@ -43,28 +44,35 @@
         </activity>
         <activity
             android:name=".addeditstore.AddEditStoreActivity"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".config.SettingsActivity"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".activity.CreditsActivity"
             android:label="@string/title_activity_credits"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.razorpay.CheckoutActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
 
-        <activity android:name=".addeditstore.StoreDetailsFetcherActivity"
+        <activity
+            android:name=".addeditstore.StoreDetailsFetcherActivity"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".addeditservice.ServiceDetailsFetcherActivity"
+        <activity
+            android:name=".addeditservice.ServiceDetailsFetcherActivity"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".activity.RazorPayActivity"
+        <activity
+            android:name=".tokens.TokensFetcherActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activity.RazorPayActivity"
             android:screenOrientation="portrait" />
         <!-- Add your API key here -->
         <meta-data
@@ -74,13 +82,15 @@
             android:name="io.fabric.ApiKey"
             android:value="da7a69f0dee3ffe21c69c8e4aff9bdff1db53059" />
 
-        <receiver android:name=".sms.SmsReceiver" android:exported="true" >
-            <intent-filter android:priority="999" >
+        <receiver
+            android:name=".sms.SmsReceiver"
+            android:exported="true">
+            <intent-filter android:priority="999">
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
 
-        <service android:name=".display.TokenDisplayService"/>
+        <service android:name=".display.TokenDisplayService" />
     </application>
 
 </manifest>

@@ -29,6 +29,8 @@ public class ApplicationConstants {
 
     public static final String STORE_UID = "store_uid";
     public static final String SERVICE_UID = "service_uid";
+    public static final String BOOKING_DATE = "booking_date";
+    public static final String IS_OPEN_TODAY = "is_open_today";
 
     public static final String LAST_CREATED_TOKEN = "last_created_token";
 }

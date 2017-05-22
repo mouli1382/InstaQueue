@@ -64,6 +64,8 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
 
     private ExpandableListView mExpandableListView;
 
+    private boolean isOpenToday;
+
     public SnapFragment() {
         // Requires empty public constructor
     }
@@ -82,7 +84,7 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
                 showNetworkError(getView());
             } else {
                 if (getView() != null) {
-                    mPresenter.loadTokensMap(false);
+                    startLoadingSlots(false);
                 }
             }
         }
@@ -105,7 +107,11 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
             setLoadingIndicator(false);
             showNetworkError(getView());
         } else {
-            mPresenter.subscribe();
+            if (isOpenToday) {
+                mPresenter.subscribe();
+            } else {
+                showNotWorkingToday();
+            }
         }
         TTLocalBroadcastManager.registerReceiver(getActivity(), mNetworkBroadcastReceiver, TTLocalBroadcastManager.NETWORK_INTENT_ACTION);
     }
@@ -138,20 +144,22 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         dateButton.setVisibility(View.VISIBLE);
 
 
-        final Service service = (Service) getArguments().getParcelable(ApplicationConstants.SERVICE_UID);
+        final Service service = getArguments().getParcelable(ApplicationConstants.SERVICE_UID);
+        isOpenToday = getArguments().getBoolean(ApplicationConstants.IS_OPEN_TODAY);
         // Set up floating action button
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        fab.setVisibility(View.GONE);
 
-        fab.setImageResource(R.drawable.ic_add);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //ToDo - TESTING CM
-                mPresenter.createAppointmentSlots(service.getId());
-            }
-        });
-        fab.setVisibility(View.VISIBLE);
+//        fab.setImageResource(R.drawable.ic_add);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                //ToDo - TESTING CM
+//                mPresenter.createAppointmentSlots(service.getId());
+//            }
+//        });
+//        fab.setVisibility(View.VISIBLE);
     }
 
     @Nullable
@@ -193,7 +201,7 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
             @Override
             public void onRefresh() {
                 if (mNetworkConnectionUtils.isConnected()) {
-                    mPresenter.loadTokensMap(false);
+                    startLoadingSlots(false);
                 } else {
                     setLoadingIndicator(false);
                 }
@@ -213,7 +221,7 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
                 showFilteringPopUpMenu();
                 break;
             case R.id.menu_refresh:
-                mPresenter.loadTokensMap(true);
+                startLoadingSlots(true);
                 break;
         }
         return true;
@@ -245,12 +253,22 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
                         mPresenter.setFiltering(TokensFilterType.ALL_TOKENS);
                         break;
                 }
-                mPresenter.loadTokensMap(false);
+                startLoadingSlots(false);
                 return true;
             }
         });
 
         popup.show();
+    }
+
+
+    private void startLoadingSlots(boolean forceUpdate) {
+        if (isOpenToday) {
+            mPresenter.loadTokensMap(forceUpdate);
+        } else {
+            showNotWorkingToday();
+            showMessage(getString(R.string.not_open_today));
+        }
     }
 
     /**
@@ -404,6 +422,17 @@ public class SnapFragment extends BaseFragment implements TokensContract.View {
         mNoTokenMainView.setText(mainText);
         mNoTokenIcon.setImageDrawable(getResources().getDrawable(iconRes));
         mNoTokenAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
+    }
+
+    private void showNotWorkingToday() {
+        setLoadingIndicator(false);
+        mTokensView.setVisibility(View.GONE);
+
+        mNoTokensView.setVisibility(View.VISIBLE);
+        mNoTokenMainView.setText(getString(R.string.not_open_today));
+
+        mNoTokenIcon.setVisibility(View.GONE);
+        mNoTokenAddView.setVisibility(View.GONE);
     }
 
     @Override

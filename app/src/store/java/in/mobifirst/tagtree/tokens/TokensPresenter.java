@@ -121,30 +121,6 @@ final class TokensPresenter implements TokensContract.Presenter {
         mSubscriptions.clear();
         Subscription subscription = mTokensRepository
                 .getTokens(mService.getId(), mCurrentCounter)
-//                .flatMap(new Func1<List<Token>, Observable<Token>>() {
-//                    @Override
-//                    public Observable<Token> call(List<Token> tokens) {
-//                        return Observable.from(tokens);
-//                    }
-//                })
-//                .filter(new Func1<Token, Boolean>() {
-//                    @Override
-//                    public Boolean call(Token token) {
-////                        switch (mCurrentFiltering) {
-////                            case ACTIVE_TOKENS:
-////                                return token.isActive();
-////                            case COMPLETED_TOKENS:
-////                                return token.isCompleted();
-////                            case CANCELLED_TOKENS:
-////                                return token.isCancelled();
-////                            default:
-////                                return true;
-////                        }
-//
-//                        return !token.isCompleted();
-//                    }
-//                })
-//                .toList()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<Token>>() {
@@ -180,62 +156,6 @@ final class TokensPresenter implements TokensContract.Presenter {
         mSubscriptions.clear();
         Subscription subscription = mTokensRepository
                 .getSnaps(mService.getId(), mDate, false)
-//                .flatMap(new Func1<List<Token>, Observable<Token>>() {
-//                    @Override
-//                    public Observable<Token> call(List<Token> tokens) {
-//                        return Observable.from(tokens);
-//                    }
-//                })
-//                .toSortedList(new Func2<Token, Token, Integer>() {
-//                    @Override
-//                    public Integer call(Token token, Token token2) {
-//                        return new Long(token.getTokenNumber()).compareTo(token2.getTokenNumber());
-//                    }
-//                })
-//                .flatMap(new Func1<List<Token>, Observable<Token>>() {
-//                    @Override
-//                    public Observable<Token> call(List<Token> tokens) {
-//                        return Observable.from(tokens);
-//                    }
-//                })
-//                .filter(new Func1<Token, Boolean>() {
-//                    @Override
-//                    public Boolean call(Token token) {
-////                        switch (mCurrentFiltering) {
-////                            case ACTIVE_TOKENS:
-////                                return token.isActive();
-////                            case COMPLETED_TOKENS:
-////                                return token.isCompleted();
-////                            case CANCELLED_TOKENS:
-////                                return token.isCancelled();
-////                            default:
-////                                return true;
-////                        }
-//
-//                        return !token.isCompleted();
-//                    }
-//                })
-//                .toMultimap(new Func1<Token, Integer>() {
-//                    @Override
-//                    public Integer call(Token token) {
-//                        return token.getTimeRange();
-//                    }
-//                })
-//                .map(new Func1<Map<Integer, Collection<Token>>, List<Snap>>() {
-//                    @Override
-//                    public List<Snap> call(Map<Integer, Collection<Token>> integerCollectionMap) {
-//                        TreeMap<Integer, Collection<Token>> sortedMap = new TreeMap<>();
-//                        sortedMap.putAll(integerCollectionMap);
-//                        ArrayList<Snap> snaps = new ArrayList<>(sortedMap.size());
-//                        Iterator<Integer> keyIterator = sortedMap.keySet().iterator();
-//                        while (keyIterator.hasNext()) {
-//                            int key = keyIterator.next();
-//                            Snap snap = new Snap(key, new ArrayList<>(sortedMap.get(key)));
-//                            snaps.add(snap);
-//                        }
-//                        return snaps;
-//                    }
-//                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Snap>>() {
